@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 import install
-from conftest import make_steam_root
+from conftest import build_audio_zip, build_base_audio_zip, make_steam_root
 
 DEFAULT_OPTS = {
     "device": "steam_deck",
@@ -258,3 +258,40 @@ def test_uninstall_keeps_recovery_data_on_error(tmp_path, game_dir,
     # Recovery data kept for a retry.
     assert (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).is_file()
     assert any("could not be reverted" in n for n in notes)
+
+
+# -- incremental (partial) re-install must keep the earlier install's record --
+def test_incremental_install_merges_manifest(tmp_path):
+    """Install MGS3 Base, then later install ONLY the Update: the Base files
+    must remain in the manifest so uninstall removes everything (regression)."""
+    game_dir = tmp_path / "MGS3"
+    game_dir.mkdir()
+    manifest_path = game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME
+
+    # Run 1: Base only (many unique files like us/stage/clip0000.sdt).
+    base = build_base_audio_zip(tmp_path / "base.zip", n=30)
+    tx1 = install.InstallTxn(game_dir, "mgs3", _noop)
+    install.install_better_audio(
+        tx1, install.order_audio_components("mgs3", {"base": base}), _noop)
+    tx1.commit()
+    base_added = set(json.loads(manifest_path.read_text())["added"])
+    assert "us/stage/clip0000.sdt" in base_added
+
+    # Run 2: Update only — must NOT drop the Base files/mods from the manifest.
+    upd = build_audio_zip(tmp_path / "update.zip", {"us/patch/fix.sdt": b"p"})
+    tx2 = install.InstallTxn(game_dir, "mgs3", _noop)
+    install.install_better_audio(
+        tx2, install.order_audio_components("mgs3", {"update": upd}), _noop)
+    tx2.commit()
+    m2 = json.loads(manifest_path.read_text())
+    assert base_added <= set(m2["added"])                 # Base files carried over
+    assert "us/patch/fix.sdt" in m2["added"]              # Update file recorded
+    assert "Better Audio — Base 1.0" in m2["mods"]        # both mods present
+    assert "Better Audio — Update 2.0" in m2["mods"]
+
+    # Uninstall removes BOTH the Base and Update payloads — nothing orphaned.
+    notes, ok = install.uninstall_game(game_dir, _noop)
+    assert ok
+    assert not (game_dir / "us" / "stage" / "clip0000.sdt").exists()
+    assert not (game_dir / "us" / "patch" / "fix.sdt").exists()
+    assert not (game_dir / install.MODKIT_DIRNAME).exists()

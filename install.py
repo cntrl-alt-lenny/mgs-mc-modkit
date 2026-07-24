@@ -65,7 +65,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.5.0"
+MODKIT_VERSION = "1.6.0"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -754,20 +754,25 @@ def _rel_is_unsafe(rel: str) -> bool:
     return any(p in ("..",) for p in parts)
 
 
-def staged_files(archive: Path, staging: Path) -> list[str]:
+def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
     """Extract `archive` into `staging` and return the safe relative paths.
 
     Raises UnsafeArchiveError if the archive lists an absolute/`..` path, or if
     anything extracted is a symlink or otherwise not a plain file/dir. The
     caller moves the returned paths into place; nothing here touches the game.
+
+    If `on_progress` is given it's called with a 0.0–1.0 fraction as entries
+    are extracted (genuine per-file progress for multi-GB audio archives).
     """
     # 1. Pre-flight the listing — reject obviously hostile members up front.
     listing = subprocess.run(["bsdtar", "-tf", str(archive)],
                              capture_output=True, text=True, check=True)
+    total = 0
     for ln in listing.stdout.splitlines():
         name = ln.rstrip("\r")
         if not name:
             continue
+        total += 1
         if _rel_is_unsafe(name.rstrip("/")):
             raise UnsafeArchiveError(
                 f"Archive '{archive.name}' contains an unsafe path "
@@ -775,8 +780,25 @@ def staged_files(archive: Path, staging: Path) -> list[str]:
 
     # 2. Extract into the isolated staging dir.
     staging.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["bsdtar", "-xf", str(archive), "-C", str(staging)],
-                   check=True)
+    if on_progress and total:
+        # -v prints one line per extracted entry to stderr; count them for a
+        # real progress fraction.
+        proc = subprocess.Popen(
+            ["bsdtar", "-xvf", str(archive), "-C", str(staging)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+        done = 0
+        for line in proc.stderr:               # type: ignore[union-attr]
+            if line.strip():
+                done += 1
+                if done % 40 == 0:
+                    on_progress(min(0.99, done / total))
+        proc.wait()
+        if proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, "bsdtar")
+        on_progress(1.0)
+    else:
+        subprocess.run(["bsdtar", "-xf", str(archive), "-C", str(staging)],
+                       check=True)
 
     # 3. Walk what landed. Any symlink (dir or file) is a traversal risk once
     #    we copy through it, so reject the archive outright. os.walk does not
@@ -877,11 +899,15 @@ class InstallTxn:
         # and on a failed re-install its manifest/backups are left intact.
         self._had_prior = False
         self._prior_added: set[str] = set()
+        self._prior_added_list: list[str] = []   # ordered, for the merged manifest
+        self._prior_mods: dict[str, str] = {}
         prev = self.root / MANIFEST_NAME
         if prev.is_file():
             try:
                 data = json.loads(prev.read_text(encoding="utf-8"))
-                self._prior_added = set(data.get("added", []))
+                self._prior_added_list = list(data.get("added", []))
+                self._prior_added = set(self._prior_added_list)
+                self._prior_mods = dict(data.get("mods", {}))
                 # Carry prior backups forward: the REAL stock originals are
                 # already saved from the first run. On a re-install we must not
                 # re-back-up our own mod files over them (that would lose the
@@ -929,12 +955,12 @@ class InstallTxn:
             self._new_added.append(rel)
 
     # -- operations ------------------------------------------------------
-    def install_archive(self, archive: Path) -> list[str]:
+    def install_archive(self, archive: Path, on_progress=None) -> list[str]:
         """Stage-validate `archive`, then move its files into the game dir."""
         self.staging.mkdir(parents=True, exist_ok=True)
         stage = Path(tempfile.mkdtemp(prefix="stage_", dir=self.staging))
         try:
-            rels = staged_files(archive, stage)
+            rels = staged_files(archive, stage, on_progress=on_progress)
             for rel in rels:
                 if _rel_is_unsafe(rel):
                     raise UnsafeArchiveError(
@@ -965,13 +991,21 @@ class InstallTxn:
     def commit(self) -> None:
         self.staging.mkdir(parents=True, exist_ok=True)
         shutil.rmtree(self.staging, ignore_errors=True)
+        # Merge with the PREVIOUS install so the manifest is cumulative: a
+        # partial re-run (e.g. adding only MGS3 Update 2.0 later) must not drop
+        # the earlier install's files/mods from the record, or uninstall would
+        # orphan them. added is a de-duplicated union preserving order; mods
+        # carry forward with this run's entries overriding by key. (overwritten
+        # was already carried forward in __init__.)
+        merged_added = list(dict.fromkeys(self._prior_added_list + self.added))
+        merged_mods = {**self._prior_mods, **self.mods}
         manifest = {
             "modkit_version": MODKIT_VERSION,
             "game": self.game_key,
             "installed_utc": datetime.now(timezone.utc)
                 .replace(microsecond=0).isoformat(),
-            "mods": self.mods,
-            "added": self.added,
+            "mods": merged_mods,
+            "added": merged_added,
             "overwritten": self.overwritten,
         }
         self.root.mkdir(parents=True, exist_ok=True)
@@ -1052,20 +1086,29 @@ def install_hdfix(tx: InstallTxn, tmp: Path, log) -> None:
     log("    ✓ winhttp.dll + wininet.dll + plugins/MGSHDFix.asi")
 
 
-def install_better_audio(tx: InstallTxn, components: list[dict], log) -> None:
+def install_better_audio(tx: InstallTxn, components: list[dict], log,
+                         report=None) -> None:
     """Install ordered Better Audio components, each logged + recorded by name.
 
     `components` is the ordered output of order_audio_components(): base first,
-    optional HQ Ending next, and the required Update LAST.
+    optional HQ Ending next, then the Update last. If `report` is given it's
+    called as report(status_label, fraction 0..1) with genuine per-file
+    extraction progress across all components.
     """
-    for comp in components:
+    n = len(components)
+    for j, comp in enumerate(components):
         archive = Path(comp["path"])
         gb = archive.stat().st_size / 1024 ** 3
         log(f"  Installing {comp['log']} from {archive.name} "
             f"({gb:.2f} GB) …")
+
+        op = None
+        if report is not None:
+            def op(frac, status=comp["status"], j=j):
+                report(status, (j + frac) / n)     # this component's slice
         # install_archive stage-validates paths (no traversal/symlinks) and
         # moves every file into place, tracking it for rollback/uninstall.
-        rels = tx.install_archive(archive)
+        rels = tx.install_archive(archive, on_progress=op)
         # Verify the payload actually landed — every file entry must exist.
         missing = [e for e in rels if not (tx.game_dir / e).is_file()]
         if missing:
@@ -1509,11 +1552,18 @@ def validate_audio_for_role(path: Path, game_key: str,
     """Classify a file against the role it's being selected for.
 
     Returns (verdict, message). verdict is one of:
-      ok          — matches (or MGS2's single role); use it silently
-      not_audio   — not an MGS audio archive at all
-      wrong_game  — Nexus mod-id is for the other game
-      mismatch    — confidently looks like a DIFFERENT MGS3 component
-      ambiguous   — MGS3 audio, but the exact component can't be confirmed
+      ok               — confidently matches; use it silently
+      not_audio        — not an MGS audio archive at all  (REJECT outright)
+      wrong_game       — Nexus mod-id is for the other game  (REJECT outright)
+      missing_identity — audio, but no Nexus mod-id to confirm the GAME; a
+                         renamed file can't be size-guessed into a silent pass
+      mismatch         — confidently looks like a DIFFERENT MGS3 component
+      ambiguous        — right game, but the exact MGS3 component can't be proven
+
+    not_audio and wrong_game are hard rejects. Everything else short of a
+    confident match needs the user to confirm — a file without a verifiable
+    game identity is never accepted silently, even if its size/shape happens
+    to resemble a component.
     """
     prof = audio_archive_profile(path)
     if prof is None or not prof["is_audio"]:
@@ -1521,10 +1571,17 @@ def validate_audio_for_role(path: Path, game_key: str,
                              "folder or .sdt/.sdx/.xxs files inside")
     exp_modid = AUDIO_MODID[game_key]
     if prof["modid"] is not None and prof["modid"] != exp_modid:
-        return "wrong_game", (f"looks like NexusMods mod #{prof['modid']}, but "
-                              f"this game's Better Audio is mod #{exp_modid}")
+        return "wrong_game", (f"is NexusMods mod #{prof['modid']}, but this "
+                              f"game's Better Audio is mod #{exp_modid}")
+    if prof["modid"] is None:
+        # Renamed file: we can't prove which GAME it's for. Never silently
+        # accept it (a renamed MGS2 base could otherwise pass as an MGS3 base
+        # purely on size/file-count) — require an explicit confirmation.
+        return "missing_identity", (f"has no NexusMods mod-id in its name, so "
+                                    f"it can't be confirmed as {game_key.upper()} "
+                                    "audio")
     if game_key == "mgs2":
-        return "ok", "ok"          # MGS2 has a single component
+        return "ok", "ok"          # right game, single component
     guess, confident = classify_mgs3_role(prof)
     if confident and guess == role:
         return "ok", "ok"
@@ -1635,7 +1692,12 @@ def request_audio_archive(ui: UI, game_key: str, role: str,
         if verdict == "ok":
             return p
         if verdict in ("not_audio", "wrong_game"):
-            if ui.yesno(f"{p.name}\n{msg}.\n\nUse it anyway?"):
+            # Hard reject — no "use it anyway". Back to the menu for another file.
+            ui.info(f"{p.name}\n{msg}.\n\nRejected — pick a different file.")
+            continue
+        if verdict == "missing_identity":
+            if ui.yesno(f"{p.name}\n{msg}.\n\n"
+                        f"Use it as {rspec['status']} anyway?"):
                 return p
             continue
         if verdict == "mismatch":
@@ -2087,9 +2149,14 @@ def main() -> int:
                         stage("Extracting MGSHDFix", 0.2)
                         install_hdfix(tx, tmp, log)              # 1
                         if key in audio_archives:                # 2
-                            stage("Extracting Better Audio (large — please "
-                                  "wait)", 0.45)
-                            install_better_audio(tx, audio_archives[key], log)
+                            def audio_report(status, frac, short=g["short"],
+                                             idx=i):
+                                # Map audio extraction onto 0.30–0.65 of slice.
+                                prog.update(
+                                    f"{short} — Extracting {status} audio",
+                                    (idx + 0.30 + 0.35 * frac) / total * 100)
+                            install_better_audio(tx, audio_archives[key], log,
+                                                 report=audio_report)
                         stage("Extracting Bugfix Compilation", 0.7)
                         install_bugfix(tx, g, tmp, log)          # 3
                         stage("Writing config + launcher options", 0.85)

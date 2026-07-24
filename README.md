@@ -124,8 +124,8 @@ reversible.</sub>
 (needs `bsdtar`). Bumping a mod version? `python3 tools/refresh_checksums.py`
 prints the new hashes.</sub>
 
-<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.5.0`**.
-To cut a release, push a matching tag (`git tag v1.5.0 && git push --tags`) —
+<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.6.0`**.
+To cut a release, push a matching tag (`git tag v1.6.0 && git push --tags`) —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's baked-in tag/hash doesn't match `install.py`**, then publishes
 `install.py` + a `SHA256SUMS` file. After editing `install.py`, update the
@@ -236,11 +236,13 @@ limit).
    lets you point at the archive. It remembers the last folder and accepts
    files from **anywhere** (Downloads, Google Drive, external storage, a
    renamed copy).
-3. Files are validated by **content**, and the installer tries to confirm each
-   MGS3 archive's role (Base / Update / HQ) from its structure. When it can't
-   prove the exact component it asks you to confirm rather than guessing, flags
-   a likely wrong component or wrong game, and rejects the same file picked
-   twice.
+3. Files are validated by **content**. Archives that aren't MGS audio, or whose
+   Nexus mod-id is for the *other* game, are **rejected outright**. A renamed
+   file with no mod-id (so its game can't be verified) needs an explicit
+   confirmation — it's never accepted on size/shape alone. The installer also
+   tries to confirm each MGS3 archive's role (Base / Update / HQ) from its
+   structure, asks you to confirm when it can't prove the component, flags a
+   likely wrong one, and rejects the same file picked for two roles.
 4. When several MGS3 components are chosen, install order is enforced —
    base → HQ Ending → **Update last** — and the confirmation screen plus the
    logs name each component (and its filename) explicitly.
@@ -251,9 +253,11 @@ limit).
 
 Opening Nexus is always a button, never the default — the installer won't
 nag you to open it after you've declined. Extraction runs inside a **progress
-window** (Preparing → Extracting → Verifying → Complete), it verifies every
-audio file landed on disk, and it records each component separately in the
-manifest.
+window** with **genuine per-file progress** for the multi-GB archives
+(Preparing → Extracting → Verifying → Complete), it verifies every audio file
+landed on disk, and it records each component separately in the manifest. A
+later partial re-run (say, adding just Update 2.0) is merged into the existing
+record, so uninstall always removes the complete set.
 
 The optional MGS3 *HQ Ending Cutscenes* archive has one quirk, per its
 author: the final two cutscenes **pause at the end and need a button press
