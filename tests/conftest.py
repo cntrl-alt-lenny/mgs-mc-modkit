@@ -131,3 +131,68 @@ def make_steam_root(tmp_path: Path, account_id: str = "12345678") -> Path:
     root = tmp_path / "steam"
     (root / "userdata" / account_id).mkdir(parents=True)
     return root
+
+
+# ---------------------------------------------------------------------------
+# Better Audio archive fixtures + a scripted fake UI
+# ---------------------------------------------------------------------------
+# probe_audio_archive() accepts an archive if it contains a us/ folder or any
+# .sdt/.sdx/.xxs file — mimic that real payload shape.
+AUDIO_PAYLOAD = {
+    "us/stage/demo.sdt": b"audio-data",
+    "us/sound/vox.sdx": b"audio-data",
+}
+
+
+def build_audio_zip(path: Path, extra: dict[str, bytes] | None = None) -> Path:
+    files = dict(AUDIO_PAYLOAD)
+    if extra:
+        files.update(extra)
+    return build_zip(path, files)
+
+
+class FakeUI:
+    """Scripts UI responses so the interactive flows can be unit-tested.
+
+    Each queue is consumed in order; popping an empty queue raises IndexError,
+    which is a useful signal that the flow asked for more input than expected.
+    """
+    kind = "term"
+
+    def __init__(self, *, menu=None, checklist=None, yesno=None,
+                 files=None, dirs=None):
+        self._menu = list(menu or [])
+        self._checklist = list(checklist or [])
+        self._yesno = list(yesno or [])
+        self._files = list(files or [])
+        self._dirs = list(dirs or [])
+        self.last_dir = Path.home()
+        self.infos: list = []
+        self.errors: list = []
+
+    def menu(self, *a, **k):
+        return self._menu.pop(0)
+
+    def checklist(self, *a, **k):
+        return self._checklist.pop(0)
+
+    def yesno(self, *a, **k):
+        return self._yesno.pop(0)
+
+    def pick_archive_file(self, *a, **k):
+        v = self._files.pop(0)
+        if v:
+            self.last_dir = Path(v).parent
+        return v
+
+    def pick_file(self, *a, **k):
+        return self._files.pop(0)
+
+    def pick_dir(self, *a, **k):
+        return self._dirs.pop(0)
+
+    def info(self, *a, **k):
+        self.infos.append(a)
+
+    def error(self, *a, **k):
+        self.errors.append(a)

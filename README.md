@@ -50,11 +50,10 @@ Download <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</c
 <sub>🔒 The shortcut downloads <code>install.py</code> from a <b>pinned GitHub release</b> and verifies its SHA-256 before running it — never an unchecked live script.</sub>
 </td></tr>
 <tr><td align="center"><h3>2</h3></td><td>
-<i>(Recommended)</i> Grab the <b>Better Audio Mod</b> for each game — just leave
-the files in <code>Downloads</code>, the installer finds them by itself:<br><br>
+<i>(Recommended)</i> Grab the <b>Better Audio Mod</b> for each game from NexusMods (free login). You'll pick the files in the installer — Downloads, Google Drive, external storage, wherever — renamed is fine:<br><br>
 🔊 <a href="https://www.nexusmods.com/metalgearsolid2mc/mods/3"><b>MGS2 Better Audio</b></a> — one file: <i>Full Version</i> (v2.0)<br>
-🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3 Better Audio</b></a> — <b>two</b> files: the main mod (v1.0 — that's current!) <b>and</b> <i>Update 2.0</i> (~25 MB)
-<br><br><sub>Free Nexus login required. The installer checks what you have and warns about anything missing. Skip this step and it will open the pages for you instead.</sub>
+🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3 Better Audio</b></a> — <b>two</b> files: the main mod (v1.0 — that's current!) <b>and</b> the required <i>Update 2.0</i> (~25 MB). Optional: <i>HQ Ending Cutscenes</i>.
+<br><br><sub>The installer shows one checklist of the components for your games, then asks you to point at each archive (with an "Open Nexus page" button if you still need it). MGS3 is only ever installed as a <b>complete</b> set — base <b>+</b> Update 2.0.</sub>
 </td></tr>
 <tr><td align="center"><h3>3</h3></td><td>
 <b>Double-click the installer.</b> Answer a few questions. Done.
@@ -64,6 +63,7 @@ In Steam, for <b>each</b> game → <i>Properties → Launch Options</i>, paste
 <b>its</b> line:<br><br>
 <b>MGS2 & MGS3:</b> <code>WINEDLLOVERRIDES="wininet,winhttp=n,b" %command%</code><br>
 <b>MGS1:</b> <code>WINEDLLOVERRIDES="dinput8=n,b;d3d11=n,b" %command%</code>
+<br><br><sub>The installer offers to save these to <b><code>MGS Steam Launch Options.txt</code></b> on your Desktop, so you can copy-paste them without switching back here.</sub>
 </td></tr>
 </table>
 
@@ -124,8 +124,8 @@ reversible.</sub>
 (needs `bsdtar`). Bumping a mod version? `python3 tools/refresh_checksums.py`
 prints the new hashes.</sub>
 
-<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.3.0`**.
-To cut a release, push a matching tag (`git tag v1.3.0 && git push --tags`) —
+<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.4.0`**.
+To cut a release, push a matching tag (`git tag v1.4.0 && git push --tags`) —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's baked-in tag/hash doesn't match `install.py`**, then publishes
 `install.py` + a `SHA256SUMS` file. After editing `install.py`, update the
@@ -223,30 +223,37 @@ limit).
 
 - **MGS2** — one archive: *Full Version* (v2.0).
 - **MGS3** — **two** archives: the main mod (v1.0 — that *is* the current
-  main file) **plus** the small *Update 2.0* (~25 MB). An optional
+  main file) **plus** the required *Update 2.0* (~25 MB). An optional
   *HQ Ending Cutscenes* archive (~178 MB, higher-bitrate ending audio) also
-  exists; the installer offers it if found.
+  exists.
 
-The installer reads the version and mod-id baked into every Nexus download
-filename, so it matches even generically-named files like
-`Update 2.0-4-2-0-….zip`, validates each archive's contents before
-installing, layers them in the right order, and warns if MGS3's update is
-missing.
+**How selection works (redesigned after real Steam Deck testing):**
+
+1. One **checklist** shows only the audio components for the games you chose —
+   MGS2 Better Audio, MGS3 Better Audio, MGS3 HQ Ending Cutscenes.
+2. For each, a **Select file / Open Nexus page / Skip** dialog lets you point
+   at the archive. It remembers the last folder, so picking several in a row
+   is quick, and it accepts files from **anywhere** (Downloads, Google Drive,
+   external storage, a renamed copy — contents are validated, not filenames).
+3. **MGS3 is only ever installed as a complete set.** If you provide the base
+   but not *Update 2.0*, the installer stops and lets you select the update,
+   open Nexus, or drop MGS3 audio — it never silently installs a partial set.
+4. Install order is enforced — base → HQ Ending (if chosen) → **Update last** —
+   and the confirmation screen plus the logs name each component explicitly.
 
 🔊 **[MGS2 Better Audio Mod](https://www.nexusmods.com/metalgearsolid2mc/mods/3)**
 &nbsp;·&nbsp;
 🔊 **[MGS3 Better Audio Mod](https://www.nexusmods.com/metalgearsolid3mc/mods/4)**
 
-The installer makes the rest painless: if the archives are already on your
-machine it finds them automatically — Downloads, Desktop, Documents or home —
-and if they're missing it opens the right page for you, then picks the file
-up afterwards on its own. After extraction it verifies every audio file
-actually landed on disk.
+Opening Nexus is always a button, never the default — the installer won't
+nag you to open it after you've declined. After extraction it verifies every
+audio file actually landed on disk, and records each component separately in
+the manifest.
 
 The optional MGS3 *HQ Ending Cutscenes* archive has one quirk, per its
 author: the final two cutscenes **pause at the end and need a button press
-(A/X) to continue** — which is why the installer recommends skipping it for
-a first playthrough.
+(A/X) to continue** — which is why it defaults to **off** for a first
+playthrough.
 
 Skip it and re-run the kit later any time — it's entirely optional.
 
