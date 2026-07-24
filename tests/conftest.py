@@ -151,6 +151,12 @@ def build_audio_zip(path: Path, extra: dict[str, bytes] | None = None) -> Path:
     return build_zip(path, files)
 
 
+def build_base_audio_zip(path: Path, n: int = 160) -> Path:
+    """A 'base'-shaped archive: many files, so classify_mgs3_role sees a base."""
+    extra = {f"us/stage/clip{i:04d}.sdt": b"audio" for i in range(n)}
+    return build_audio_zip(path, extra)
+
+
 class FakeUI:
     """Scripts UI responses so the interactive flows can be unit-tested.
 

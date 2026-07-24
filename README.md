@@ -51,9 +51,9 @@ Download <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</c
 </td></tr>
 <tr><td align="center"><h3>2</h3></td><td>
 <i>(Recommended)</i> Grab the <b>Better Audio Mod</b> for each game from NexusMods (free login). You'll pick the files in the installer — Downloads, Google Drive, external storage, wherever — renamed is fine:<br><br>
-🔊 <a href="https://www.nexusmods.com/metalgearsolid2mc/mods/3"><b>MGS2 Better Audio</b></a> — one file: <i>Full Version</i> (v2.0)<br>
-🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3 Better Audio</b></a> — <b>two</b> files: the main mod (v1.0 — that's current!) <b>and</b> the required <i>Update 2.0</i> (~25 MB). Optional: <i>HQ Ending Cutscenes</i>.
-<br><br><sub>The installer shows one checklist of the components for your games, then asks you to point at each archive (with an "Open Nexus page" button if you still need it). MGS3 is only ever installed as a <b>complete</b> set — base <b>+</b> Update 2.0.</sub>
+🔊 <a href="https://www.nexusmods.com/metalgearsolid2mc/mods/3"><b>MGS2 Better Audio</b></a> — <i>Full Version</i> (v2.0)<br>
+🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3 Better Audio</b></a> — <i>Base</i> (v1.0), <i>Update 2.0</i> (~25 MB, recommended), and optional <i>HQ Ending Cutscenes</i>.
+<br><br><sub>The installer shows one checklist where <b>every component is independently selectable</b> — tick what you want (e.g. just Update 2.0 if you already have the base), then point at each file. An "Open Nexus page" button is there if you still need it.</sub>
 </td></tr>
 <tr><td align="center"><h3>3</h3></td><td>
 <b>Double-click the installer.</b> Answer a few questions. Done.
@@ -124,8 +124,8 @@ reversible.</sub>
 (needs `bsdtar`). Bumping a mod version? `python3 tools/refresh_checksums.py`
 prints the new hashes.</sub>
 
-<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.4.0`**.
-To cut a release, push a matching tag (`git tag v1.4.0 && git push --tags`) —
+<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.5.0`**.
+To cut a release, push a matching tag (`git tag v1.5.0 && git push --tags`) —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's baked-in tag/hash doesn't match `install.py`**, then publishes
 `install.py` + a `SHA256SUMS` file. After editing `install.py`, update the
@@ -219,43 +219,46 @@ permit it being mirrored** — that's the primary reason this kit will never
 host or auto-fetch it (the 2–3 GB files also exceed GitHub's 2 GB release
 limit).
 
-**What to download per game:**
+**The components (each independently selectable):**
 
-- **MGS2** — one archive: *Full Version* (v2.0).
-- **MGS3** — **two** archives: the main mod (v1.0 — that *is* the current
-  main file) **plus** the required *Update 2.0* (~25 MB). An optional
-  *HQ Ending Cutscenes* archive (~178 MB, higher-bitrate ending audio) also
-  exists.
+- **MGS2 Better Audio** — *Full Version* (v2.0).
+- **MGS3 Better Audio — Base** (v1.0).
+- **MGS3 Better Audio — Update 2.0** (~25 MB) — recommended patch, but
+  optional. You can install it **on its own** if you already have the base
+  from an earlier run.
+- **MGS3 HQ Ending Cutscenes** (~178 MB) — optional, **off by default**.
 
 **How selection works (redesigned after real Steam Deck testing):**
 
-1. One **checklist** shows only the audio components for the games you chose —
-   MGS2 Better Audio, MGS3 Better Audio, MGS3 HQ Ending Cutscenes.
-2. For each, a **Select file / Open Nexus page / Skip** dialog lets you point
-   at the archive. It remembers the last folder, so picking several in a row
-   is quick, and it accepts files from **anywhere** (Downloads, Google Drive,
-   external storage, a renamed copy — contents are validated, not filenames).
-3. **MGS3 is only ever installed as a complete set.** If you provide the base
-   but not *Update 2.0*, the installer stops and lets you select the update,
-   open Nexus, or drop MGS3 audio — it never silently installs a partial set.
-4. Install order is enforced — base → HQ Ending (if chosen) → **Update last** —
-   and the confirmation screen plus the logs name each component explicitly.
+1. One **checklist** lists exactly those components for the games you chose.
+   Tick any combination — nothing is forced, nothing blocks on anything else.
+2. For each ticked item, a **Select file / Open Nexus page / Skip** dialog
+   lets you point at the archive. It remembers the last folder and accepts
+   files from **anywhere** (Downloads, Google Drive, external storage, a
+   renamed copy).
+3. Files are validated by **content**, and the installer tries to confirm each
+   MGS3 archive's role (Base / Update / HQ) from its structure. When it can't
+   prove the exact component it asks you to confirm rather than guessing, flags
+   a likely wrong component or wrong game, and rejects the same file picked
+   twice.
+4. When several MGS3 components are chosen, install order is enforced —
+   base → HQ Ending → **Update last** — and the confirmation screen plus the
+   logs name each component (and its filename) explicitly.
 
 🔊 **[MGS2 Better Audio Mod](https://www.nexusmods.com/metalgearsolid2mc/mods/3)**
 &nbsp;·&nbsp;
 🔊 **[MGS3 Better Audio Mod](https://www.nexusmods.com/metalgearsolid3mc/mods/4)**
 
 Opening Nexus is always a button, never the default — the installer won't
-nag you to open it after you've declined. After extraction it verifies every
-audio file actually landed on disk, and records each component separately in
-the manifest.
+nag you to open it after you've declined. Extraction runs inside a **progress
+window** (Preparing → Extracting → Verifying → Complete), it verifies every
+audio file landed on disk, and it records each component separately in the
+manifest.
 
 The optional MGS3 *HQ Ending Cutscenes* archive has one quirk, per its
 author: the final two cutscenes **pause at the end and need a button press
 (A/X) to continue** — which is why it defaults to **off** for a first
 playthrough.
-
-Skip it and re-run the kit later any time — it's entirely optional.
 
 </details>
 

@@ -75,3 +75,26 @@ def test_desktop_fallback_cancelled_returns_none(monkeypatch):
     monkeypatch.setattr(install, "resolve_desktop_dir", lambda: None)
     ui = FakeUI(dirs=[None])                         # user cancels the folder pick
     assert install.save_launch_options_file(ui, ["mgs2"], lambda m: None) is None
+
+
+# -- progress window (term fallback is the tested path) ---------------------
+def test_progress_term_fallback_never_raises():
+    logs = []
+    p = install.Progress("term", "Installing", logs.append)
+    p.update("Preparing", 5)
+    p.update("Extracting", 40)
+    p.update("Verifying", 95)
+    p.update("Complete", 100)
+    p.close()
+    p.close()                                       # idempotent
+    assert any("Preparing" in m for m in logs)
+    assert any("100%" in m for m in logs)
+
+
+def test_progress_clamps_percent():
+    logs = []
+    p = install.Progress("term", "x", logs.append)
+    p.update("a", -20)
+    p.update("b", 250)
+    assert any("(0%)" in m for m in logs)
+    assert any("(100%)" in m for m in logs)

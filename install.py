@@ -65,7 +65,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.4.0"
+MODKIT_VERSION = "1.5.0"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -535,6 +535,94 @@ class UI:
         for tag, label in items:
             print(f"  {tag}) {label}")
         return input("Choice: ").strip() or None
+
+    def progress(self, title: str, log) -> "Progress":
+        return Progress(self.kind, title, log)
+
+
+# ---------------------------------------------------------------------------
+# Progress window shown during install/extraction.
+#
+# Best-effort GUI: a zenity --progress pipe when available (simple, reliable),
+# a kdialog --progressbar driven over D-Bus via qdbus when that's present, and
+# otherwise plain log lines — which are always emitted too and are visible in
+# the Konsole the shortcut opens. Everything is defensive: a progress failure
+# can NEVER break or block the install, and close() always tears the dialog
+# down (with a kill fallback) so nothing is left hanging.
+# ---------------------------------------------------------------------------
+class Progress:
+    def __init__(self, kind: str, title: str, log) -> None:
+        self.title = title
+        self.log = log
+        self._proc = None
+        self._backend = "term"
+        self._dbus = None           # (service, path) for kdialog
+        self._qdbus = None
+        if kind == "zenity" and shutil.which("zenity"):
+            try:
+                self._proc = subprocess.Popen(
+                    ["zenity", "--progress", "--title", title, "--width", "460",
+                     "--auto-close", "--no-cancel", "--percentage", "0"],
+                    stdin=subprocess.PIPE, text=True)
+                self._backend = "zenity"
+            except OSError:
+                self._proc = None
+        elif kind == "kdialog" and shutil.which("kdialog"):
+            self._qdbus = (shutil.which("qdbus") or shutil.which("qdbus6")
+                           or shutil.which("qdbus-qt5"))
+            if self._qdbus:
+                try:
+                    r = subprocess.run(
+                        ["kdialog", "--title", title, "--progressbar", title,
+                         "100"], capture_output=True, text=True, timeout=10)
+                    parts = r.stdout.split()
+                    if r.returncode == 0 and len(parts) == 2:
+                        self._dbus = (parts[0], parts[1])
+                        self._backend = "kdialog"
+                except (OSError, subprocess.SubprocessError):
+                    self._dbus = None
+
+    def _qdbus_call(self, *args) -> None:
+        if not (self._qdbus and self._dbus):
+            return
+        try:
+            subprocess.run([self._qdbus, self._dbus[0], self._dbus[1], *args],
+                           capture_output=True, timeout=5)
+        except (OSError, subprocess.SubprocessError):
+            self._backend = "term"      # stop trying if D-Bus misbehaves
+
+    def update(self, label: str, pct: float) -> None:
+        pct = max(0, min(100, int(pct)))
+        self.log(f"  … {label}  ({pct}%)")
+        if self._backend == "zenity" and self._proc and self._proc.stdin:
+            try:
+                self._proc.stdin.write(f"{pct}\n# {label}\n")
+                self._proc.stdin.flush()
+            except (OSError, ValueError):
+                self._backend = "term"
+                self._proc = None
+        elif self._backend == "kdialog":
+            self._qdbus_call("org.freedesktop.DBus.Properties.Set",
+                             "org.kde.kdialog.ProgressDialog", "value", str(pct))
+            self._qdbus_call("setLabelText", label)
+
+    def close(self) -> None:
+        if self._backend == "kdialog":
+            self._qdbus_call("close")
+        if self._proc:
+            try:
+                if self._proc.stdin:
+                    self._proc.stdin.write("100\n")
+                    self._proc.stdin.close()
+            except (OSError, ValueError):
+                pass
+            try:
+                self._proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self._proc.kill()
+            except OSError:
+                pass
+        self._proc = None
 
 
 # ---------------------------------------------------------------------------
@@ -1268,51 +1356,65 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
 
 
 # ---------------------------------------------------------------------------
-# Better Audio Mod — explicit component model.
+# Better Audio Mod — independent component model.
 #
-# Real Steam Deck testing showed that auto-detecting "the audio archive" could
-# silently install the wrong or incomplete set (e.g. MGS3's main v1.0 without
-# its REQUIRED Update 2.0). So the flow is now explicit and testable:
-#   1. one checklist of the components relevant to the selected games,
-#   2. a Select / Open-Nexus / Skip picker per required archive (remembers the
-#      last folder; accepts files from anywhere, under any name),
-#   3. MGS3 is only ever installed as a COMPLETE set (base + Update 2.0),
-#   4. the optional HQ Ending is ALWAYS offered, never auto-detected.
+# Every audio component is its own checklist item and is installed independently
+# (real Steam Deck use showed Update 2.0 shouldn't be forced — you might already
+# have the base from an earlier run and just want the patch). Nothing blocks on
+# another component being present.
 #
-# Enforced install order per game — base, then HQ Ending (if chosen), then the
-# Update LAST — is defined by AUDIO_SPECS[game]["order"].
+# When several MGS3 components ARE chosen, install order is fixed:
+#     base  →  HQ Ending  →  Update 2.0 (last)
+# defined by AUDIO_SPECS[game]["order"].
+#
+# The archives live on NexusMods (login-gated, no mirroring), so they can't be
+# inspected here to hard-code exact per-file signatures. Role identification
+# (classify_mgs3_role) therefore uses structural evidence — archive file count,
+# size, and the version/mod-id parsed from the Nexus filename — and only claims
+# a confident match when signals agree; otherwise the user confirms explicitly.
 # ---------------------------------------------------------------------------
 AUDIO_MODID = {"mgs2": 3, "mgs3": 4}
 
-HQ_ENDING_WARNING = (
-    "Optional higher-quality audio for the final two cutscenes. The mod "
-    "author notes that these cutscenes may pause at the end and require a "
-    "button press to continue. Recommended default for a first playthrough: "
-    "off.")
+HQ_ENDING_DISCLAIMER = (
+    "Higher-quality audio for the final two cutscenes. These scenes may pause "
+    "at the end and require a button press to continue.")
+
+UPDATE_NOTE = "Recommended patch for MGS3 Better Audio, but optional here."
 
 AUDIO_SPECS = {
     "mgs2": {
         "order": ["base"],
-        "required": ["base"],
         "roles": {
-            "base": {"label": "MGS2 Better Audio — Full Version 2.0",
-                     "log": "MGS2 AUDIO BASE 2.0", "status": "Base 2.0"},
+            "base": {"status": "Base 2.0", "log": "MGS2 AUDIO BASE 2.0",
+                     "checklist": "MGS2 Better Audio — Full Version 2.0",
+                     "default": True},
         },
     },
     "mgs3": {
-        "order": ["base", "hq", "update"],   # Update ALWAYS installed last
-        "required": ["base", "update"],
+        "order": ["base", "hq", "update"],       # HQ before Update; Update last
         "roles": {
-            "base": {"label": "MGS3 Better Audio — main archive v1.0",
-                     "log": "MGS3 AUDIO BASE 1.0", "status": "Base 1.0"},
-            "hq": {"label": "MGS3 HQ Ending Cutscenes (optional)",
-                   "log": "MGS3 HQ ENDING — OPTIONAL", "status": "HQ Ending"},
-            "update": {"label": "MGS3 Better Audio — Update 2.0 (required)",
-                       "log": "MGS3 UPDATE 2.0 — REQUIRED",
-                       "status": "Required Update 2.0"},
+            "base": {"status": "Base 1.0", "log": "MGS3 AUDIO BASE 1.0",
+                     "checklist": "MGS3 Better Audio — Base 1.0",
+                     "default": True},
+            "hq": {"status": "HQ Ending", "log": "MGS3 HQ ENDING — OPTIONAL",
+                   "checklist": "MGS3 HQ Ending Cutscenes",
+                   "default": False, "note": HQ_ENDING_DISCLAIMER},
+            "update": {"status": "Update 2.0",
+                       "log": "MGS3 UPDATE 2.0 — OPTIONAL PATCH",
+                       "checklist": "MGS3 Better Audio — Update 2.0",
+                       "default": True, "note": UPDATE_NOTE},
         },
     },
 }
+
+# Structural bands used as evidence for classify_mgs3_role(). These are
+# deliberately loose — real archives are login-gated and can't be inspected
+# here, so ambiguous cases fall through to explicit user confirmation rather
+# than a false confident match.
+AUDIO_BASE_MIN_BYTES = 1_000 * 1024 * 1024   # base is multi-GB
+AUDIO_BASE_MIN_FILES = 150                    # base is a full replacement
+AUDIO_SMALL_MAX_BYTES = 60 * 1024 * 1024      # update patch is tiny
+AUDIO_SMALL_MAX_FILES = 40
 
 
 def audio_version(path: Path) -> tuple[int, int] | None:
@@ -1349,26 +1451,87 @@ def open_url(url: str) -> bool:
         return False
 
 
-# -- pure helpers (unit-tested) ---------------------------------------------
-def validate_audio_archive(path: Path,
-                           expect_modid: int | None = None) -> tuple[bool, str]:
-    """Content-validate a Better Audio archive.
+# -- role identification (unit-tested) --------------------------------------
+def audio_archive_profile(path: Path) -> dict | None:
+    """Structural profile of an archive, or None if unreadable/not an archive."""
+    p = subprocess.run(["bsdtar", "-tf", str(path)],
+                       capture_output=True, text=True)
+    if p.returncode != 0:
+        return None
+    entries = [ln for ln in p.stdout.splitlines() if ln and not ln.endswith("/")]
+    names = "\n".join(entries).lower()
+    return {
+        "file_count": len(entries),
+        "size": path.stat().st_size if path.is_file() else 0,
+        "is_audio": ("us/" in names or ".sdt" in names or ".sdx" in names
+                     or ".xxs" in names),
+        "modid": audio_modid(path),
+        "version": audio_version(path),
+        "name": path.name.lower(),
+    }
 
-    Payload contents are the primary check (so a renamed file still passes);
-    the Nexus mod-id parsed from the filename is only corroborating evidence,
-    used to flag an archive that looks like it's for a DIFFERENT game.
+
+def classify_mgs3_role(profile: dict) -> tuple[str | None, bool]:
+    """Best-guess (role, confident) for an MGS3 audio archive from evidence.
+
+    Primary signal is content scale (file count); the Nexus version and a
+    name hint corroborate; size is weak support. confident=True only when the
+    signals agree — ambiguous archives return confident=False so the caller
+    asks the user to confirm rather than guessing silently. (Exact per-file
+    signatures aren't hard-coded: the login-gated archives can't be inspected
+    here, and a wrong guess would reject a valid file.)
     """
-    if not path.is_file():
-        return False, "file not found"
-    if not probe_audio_archive(path):
-        return False, ("doesn't look like an MGS audio mod archive — no us/ "
-                       "folder or .sdt/.sdx/.xxs files inside")
-    mid = audio_modid(path)
-    if expect_modid is not None and mid is not None and mid != expect_modid:
-        return False, (f"looks like NexusMods mod #{mid}, but this game's "
-                       f"Better Audio is mod #{expect_modid} — probably the "
-                       "wrong game")
-    return True, "ok"
+    n = profile["file_count"]
+    size = profile["size"]
+    ver = profile["version"]
+    name = profile.get("name", "")
+
+    # Base: a full replacement — many files and/or multi-GB.
+    if n >= AUDIO_BASE_MIN_FILES or size >= AUDIO_BASE_MIN_BYTES:
+        return "base", True
+    # HQ Ending: the filename says so (supporting evidence when present).
+    if "ending" in name or "cutscene" in name:
+        return "hq", True
+    # Update: a small patch tagged v2.x on Nexus.
+    if ver is not None and ver[0] >= 2:
+        return "update", True
+    # Medium-sized, not tagged v2 — most likely the HQ Ending pack.
+    if AUDIO_SMALL_MAX_BYTES < size < AUDIO_BASE_MIN_BYTES:
+        return "hq", True
+    if n <= AUDIO_SMALL_MAX_FILES and size <= AUDIO_SMALL_MAX_BYTES:
+        # Tiny with no distinguishing tag — probably the update, low confidence.
+        return "update", False
+    return None, False
+
+
+def validate_audio_for_role(path: Path, game_key: str,
+                            role: str) -> tuple[str, str]:
+    """Classify a file against the role it's being selected for.
+
+    Returns (verdict, message). verdict is one of:
+      ok          — matches (or MGS2's single role); use it silently
+      not_audio   — not an MGS audio archive at all
+      wrong_game  — Nexus mod-id is for the other game
+      mismatch    — confidently looks like a DIFFERENT MGS3 component
+      ambiguous   — MGS3 audio, but the exact component can't be confirmed
+    """
+    prof = audio_archive_profile(path)
+    if prof is None or not prof["is_audio"]:
+        return "not_audio", ("doesn't look like an MGS audio archive — no us/ "
+                             "folder or .sdt/.sdx/.xxs files inside")
+    exp_modid = AUDIO_MODID[game_key]
+    if prof["modid"] is not None and prof["modid"] != exp_modid:
+        return "wrong_game", (f"looks like NexusMods mod #{prof['modid']}, but "
+                              f"this game's Better Audio is mod #{exp_modid}")
+    if game_key == "mgs2":
+        return "ok", "ok"          # MGS2 has a single component
+    guess, confident = classify_mgs3_role(prof)
+    if confident and guess == role:
+        return "ok", "ok"
+    if confident and guess is not None and guess != role:
+        other = AUDIO_SPECS["mgs3"]["roles"][guess]["status"]
+        return "mismatch", f"looks like MGS3 {other}"
+    return "ambiguous", "an MGS3 audio archive, but the exact component"
 
 
 def order_audio_components(game_key: str, provided: dict) -> list[dict]:
@@ -1379,160 +1542,145 @@ def order_audio_components(game_key: str, provided: dict) -> list[dict]:
         p = provided.get(role)
         if p is not None:
             r = spec["roles"][role]
-            out.append({"game": game_key, "role": role, "label": r["label"],
-                        "log": r["log"], "status": r["status"],
-                        "path": p, "filename": Path(p).name})
+            out.append({"game": game_key, "role": role, "log": r["log"],
+                        "status": r["status"], "path": p,
+                        "filename": Path(p).name})
     return out
 
 
-def audio_selection_complete(game_key: str,
-                             provided: dict) -> tuple[bool, list[str]]:
-    """(complete, missing_status_labels) — a game's REQUIRED roles all present?"""
-    spec = AUDIO_SPECS[game_key]
-    missing = [spec["roles"][r]["status"] for r in spec["required"]
-               if provided.get(r) is None]
-    return (not missing), missing
-
-
 def build_audio_checklist(hdfix_keys) -> list[tuple[str, str, bool]]:
-    """Checklist of ONLY the audio components relevant to the chosen games."""
+    """Checklist of the audio components for the chosen games.
+
+    Every component is its own independently-selectable item.
+    """
     items: list[tuple[str, str, bool]] = []
-    if "mgs2" in hdfix_keys:
-        items.append(("mgs2:base", "MGS2 Better Audio (Full Version 2.0)", True))
-    if "mgs3" in hdfix_keys:
-        items.append(("mgs3:base",
-                      "MGS3 Better Audio (main v1.0 + required Update 2.0)",
-                      True))
-        items.append(("mgs3:hq",
-                      "MGS3 HQ Ending Cutscenes — " + HQ_ENDING_WARNING, False))
+    order = [("mgs2", "base"), ("mgs3", "base"), ("mgs3", "update"),
+             ("mgs3", "hq")]
+    for game, role in order:
+        if game not in hdfix_keys:
+            continue
+        r = AUDIO_SPECS[game]["roles"][role]
+        label = r["checklist"]
+        if role == "update":
+            label += "  (recommended, optional)"
+        elif role == "hq":
+            label += "  — " + r["note"]
+        items.append((f"{game}:{role}", label, r["default"]))
     return items
 
 
 def audio_status_text(audio: dict) -> str:
-    """Per-game component status block for the confirmation screen."""
+    """Per-game component block (with chosen filenames) for the summary."""
     blocks = []
     for key in ("mgs2", "mgs3"):
         if key not in audio:
             continue
         spec = AUDIO_SPECS[key]
-        have = {c["role"] for c in audio[key]}
+        by_role = {c["role"]: c for c in audio[key]}
         lines = [f"{key.upper()} Better Audio"]
         for role in spec["order"]:
             st = spec["roles"][role]["status"]
-            lines.append(f"  {st}: "
-                         + ("selected" if role in have else "not selected"))
+            c = by_role.get(role)
+            lines.append(f"  {st}: " + (c["filename"] if c else "not selected"))
         blocks.append("\n".join(lines))
     return "\n\n".join(blocks)
 
 
-# -- interactive collection -------------------------------------------------
-def request_audio_archive(ui: UI, role_spec: dict, nexus_url: str,
-                          expect_modid: int) -> Path | None:
-    """Ask for ONE archive: Select a file / Open Nexus / Skip.
+def audio_recommendation_note(audio: dict) -> str:
+    """One concise note if MGS3 base is installed without the recommended patch."""
+    comps = audio.get("mgs3", [])
+    roles = {c["role"] for c in comps}
+    if "base" in roles and "update" not in roles:
+        return "Note: MGS3 Update 2.0 (recommended patch) was not selected."
+    return ""
 
-    Nexus is only ever opened when the user explicitly picks that action — it
-    is never the default and is never re-offered as a yes/no after a decline.
-    A file may live anywhere and be renamed; contents are validated.
+
+# -- interactive collection -------------------------------------------------
+def request_audio_archive(ui: UI, game_key: str, role: str,
+                          chosen: dict[str, tuple]) -> Path | None:
+    """Ask for ONE component's archive: Select file / Open Nexus / Skip.
+
+    `chosen` maps already-picked resolved-path -> (game, role) so the same file
+    can't be silently used for two components. Nexus is only opened when the
+    user explicitly asks; it's never the default or a repeated prompt.
     """
+    rspec = AUDIO_SPECS[game_key]["roles"][role]
+    nexus = GAMES[game_key]["audio_page"]
     while True:
         choice = ui.menu(
-            f"Better Audio — {role_spec['status']}",
-            f"{role_spec['label']}\n\nHow do you want to provide this file?",
-            [("select", "Select the archive file…"),
-             ("nexus", "Open the NexusMods page in a browser"),
-             ("skip", "Skip / not now")],
-        )
+            f"Audio file — {rspec['status']}",
+            f"Provide the {rspec['status']} archive:",
+            [("select", "Select a file…"),
+             ("nexus", "Open Nexus page"),
+             ("skip", "Skip this one")])
         if choice in (None, "skip"):
             return None
         if choice == "nexus":
-            if not open_url(nexus_url):
-                ui.info(f"Couldn't open a browser. Visit:\n{nexus_url}")
+            if not open_url(nexus):
+                ui.info(f"Open this page to download it:\n{nexus}")
             else:
-                ui.info("Download the file, then choose “Select the archive "
-                        "file…” back in this dialog.")
+                ui.info("Download it, then pick “Select a file…”.")
             continue
-        sel = ui.pick_archive_file(f"Select the {role_spec['status']} archive")
+        sel = ui.pick_archive_file(f"Select the {rspec['status']} archive")
         if not sel:
+            continue                     # cancel returns to this component's menu
+        p = Path(sel).resolve()
+        prior = chosen.get(str(p))
+        if prior is not None:
+            other = AUDIO_SPECS[prior[0]]["roles"][prior[1]]["status"]
+            ui.info(f"{p.name}\nis already selected for {other}. "
+                    "Pick a different file.")
             continue
-        p = Path(sel)
-        ok, reason = validate_audio_archive(p, expect_modid)
-        if ok:
+        verdict, msg = validate_audio_for_role(p, game_key, role)
+        if verdict == "ok":
             return p
-        if ui.yesno(f"WARNING: {p.name}\n{reason}\n\nUse it anyway?"):
+        if verdict in ("not_audio", "wrong_game"):
+            if ui.yesno(f"{p.name}\n{msg}.\n\nUse it anyway?"):
+                return p
+            continue
+        if verdict == "mismatch":
+            if ui.yesno(f"{p.name}\n{msg}, not {rspec['status']}.\n\n"
+                        f"Use it as {rspec['status']} anyway?"):
+                return p
+            continue
+        # ambiguous
+        if ui.yesno(f"This appears to be {msg} could not be confirmed.\n\n"
+                    f"Continue using it as {rspec['status']}?"):
             return p
         # otherwise loop back to the menu
 
 
 def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
-    """Drive the whole Better Audio selection; returns {game: [components]}.
+    """Drive Better Audio selection; returns {game: [ordered components]}.
 
-    Only COMPLETE sets are returned — MGS3 is never installed without its
-    required Update 2.0.
+    Every checked component is collected independently — no component blocks
+    on another. Only the files for CHECKED items are requested.
     """
     items = build_audio_checklist(hdfix_keys)
     if not items:
         return {}
     picked = ui.checklist(
-        "Better Audio Mod",
-        "The Better Audio Mod restores PS3-quality audio (and fixes an MGS2 "
-        "late-game cutscene crash). It's on NexusMods — a free login is "
-        "required and the author doesn't allow mirroring, so you provide the "
-        "files. Choose which to install:",
+        "Better Audio (optional)",
+        "Restores PS3-quality audio (and fixes an MGS2 cutscene crash). Files "
+        "come from NexusMods — tick what you want, then pick each file:",
         items)
     if not picked:            # cancelled or nothing ticked
         return {}
     picked = set(picked)
+    chosen: dict[str, tuple] = {}
     audio: dict[str, list[dict]] = {}
-
-    if "mgs2:base" in picked:
-        base = request_audio_archive(ui, AUDIO_SPECS["mgs2"]["roles"]["base"],
-                                     GAMES["mgs2"]["audio_page"],
-                                     AUDIO_MODID["mgs2"])
-        if base:
-            audio["mgs2"] = order_audio_components("mgs2", {"base": base})
-
-    if "mgs3:base" in picked:
-        nexus = GAMES["mgs3"]["audio_page"]
-        modid = AUDIO_MODID["mgs3"]
+    for game in ("mgs2", "mgs3"):
+        if game not in hdfix_keys:
+            continue
         provided: dict[str, Path] = {}
-        base = request_audio_archive(ui, AUDIO_SPECS["mgs3"]["roles"]["base"],
-                                     nexus, modid)
-        if base:
-            provided["base"] = base
-            # Optional HQ Ending — always offered when ticked, never detected.
-            if "mgs3:hq" in picked:
-                hq = request_audio_archive(ui, AUDIO_SPECS["mgs3"]["roles"]["hq"],
-                                           nexus, modid)
-                if hq:
-                    provided["hq"] = hq
-            # Required Update 2.0 — MGS3 audio is never installed without it.
-            update = request_audio_archive(
-                ui, AUDIO_SPECS["mgs3"]["roles"]["update"], nexus, modid)
-            while update is None:
-                choice = ui.menu(
-                    "MGS3 Update 2.0 is required",
-                    "MGS3 Better Audio is INCOMPLETE without its Update 2.0, "
-                    "so it won't be installed as a partial set. What now?",
-                    [("provide", "Select the Update 2.0 archive"),
-                     ("nexus", "Open the NexusMods page in a browser"),
-                     ("drop", "Skip MGS3 Better Audio entirely")])
-                if choice in (None, "drop"):
-                    provided.clear()
-                    break
-                if choice == "nexus":
-                    if not open_url(nexus):
-                        ui.info(f"Couldn't open a browser. Visit:\n{nexus}")
-                    else:
-                        ui.info("Download Update 2.0, then choose “Select the "
-                                "Update 2.0 archive”.")
-                    continue
-                update = request_audio_archive(
-                    ui, AUDIO_SPECS["mgs3"]["roles"]["update"], nexus, modid)
-            if update is not None:
-                provided["update"] = update
-            complete, _ = audio_selection_complete("mgs3", provided)
-            if complete:
-                audio["mgs3"] = order_audio_components("mgs3", provided)
+        for role in AUDIO_SPECS[game]["order"]:     # base, hq, update
+            if f"{game}:{role}" in picked:
+                p = request_audio_archive(ui, game, role, chosen)
+                if p is not None:
+                    provided[role] = p
+                    chosen[str(p)] = (game, role)
+        if provided:
+            audio[game] = order_audio_components(game, provided)
     return audio
 
 
@@ -1889,6 +2037,9 @@ def main() -> int:
     audio_block = audio_status_text(audio_archives)
     if audio_block:
         summary += "Better Audio components:\n" + audio_block + "\n\n"
+        note = audio_recommendation_note(audio_archives)
+        if note:
+            summary += note + "\n\n"
     elif hdfix_sel:
         summary += "Better Audio: skipped\n\n"
     if not ui.yesno(
@@ -1901,34 +2052,52 @@ def main() -> int:
     # Each game is installed in its own transaction: on any failure that game
     # is rolled back to exactly how it was found (added files removed, backed-up
     # originals restored), so no half-modified install is left behind. Games
-    # already committed before the failure stay installed.
+    # already committed before the failure stay installed. A progress window
+    # tracks the currently-installing game/component and its stage.
+    prog = ui.progress("Installing MGS mods", log)
+    total = len(found)
     try:
         with tempfile.TemporaryDirectory(prefix="mgskit_") as td:
             tmp = Path(td)
-            for key in found:
+            for i, key in enumerate(found):
                 g, (game_dir, sroot) = GAMES[key], found[key]
                 log(f"\n=== {g['name']} ===")
+
+                def stage(text: str, frac: float, short=g["short"], idx=i):
+                    # Map an in-game 0..1 fraction onto this game's slice.
+                    prog.update(f"{short} — {text}", (idx + frac) / total * 100)
+
                 tx = InstallTxn(game_dir, key, log)
                 try:
+                    stage("Preparing", 0.05)
                     if g.get("kind", "hdfix") == "m2fix":
+                        stage("Extracting MGSM2Fix", 0.4)
                         install_m2fix(tx, tmp, opts, log)
+                        stage("Verifying", 0.9)
                     else:
                         # Pre-download every networked archive BEFORE touching
                         # the game, so a download failure can't strike after the
                         # large, un-backed-up Better Audio files are overwritten.
-                        log("  Downloading mods (verifying checksums) …")
+                        stage("Downloading mods (verifying checksums)", 0.1)
                         fetch(HDFIX_URL, tmp / f"MGSHDFix_{HDFIX_VERSION}.zip",
                               log, sha256=HDFIX_SHA256)
                         fetch(g["bugfix_url"],
                               tmp / f"{g['short']}_bugfix_base.zip",
                               log, sha256=g.get("bugfix_sha256"))
+                        stage("Extracting MGSHDFix", 0.2)
                         install_hdfix(tx, tmp, log)              # 1
                         if key in audio_archives:                # 2
+                            stage("Extracting Better Audio (large — please "
+                                  "wait)", 0.45)
                             install_better_audio(tx, audio_archives[key], log)
+                        stage("Extracting Bugfix Compilation", 0.7)
                         install_bugfix(tx, g, tmp, log)          # 3
+                        stage("Writing config + launcher options", 0.85)
                         write_settings(tx, g, opts, log)
                         set_launcher_options(tx, g, sroot, opts, log)
+                        stage("Verifying", 0.95)
                     tx.commit()
+                    stage("Complete", 1.0)
                 except BaseException:
                     log(f"  ✗ {g['short']} failed — rolling back its changes …")
                     tx.rollback()
@@ -1946,6 +2115,8 @@ def main() -> int:
                  "Installed Files → Verify integrity to be safe. You can also "
                  "re-run this kit, or --uninstall.")
         return 1
+    finally:
+        prog.close()
 
     # 7. Verify -------------------------------------------------------------
     all_problems = []
@@ -1971,52 +2142,32 @@ def main() -> int:
         "later is handy.\n\n(Recommended: Yes)"
     ):
         saved_path = save_launch_options_file(ui, list(found.keys()), log)
-    saved_note = (f"   ✓ Saved a copy to:\n   {saved_path}\n\n"
+    saved_note = (f"Saved a copy to {saved_path.name} on your Desktop.\n\n"
                   if saved_path else "")
 
-    launcher_note = ""
+    tips = []
     if hdfix_sel:
-        launcher_note = (
-            "3) The Konami launcher is SKIPPED — MGS2/MGS3 boot straight "
-            "in.\n"
-            f"   High-quality cinematics: "
-            f"{'ON' if opts['hq_movies'] else 'off'} (already applied).\n"
-            "   Need the launcher back? Edit plugins/MGSHDFix.settings →\n"
-            "   Skip Launcher=0\n\n"
-            if opts["skip_launcher"] else
-            "3) The Konami launcher will still appear on launch. Its "
-            "options\n"
-            f"   are already set for you (high-quality cinematics: "
-            f"{'ON' if opts['hq_movies'] else 'off'}), so just hit Play.\n"
-            "   To skip it entirely, edit plugins/MGSHDFix.settings →\n"
-            "   Skip Launcher=1\n\n"
-        )
+        if opts["skip_launcher"]:
+            tips.append("• Launcher skipped, HQ cinematics ON. (To restore it: "
+                        "Skip Launcher=0 in plugins/MGSHDFix.settings.)")
+        else:
+            tips.append("• The Konami launcher still shows — options are "
+                        "preset, just hit Play.")
+        tips.append("• Docked / on a TV at 720p? Properties → Game Resolution "
+                    "→ Native.")
+        tips.append("• A “missing config key” error later? Run plugins/"
+                    "'MGSHDFix Config Tool.exe' → Save and Exit.")
+    if any(GAMES[k].get("kind") == "m2fix" for k in found):
+        tips.append("• MGS1 first boot: pick METAL GEAR SOLID (US), Max "
+                    "resolution, 4:3.")
+
     ui.info(
         f"✅ Done — {names} modded and verified!\n\n"
-        "ONE manual step remains (Steam reverts script-made edits, so this\n"
-        "must be done in Steam's UI):\n\n"
-        "1) LAUNCH OPTIONS — for EACH game, right-click it in Steam →\n"
-        "   Properties → General → Launch Options, and paste EXACTLY\n"
-        "   (note they differ per game):\n\n"
+        "ONE manual step (Steam reverts script edits, so do it in Steam):\n"
+        "right-click each game → Properties → Launch Options, paste its line:\n\n"
         + "\n".join(lo_lines) + "\n\n"
-        + saved_note +
-        "   Without this, the fix mods will not load at all.\n\n"
-        "2) Playing docked / on a TV? SteamOS may default the game to\n"
-        "   1280x720 — set Properties → General → Game Resolution to\n"
-        "   'Native' (or 1920x1080) for full quality. Handheld needs no\n"
-        "   changes; everything renders at native 16:10.\n\n"
-        + launcher_note +
-        ("4) MGS1 FIRST BOOT — the version-select menu appears once. Pick\n"
-         "   METAL GEAR SOLID (US) — full-speed 60Hz English; the EU disc\n"
-         "   is 50Hz PAL and runs ~17% slower. In the display options pick\n"
-         "   Max resolution and keep 4:3. After that it boots straight in\n"
-         "   (change versions later via the in-game pause menu).\n\n"
-         if any(GAMES[k].get("kind") == "m2fix" for k in found) else "")
-        +
-        "If MGS2/MGS3 ever report a missing config key, run\n"
-        "'MGSHDFix Config Tool.exe' in the game's plugins folder and hit\n"
-        "'Save and Exit' — that regenerates the settings file.\n\n"
-        "You Enjoy All Weapons And Equipment From The Start Of The Game!"
+        + saved_note
+        + "\n".join(tips)
     )
     offer_self_cleanup(ui, desktop)
     return 0

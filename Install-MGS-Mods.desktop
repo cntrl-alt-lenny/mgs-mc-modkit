@@ -5,5 +5,5 @@ Name=Install MGS Master Collection Mods
 Comment=One-click vanilla-faithful mod setup for MGS1, MGS2 & MGS3 Master Collection on Steam Deck / SteamOS
 Icon=applications-games
 Terminal=true
-Exec=bash -c 'TAG=v1.4.0; SHA=647e9dd47d4599d1d7b448af30b7390c448075a4ac21f7fb0e72d5873c46d38f; URL=https://github.com/cntrl-alt-lenny/mgs-mc-deck-modkit/releases/download/$TAG/install.py; F=/tmp/mgs_install.py; if curl -fsSL "$URL" -o "$F" && echo "$SHA  $F" | sha256sum -c --status -; then python3 "$F" --desktop "%k"; else echo; echo "Installer download or SHA-256 verification FAILED — nothing was run. (Is release $TAG published?)"; fi; echo; echo "Press Enter to close."; read'
+Exec=bash -c 'TAG=v1.5.0; SHA=eb3f9d156299d3247f035b6f50dbaf25331b25833f412767202eeb3c3bd6303c; URL=https://github.com/cntrl-alt-lenny/mgs-mc-deck-modkit/releases/download/$TAG/install.py; F=/tmp/mgs_install.py; if curl -fsSL "$URL" -o "$F" && echo "$SHA  $F" | sha256sum -c --status -; then python3 "$F" --desktop "%k"; else echo; echo "Installer download or SHA-256 verification FAILED — nothing was run. (Is release $TAG published?)"; fi; echo; echo "Press Enter to close."; read'
 Categories=Game;Utility;
