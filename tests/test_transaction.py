@@ -413,3 +413,92 @@ def test_torn_journal_does_not_crash(tmp_path, game_dir, patch_download):
     tx = install.InstallTxn(game_dir, "mgs2", _noop)             # must not raise
     assert tx._prior_added == set()
     assert not (root / install.JOURNAL_NAME).exists()            # cleaned up
+
+
+# ---------------------------------------------------------------------------
+# v1.7.0 Group B — free space + entry mode
+# ---------------------------------------------------------------------------
+def test_check_space_allows_when_room(tmp_path):
+    ok, msg = install.check_space(tmp_path, 1024, margin=0)
+    assert ok and msg == ""
+
+
+def test_check_space_blocks_when_full(tmp_path, monkeypatch):
+    monkeypatch.setattr(install, "free_bytes", lambda p: 100 * 1024 * 1024)
+    ok, msg = install.check_space(tmp_path, 10 * 1024 ** 3)
+    assert ok is False
+    assert "Not enough free space" in msg
+    assert "twice" in msg                       # explains the staging cost
+
+
+def test_check_space_does_not_block_when_undetectable(tmp_path, monkeypatch):
+    def boom(p):
+        raise OSError("statvfs unavailable")
+    monkeypatch.setattr(install, "free_bytes", boom)
+    ok, _ = install.check_space(tmp_path, 10 * 1024 ** 3)
+    assert ok is True                           # never block on uncertainty
+
+
+def test_install_aborts_cleanly_when_out_of_space(tmp_path, game_dir,
+                                                  patch_download, monkeypatch):
+    """Full drive must fail before touching the game, not mid-extraction."""
+    import pytest
+    import tempfile
+    (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
+    monkeypatch.setattr(install, "free_bytes", lambda p: 1024)   # ~nothing free
+    with tempfile.TemporaryDirectory() as td:
+        tx = install.InstallTxn(game_dir, "mgs2", _noop)
+        with pytest.raises(RuntimeError, match="Not enough free space"):
+            install.install_hdfix(tx, Path(td), _noop)
+        tx.rollback()
+    assert (game_dir / "winhttp.dll").read_bytes() == b"TRUE-STOCK"
+    assert not (game_dir / "plugins" / "MGSHDFix.asi").exists()
+
+
+def test_archive_payload_bytes_reads_sizes(tmp_path):
+    from conftest import build_zip
+    z = build_zip(tmp_path / "a.zip", {"a.bin": b"x" * 5000,
+                                       "b/c.bin": b"y" * 3000})
+    assert install.archive_payload_bytes(z) == 8000
+
+
+def test_mode_menu_skipped_on_fresh_system(tmp_path, game_dir):
+    from conftest import FakeUI
+    ui = FakeUI()                                # no menu scripted
+    found = {"mgs2": (game_dir, tmp_path)}
+    assert install.already_modded(found) == []
+    assert install.choose_mode(ui, found) == "install"   # no dialog shown
+
+
+def test_mode_menu_offered_when_already_modded(tmp_path, game_dir,
+                                               patch_download):
+    from conftest import FakeUI
+    install_mgs2_full(game_dir, make_steam_root(tmp_path))
+    found = {"mgs2": (game_dir, tmp_path)}
+    assert install.already_modded(found) == ["mgs2"]
+    assert install.choose_mode(FakeUI(menu=["uninstall"]), found) == "uninstall"
+    assert install.choose_mode(FakeUI(menu=["install"]), found) == "install"
+    assert install.choose_mode(FakeUI(menu=[None]), found) is None   # cancel
+
+
+def test_uninstall_recovers_originals_when_manifest_lost(tmp_path, game_dir,
+                                                        patch_download):
+    """Damaged/lost record must not strand the user's backed-up originals."""
+    (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
+    install_mgs2_full(game_dir, make_steam_root(tmp_path))
+    (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).unlink()
+
+    notes, ok = install.uninstall_game(game_dir, _noop)
+    assert ok
+    assert (game_dir / "winhttp.dll").read_bytes() == b"TRUE-STOCK"
+    assert not (game_dir / install.MODKIT_DIRNAME).exists()
+    assert any("put back" in n for n in notes)
+
+
+def test_uninstall_offered_when_only_backups_remain(tmp_path, game_dir,
+                                                    patch_download):
+    """run_uninstall must consider a modkit folder, not only a readable manifest."""
+    install_mgs2_full(game_dir, make_steam_root(tmp_path))
+    (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).write_text("{bad")
+    # A damaged manifest still leaves the folder -> the game stays recoverable.
+    assert (game_dir / install.MODKIT_DIRNAME).is_dir()

@@ -27,10 +27,20 @@ def test_checklist_defaults_and_disclaimer():
     items = {t: (label, default)
              for t, label, default in install.build_audio_checklist(["mgs3"])}
     assert items["mgs3:base"][1] is True
-    assert items["mgs3:update"][1] is True
-    assert items["mgs3:hq"][1] is False
-    assert "optional" in items["mgs3:update"][0].lower()
-    assert "pause" in items["mgs3:hq"][0].lower()
+    assert items["mgs3:update"][1] is True          # recommended, on by default
+    assert items["mgs3:hq"][1] is False             # off by default
+    assert "recommended" in items["mgs3:update"][0].lower()
+    assert "optional" in items["mgs3:hq"][0].lower()
+    # The HQ pause disclaimer moved into the dialog header (rows don't wrap).
+    assert "pause" in install.AUDIO_CHECKLIST_TEXT.lower()
+    assert "button press" in install.AUDIO_CHECKLIST_TEXT.lower()
+
+
+def test_checklist_rows_fit_the_deck_screen():
+    """kdialog rows don't wrap; long labels ellipsize or overflow 1280px."""
+    for game_set in (["mgs2"], ["mgs3"], ["mgs2", "mgs3"]):
+        for _tag, label, _d in install.build_audio_checklist(game_set):
+            assert len(label) <= install.CHECKLIST_LABEL_MAX, label
 
 
 def test_order_always_base_hq_update(tmp_path):

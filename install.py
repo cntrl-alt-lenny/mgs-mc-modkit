@@ -35,17 +35,26 @@ Installs are TRANSACTIONAL. Each archive is extracted to a staging folder and
 every path is validated (no absolute paths, no `../` traversal, no symlinks)
 before anything is copied into the live game directory. Overwritten originals
 are backed up and every change is recorded in a manifest, so a mid-install
-failure rolls back cleanly and `--uninstall` reverses the whole thing later.
+failure rolls back cleanly and the mods can be removed again later.
+
+Because the machine can lose power mid-write, an intent journal is flushed to
+disk before any file is moved into the game folder, and backups are never
+overwritten — the copy closest to the user's original always wins. A record we
+cannot parse is treated as a hard stop, never as "no previous install".
+
+Run it again any time: if a previous install is found you are asked whether to
+install/repair or remove the mods, so the shortcut stays useful and is never
+deleted.
 
 It deliberately does NOT set Steam launch options: Steam rewrites its config
 from memory and will silently revert edits made while it is running. The one
-line you must paste is shown at the end.
+line you must paste is shown at the end and saved to a file on your Desktop.
 
 Requirements (all preinstalled on SteamOS): python3, bsdtar, and kdialog OR
 zenity. No pip packages, no sudo.
 
 Run it from the Desktop (Konsole):  python3 install.py
-Uninstall a previous run:           python3 install.py --uninstall
+Skip straight to removal:           python3 install.py --uninstall
 """
 
 from __future__ import annotations
@@ -840,6 +849,60 @@ def free_gb(path: Path) -> float:
     return st.f_bavail * st.f_frsize / (1024 ** 3)
 
 
+def free_bytes(path: Path) -> int:
+    st = os.statvfs(path)
+    return st.f_bavail * st.f_frsize
+
+
+# Extraction is staged inside the game folder before files are moved into
+# place, so peak usage is roughly the payload twice over plus a safety margin.
+SPACE_MARGIN_BYTES = 512 * 1024 * 1024
+
+
+def archive_payload_bytes(archive: Path) -> int:
+    """Total uncompressed size of an archive, or 0 if it can't be determined.
+
+    `bsdtar -tvf` prints ls-style rows whose 5th column is the member size.
+    Used only for a pre-flight space check, so an unparseable row is skipped
+    rather than treated as an error.
+    """
+    try:
+        p = subprocess.run(["bsdtar", "-tvf", str(archive)],
+                           capture_output=True, text=True, timeout=600)
+    except (OSError, subprocess.SubprocessError):
+        return 0
+    if p.returncode != 0:
+        return 0
+    total = 0
+    for line in p.stdout.splitlines():
+        parts = line.split()
+        if len(parts) >= 5 and parts[0][:1] in "-d l":
+            try:
+                total += int(parts[4])
+            except ValueError:
+                continue
+    return total
+
+
+def check_space(game_dir: Path, payload_bytes: int,
+                margin: int = SPACE_MARGIN_BYTES) -> tuple[bool, str]:
+    """(ok, human message) — is there room to stage AND install `payload_bytes`?"""
+    try:
+        avail = free_bytes(game_dir)
+    except OSError:
+        return True, ""            # can't tell; don't block the install
+    needed = payload_bytes * 2 + margin
+    if avail >= needed:
+        return True, ""
+    gb = 1024 ** 3
+    return False, (
+        f"Not enough free space on the drive holding {game_dir.name}.\n\n"
+        f"Needed: about {needed / gb:.1f} GB    Free: {avail / gb:.1f} GB\n\n"
+        "The installer unpacks each mod before putting it in place, so it "
+        "briefly needs roughly twice the mod's size. Free up some space (or "
+        "move the game to another drive) and run this again.")
+
+
 def detect_device(env: dict | None = None,
                   dmi_bases: tuple[str, ...] | None = None) -> str:
     """Best-effort hardware profile: 'steam_deck' or 'generic_linux'.
@@ -1063,6 +1126,11 @@ class InstallTxn:
     # -- operations ------------------------------------------------------
     def install_archive(self, archive: Path, on_progress=None) -> list[str]:
         """Stage-validate `archive`, then move its files into the game dir."""
+        # Last line of defence against filling the drive mid-extraction, which
+        # would otherwise surface as a raw bsdtar error after a partial write.
+        ok, msg = check_space(self.game_dir, archive_payload_bytes(archive))
+        if not ok:
+            raise RuntimeError(msg)
         self.staging.mkdir(parents=True, exist_ok=True)
         stage = Path(tempfile.mkdtemp(prefix="stage_", dir=self.staging))
         try:
@@ -1454,9 +1522,36 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                 errors = True
 
     if not manifest.is_file():
-        notes.append("no install manifest found — nothing tracked to remove "
-                     "(use Steam → Verify integrity to reset any remaining "
-                     "mod files)")
+        # No record — but backups may still be sitting there from a run whose
+        # manifest was lost or damaged. Those are the user's original files, so
+        # put them back rather than abandoning them.
+        restored = 0
+        backups_dir = root / "backups"
+        if backups_dir.is_dir():
+            for dirpath, _dn, filenames in os.walk(backups_dir):
+                for fn in filenames:
+                    src = Path(dirpath) / fn
+                    rel = os.path.relpath(src, backups_dir)
+                    try:
+                        dst = game_dir / rel
+                        dst.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(src, dst)
+                        restored += 1
+                    except OSError as e:
+                        notes.append(f"couldn't restore {rel} ({e})")
+                        errors = True
+        if restored:
+            notes.append(f"no install record was found, but {restored} "
+                         "backed-up original file(s) were put back")
+            if not errors:
+                shutil.rmtree(root, ignore_errors=True)
+                notes.append("removed the mgs-modkit folder")
+        else:
+            notes.append("no record of an install by this kit was found, so "
+                         "there was nothing tracked to remove. Steam's Verify "
+                         "integrity restores original files but does NOT "
+                         "delete mod files — remove any left over by hand "
+                         "(see the README's uninstall list)")
         return notes, not errors
 
     try:
@@ -1546,6 +1641,19 @@ HQ_ENDING_DISCLAIMER = (
     "at the end and require a button press to continue.")
 
 UPDATE_NOTE = "Recommended patch for MGS3 Better Audio, but optional here."
+
+# kdialog/zenity checklist rows do not wrap. Anything longer than this is
+# ellipsized or widens the dialog past the Deck's 1280px screen, so notes go
+# in the dialog's header text instead of the row label.
+CHECKLIST_LABEL_MAX = 60
+
+AUDIO_CHECKLIST_TEXT = (
+    "Restores the PS3-quality audio this port compressed (and fixes an MGS2 "
+    "cutscene crash).\n"
+    "The files come from NexusMods — tick what you want, then pick each file.\n"
+    "Each part installs on its own, so you can add the rest later.\n\n"
+    "HQ Ending Cutscenes: higher-quality audio for the final two cutscenes.\n"
+    "Those scenes may pause at the end and need a button press to continue.")
 
 AUDIO_SPECS = {
     "mgs2": {
@@ -1742,10 +1850,15 @@ def build_audio_checklist(hdfix_keys) -> list[tuple[str, str, bool]]:
         r = AUDIO_SPECS[game]["roles"][role]
         label = r["checklist"]
         if role == "update":
-            label += "  (recommended, optional)"
+            label += " (recommended)"
         elif role == "hq":
-            label += "  — " + r["note"]
-        items.append((f"{game}:{role}", label, r["default"]))
+            label += " (optional)"
+        # Rows must stay short: kdialog checklist rows do not wrap, so a long
+        # label is ellipsized or pushes the dialog past the Deck's 1280px
+        # screen. Longer explanations belong in the dialog's header text —
+        # see AUDIO_CHECKLIST_TEXT.
+        items.append((f"{game}:{role}", label[:CHECKLIST_LABEL_MAX],
+                      r["default"]))
     return items
 
 
@@ -1844,11 +1957,8 @@ def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
     items = build_audio_checklist(hdfix_keys)
     if not items:
         return {}
-    picked = ui.checklist(
-        "Better Audio (optional)",
-        "Restores PS3-quality audio (and fixes an MGS2 cutscene crash). Files "
-        "come from NexusMods — tick what you want, then pick each file:",
-        items)
+    picked = ui.checklist("Better Audio (optional)", AUDIO_CHECKLIST_TEXT,
+                          items)
     if not picked:            # cancelled or nothing ticked
         return {}
     picked = set(picked)
@@ -1948,29 +2058,31 @@ def save_launch_options_file(ui: UI, found_keys, log,
 
 
 # ---------------------------------------------------------------------------
-# Double-click shortcut self-cleanup
+# Entry mode
+#
+# The shortcut is the user's ONLY entry point, so it must never delete itself:
+# repair, adding a component later, and uninstalling all need it. When a
+# previous install is detected we ask what they want to do instead.
 # ---------------------------------------------------------------------------
-def normalize_desktop_path(raw: str | None) -> Path | None:
-    if not raw:
-        return None
-    from urllib.parse import unquote, urlparse
-    p = unquote(urlparse(raw).path) if raw.startswith("file://") else raw
-    return Path(p)
+def already_modded(found: dict) -> list[str]:
+    """Game keys that carry a record from a previous run of this kit."""
+    return [k for k, (d, _r) in found.items()
+            if (d / MODKIT_DIRNAME / MANIFEST_NAME).is_file()]
 
 
-def offer_self_cleanup(ui: UI, desktop: Path | None) -> None:
-    if not desktop:
-        return
-    if ui.yesno("Delete this installer shortcut now?\n"
-                "You won't need it again."):
-        try:
-            if desktop.is_file():
-                desktop.unlink()
-            Path("/tmp/mgs_install.py").unlink(missing_ok=True)
-            ui.info("Installer shortcut deleted. Enjoy!")
-        except OSError as e:
-            ui.error(f"Couldn't delete the shortcut automatically:\n"
-                     f"{desktop}\n\n{e}")
+def choose_mode(ui: UI, found: dict) -> str | None:
+    """'install' | 'uninstall' | None(quit). Only asked when something exists."""
+    modded = already_modded(found)
+    if not modded:
+        return "install"
+    names = ", ".join(GAMES[k]["short"] for k in modded)
+    return ui.menu(
+        "MGS Mod Kit",
+        f"{names} already set up by this installer.\n\nWhat would you like to "
+        "do?",
+        [("install", "Install or repair mods"),
+         ("uninstall", "Remove the mods"),
+         ("quit", "Quit")])
 
 
 # ---------------------------------------------------------------------------
@@ -1991,14 +2103,15 @@ def run_uninstall(ui: UI, log) -> int:
             ui.error(f"No Master Collection game executable found in:\n{d}")
             return 1
 
-    # Only offer games this kit actually touched (they have a manifest or the
-    # legacy .asi worth clearing).
+    # Offer any game this kit touched. The whole mgs-modkit folder counts, not
+    # just a readable manifest — if the record was lost or damaged, the backups
+    # of the user's original files are still in there and must be recoverable.
     modded = {k: v for k, v in found.items()
-              if (v[0] / MODKIT_DIRNAME / MANIFEST_NAME).is_file()
+              if (v[0] / MODKIT_DIRNAME).is_dir()
               or any((v[0] / n).is_file() for n in LEGACY_M2FIX_FILES)}
     if not modded:
-        ui.info("Nothing to uninstall — none of the detected games has a "
-                "mgs-modkit manifest from this installer.")
+        ui.info("Nothing to remove — none of the games found on this machine "
+                "was set up by this installer.")
         return 0
 
     if len(modded) > 1:
@@ -2033,22 +2146,21 @@ def run_uninstall(ui: UI, log) -> int:
 
     if not all_ok:
         ui.error(
-            f"{names}: uninstall finished with problems — some files could "
-            "not be removed or restored, so the mgs-modkit backup/manifest "
-            "folder was kept for a retry.\n\n"
-            "Close the games and Steam's downloads, then run --uninstall "
-            "again, or use Steam → Properties → Installed Files → Verify "
-            "integrity of game files to reset to stock.")
+            f"{names}: some files couldn't be removed or put back.\n\n"
+            "Your backups have been KEPT so you can try again. Close the "
+            "games and let any Steam downloads finish, then run this again "
+            "and choose Remove the mods.")
         return 1
 
     ui.info(
-        f"✅ {names} un-modded.\n\n"
-        "Remove the leftover Steam Launch Options too: right-click each game "
-        "in Steam → Properties → General → Launch Options and clear the "
-        "WINEDLLOVERRIDES line.\n\n"
-        "MGSHDFix also writes a logs/ folder and steam_appid.txt at runtime; "
-        "delete those if you want a spotless folder, or just run Steam → "
-        "Verify integrity of game files.")
+        f"✅ Mods removed from {names}.\n\n"
+        "Two things to tidy up in Steam yourself:\n\n"
+        "1) Right-click each game → Properties → Launch Options and clear "
+        "the line you pasted in.\n\n"
+        "2) The mods leave behind a 'logs' folder and steam_appid.txt. "
+        "Delete those if you want the folder spotless.\n\n"
+        "(Steam's Verify integrity restores original game files, but it will "
+        "not delete leftover mod files.)")
     return 0
 
 
@@ -2061,13 +2173,14 @@ def main() -> int:
 
     import argparse
     ap = argparse.ArgumentParser(add_help=False)
-    ap.add_argument("--desktop", default=None,
-                    help="Path of the launching .desktop shortcut (internal).")
+    # --desktop is still accepted so shortcuts from older releases keep working,
+    # but it is no longer used: the installer never deletes itself now, because
+    # the shortcut is also the way to repair, add components, and uninstall.
+    ap.add_argument("--desktop", default=None, help=argparse.SUPPRESS)
     ap.add_argument("--uninstall", action="store_true",
                     help="Reverse a previous install (restore backups, remove "
                          "added files) instead of installing.")
     cli, _ = ap.parse_known_args()
-    desktop = normalize_desktop_path(cli.desktop)
 
     def log(msg: str) -> None:
         print(msg)
@@ -2077,8 +2190,10 @@ def main() -> int:
         return run_uninstall(ui, log)
 
     if not shutil.which("bsdtar"):
-        ui.error("`bsdtar` is required but not found. On SteamOS it is "
-                 "preinstalled; otherwise install libarchive/bsdtar and re-run.")
+        ui.error("Your system is missing a tool this installer needs "
+                 "(bsdtar).\n\nOn a Steam Deck it's included as standard, so "
+                 "this is unexpected — on other Linux systems, install the "
+                 "'libarchive' package and run this again.")
         return 1
 
     # 1. Find the games -----------------------------------------------------
@@ -2104,13 +2219,21 @@ def main() -> int:
                      f"{d}")
             return 1
 
+    # 1b. Returning user? Offer repair/uninstall instead of assuming install.
+    mode = choose_mode(ui, found)
+    if mode is None or mode == "quit":
+        return 0
+    if mode == "uninstall":
+        return run_uninstall(ui, log)
+
     # 2. Which games to process --------------------------------------------
     if len(found) > 1:
         picks = ui.checklist(
             "MGS Mod Kit — Choose Games",
-            f"{len(found)} Master Collection games detected. "
-            "Install mods for:",
-            [(k, f"{GAMES[k]['name']}  ({found[k][0]})", True) for k in found],
+            f"{len(found)} Master Collection games found. Set up mods for:\n\n"
+            + "\n".join(f"{GAMES[k]['short']}:  {found[k][0]}" for k in found),
+            # Row labels stay short (paths are listed above instead).
+            [(k, GAMES[k]["name"][:CHECKLIST_LABEL_MAX], True) for k in found],
         )
         if not picks:
             ui.error("No games selected. Aborting.")
@@ -2364,8 +2487,9 @@ def main() -> int:
         + "\n".join(lo_lines) + "\n\n"
         + saved_note
         + "\n".join(tips)
+        + "\n\nKeep the desktop shortcut — running it again lets you repair "
+          "the mods, add the audio packs later, or remove everything."
     )
-    offer_self_cleanup(ui, desktop)
     return 0
 
 
