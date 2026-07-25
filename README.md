@@ -116,7 +116,7 @@ rehosted here.**
 | ✅ **Won't fill your drive** | Free space is checked against each archive's real unpacked size before extracting, so a full microSD fails up front instead of halfway through |
 | ✅ **Repair & uninstall built in** | Run the shortcut again any time: it detects an existing install and offers *install/repair* or *remove the mods*. Even if the record is lost, your backed-up originals are still restored |
 | ✅ **Remembers your choices** | Settings you picked are saved, so a later run to add an audio pack doesn't ask everything again |
-| ✅ **Tested** | A [CI](.github/workflows/ci.yml) test-suite (115 tests) covers discovery, every game combo, malicious/corrupt archives, rollback, interrupted installs, incremental re-installs and uninstall |
+| ✅ **Tested** | A [CI](.github/workflows/ci.yml) test-suite (118 tests) covers discovery, every game combo, malicious/corrupt archives, rollback, interrupted installs, incremental re-installs and uninstall |
 
 <sub>One honest caveat: the Better Audio Mod overwrites some multi-GB stock game
 files, which are too large to back up. Those specific files are restored with
@@ -127,8 +127,8 @@ reversible.</sub>
 (needs `bsdtar`). Bumping a mod version? `python3 tools/refresh_checksums.py`
 prints the new hashes.</sub>
 
-<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.9.0`**.
-To cut a release, push a matching tag (`git tag v1.9.0 && git push --tags`) —
+<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.9.1`**.
+To cut a release, push a matching tag (`git tag v1.9.1 && git push --tags`) —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's baked-in tag/hash doesn't match `install.py`**, then publishes
 `install.py` + a `SHA256SUMS` file. After editing `install.py`, update the

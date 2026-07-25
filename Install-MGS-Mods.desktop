@@ -5,5 +5,5 @@ Name=MGS Master Collection Mod Kit
 Comment=Install, repair or remove vanilla-faithful mods for MGS1, MGS2 & MGS3 Master Collection on Steam Deck / SteamOS. Keep this shortcut — it does all three.
 Icon=applications-games
 Terminal=true
-Exec=bash -c 'TAG=v1.9.0; SHA=0078cdf0dde4678b618fd6792b82b5eb56a87cf64523155f387fd7e9c18c5d6d; URL=https://github.com/cntrl-alt-lenny/mgs-mc-deck-modkit/releases/download/$TAG/install.py; F=$(mktemp -t mgs_install.XXXXXXXX) || exit 1; trap "rm -f \"$F\"" EXIT; if curl -fsSL "$URL" -o "$F" && echo "$SHA  $F" | sha256sum -c --status -; then python3 "$F"; else echo; echo "Installer download or SHA-256 verification FAILED — nothing was run. (Is release $TAG published?)"; fi; echo; echo "Press Enter to close."; read'
+Exec=bash -c 'TAG=v1.9.1; SHA=dfc1c67cbbe5d30fb3c2653ade7752785e5c9c35de392afb0e409f11dbdc0d8b; URL=https://github.com/cntrl-alt-lenny/mgs-mc-deck-modkit/releases/download/$TAG/install.py; F=$(mktemp /tmp/mgs_install.XXXXXX.py); echo "Fetching the MGS Mod Kit installer ($TAG)..."; if curl -fsSL "$URL" -o "$F" && echo "$SHA  $F" | sha256sum -c --status -; then python3 "$F"; else echo; echo "Could not download or verify the installer. Nothing was changed."; echo "Check your internet connection and try again."; fi; rm -f "$F"; echo; echo "Press Enter to close this window."; read'
 Categories=Game;Utility;

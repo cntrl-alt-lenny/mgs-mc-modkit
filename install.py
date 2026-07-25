@@ -74,7 +74,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.9.0"
+MODKIT_VERSION = "1.9.1"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -406,6 +406,10 @@ STEAMID64_BASE = 76561197960265728
 # then to a plain-terminal prompt so the script still works headless.
 # ---------------------------------------------------------------------------
 class UI:
+    # Class-level defaults so a UI built by any route always has them.
+    kind = "term"
+    _degraded = False
+
     def __init__(self) -> None:
         # Without a display, every kdialog/zenity call exits non-zero: info()
         # and error() vanish and yesno() reads as "No", so the run would abort
@@ -424,12 +428,44 @@ class UI:
         # they live on external storage or a synced folder.
         dl = Path.home() / "Downloads"
         self.last_dir = dl if dl.is_dir() else Path.home()
+        self._degraded = False      # set when a dialog tool fails mid-run
 
     def _run(self, args: list[str]) -> tuple[int, str]:
-        p = subprocess.run(args, capture_output=True, text=True)
+        """Run a dialog command, telling tool FAILURE apart from user CANCEL.
+
+        This distinction matters a lot: a cancel legitimately means "stop", but
+        a broken dialog tool returning non-zero would look identical and quit
+        the installer instantly with no visible reason. When the tool itself
+        fails we drop to the terminal and let the caller retry there.
+        """
+        try:
+            p = subprocess.run(args, capture_output=True, text=True)
+        except OSError as e:
+            self._degrade(f"{args[0]} could not be started ({e})")
+            return 1, ""
+        if p.returncode != 0 and p.stderr.strip():
+            # Cancel is a silent non-zero; output on stderr means it broke.
+            self._degrade(p.stderr.strip().splitlines()[0])
+            return 1, ""
         return p.returncode, p.stdout.strip()
 
-    def info(self, text: str, title: str = "MGS Deck Mod Kit") -> None:
+    def _degrade(self, why: str) -> None:
+        if self.kind == "term":
+            return
+        print(f"\n[!] The pop-up windows aren't working here ({why}).")
+        print("[!] Carrying on in this terminal window instead.\n")
+        self.kind = "term"
+        self._degraded = True
+
+    def _retryable(self, fn, *a, **k):
+        """Run a dialog; if the tool broke, run it again in terminal mode."""
+        out = fn(*a, **k)
+        if self._degraded:
+            self._degraded = False
+            out = fn(*a, **k)
+        return out
+
+    def _info_impl(self, text: str, title: str = "MGS Deck Mod Kit") -> None:
         if self.kind == "kdialog":
             self._run(["kdialog", "--title", title, "--msgbox", text])
         elif self.kind == "zenity":
@@ -438,7 +474,7 @@ class UI:
         else:
             print(f"\n=== {title} ===\n{text}\n")
 
-    def error(self, text: str, title: str = "MGS Deck Mod Kit — Error",
+    def _error_impl(self, text: str, title: str = "MGS Deck Mod Kit — Error",
               details: str | None = None) -> None:
         """Show an error. `details` goes in an expandable pane where supported.
 
@@ -460,7 +496,7 @@ class UI:
             if details:
                 print(f"{details}\n", file=sys.stderr)
 
-    def yesno(self, text: str, title: str = "MGS Deck Mod Kit") -> bool:
+    def _yesno_impl(self, text: str, title: str = "MGS Deck Mod Kit") -> bool:
         if self.kind == "kdialog":
             return self._run(["kdialog", "--title", title, "--yesno", text])[0] == 0
         if self.kind == "zenity":
@@ -468,7 +504,7 @@ class UI:
                               "--no-wrap", "--text", text])[0] == 0
         return input(f"{text} [y/N] ").strip().lower().startswith("y")
 
-    def pick_dir(self, text: str) -> str | None:
+    def _pick_dir_impl(self, text: str) -> str | None:
         start = str(Path.home())
         if self.kind == "kdialog":
             rc, out = self._run(["kdialog", "--title", text,
@@ -481,7 +517,7 @@ class UI:
         ans = input(f"{text}\nPath: ").strip()
         return ans or None
 
-    def pick_file(self, text: str, start: Path | None = None) -> str | None:
+    def _pick_file_impl(self, text: str, start: Path | None = None) -> str | None:
         start_s = str(start or (Path.home() / "Downloads"))
         if self.kind == "kdialog":
             # The filter MUST be the described "Name (globs)" form: KF5-era
@@ -509,7 +545,7 @@ class UI:
                 self.last_dir = parent
         return sel
 
-    def checklist(self, title: str, text: str,
+    def _checklist_impl(self, title: str, text: str,
                   items: list[tuple[str, str, bool]]) -> list[str] | None:
         """items: (tag, label, checked).
 
@@ -553,7 +589,7 @@ class UI:
                     chosen.add(tag)
         return list(chosen)
 
-    def menu(self, title: str, text: str,
+    def _menu_impl(self, title: str, text: str,
              items: list[tuple[str, str]]) -> str | None:
         if self.kind == "kdialog":
             args = ["kdialog", "--title", title, "--menu", text]
@@ -573,6 +609,28 @@ class UI:
         for tag, label in items:
             print(f"  {tag}) {label}")
         return input("Choice: ").strip() or None
+
+    # -- public API: every dialog retries in the terminal if the tool breaks --
+    def info(self, text, title="MGS Deck Mod Kit"):
+        return self._retryable(self._info_impl, text, title)
+
+    def error(self, text, title="MGS Deck Mod Kit — Error", details=None):
+        return self._retryable(self._error_impl, text, title, details)
+
+    def yesno(self, text, title="MGS Deck Mod Kit"):
+        return self._retryable(self._yesno_impl, text, title)
+
+    def pick_dir(self, text):
+        return self._retryable(self._pick_dir_impl, text)
+
+    def pick_file(self, text, start=None):
+        return self._retryable(self._pick_file_impl, text, start)
+
+    def checklist(self, title, text, items):
+        return self._retryable(self._checklist_impl, title, text, items)
+
+    def menu(self, title, text, items):
+        return self._retryable(self._menu_impl, title, text, items)
 
     def progress(self, title: str, log) -> "Progress":
         return Progress(self.kind, title, log)

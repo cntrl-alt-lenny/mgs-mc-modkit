@@ -203,3 +203,57 @@ def test_detailed_error_used_when_details_given(monkeypatch):
                         lambda args: (captured.setdefault("a", args), (0, ""))[1])
     ui.error("Short headline", details="long technical detail")
     assert "--detailederror" in captured["a"]
+
+
+# ---------------------------------------------------------------------------
+# Broken dialogs must degrade to the terminal, never look like "user cancelled"
+# ---------------------------------------------------------------------------
+def _broken_dialog_ui(monkeypatch, stderr="kdialog: cannot connect to display"):
+    ui = install.UI.__new__(install.UI)
+    ui.kind = "kdialog"
+    ui._degraded = False
+    ui.last_dir = Path("/tmp")
+
+    class P:
+        returncode = 1
+        stdout = ""
+    P.stderr = stderr
+    monkeypatch.setattr(install.subprocess, "run", lambda *a, **k: P())
+    return ui
+
+
+def test_broken_dialog_falls_back_to_terminal(monkeypatch, capsys):
+    ui = _broken_dialog_ui(monkeypatch)
+    monkeypatch.setattr("builtins.input", lambda *a, **k: "install")
+    got = ui.menu("t", "x", [("install", "Install"), ("quit", "Quit")])
+    assert ui.kind == "term"          # switched over
+    assert got == "install"           # and the retry actually answered
+    assert "aren't working" in capsys.readouterr().out
+
+
+def test_user_cancel_is_not_treated_as_a_broken_dialog(monkeypatch):
+    """kdialog exits non-zero with NO stderr when the user cancels."""
+    ui = install.UI.__new__(install.UI)
+    ui.kind = "kdialog"
+    ui._degraded = False
+
+    class P:
+        returncode = 1
+        stdout = ""
+        stderr = ""
+    monkeypatch.setattr(install.subprocess, "run", lambda *a, **k: P())
+    assert ui.menu("t", "x", [("a", "A")]) is None    # a real cancel
+    assert ui.kind == "kdialog"                        # no false degrade
+
+
+def test_missing_dialog_binary_degrades(monkeypatch, capsys):
+    ui = install.UI.__new__(install.UI)
+    ui.kind = "kdialog"
+    ui._degraded = False
+
+    def boom(*a, **k):
+        raise OSError("No such file or directory: kdialog")
+    monkeypatch.setattr(install.subprocess, "run", boom)
+    monkeypatch.setattr("builtins.input", lambda *a, **k: "y")
+    assert ui.yesno("proceed?") is True
+    assert ui.kind == "term"
