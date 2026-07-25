@@ -74,7 +74,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.9.1"
+MODKIT_VERSION = "1.10.0"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -1818,14 +1818,28 @@ AUDIO_SPECS = {
     },
 }
 
-# Structural bands used as evidence for classify_mgs3_role(). These are
-# deliberately loose — real archives are login-gated and can't be inspected
-# here, so ambiguous cases fall through to explicit user confirmation rather
-# than a false confident match.
-AUDIO_BASE_MIN_BYTES = 1_000 * 1024 * 1024   # base is multi-GB
-AUDIO_BASE_MIN_FILES = 150                    # base is a full replacement
-AUDIO_SMALL_MAX_BYTES = 60 * 1024 * 1024      # update patch is tiny
-AUDIO_SMALL_MAX_FILES = 40
+# ---------------------------------------------------------------------------
+# Payload signatures, read from the REAL NexusMods archives (July 2026):
+#
+#   MGS2 "Full Version"      3821 files  us/demo, us/demo2, us/movie,
+#                                        us/movievr, us/vox
+#   MGS3 main file           6053 files  us/demo, us/movie, us/vox
+#   MGS3 "Update 2.0"           3 files  us/demo/_bp/ + us/vox/_bp/
+#   MGS3 "HQ Ending Cutscenes"  2 files  us/demo/_bp/m680_*x.sdt only
+#
+# Two things fall out of that, and both beat guessing from file size:
+#   • us/demo2/ and us/movievr/ exist ONLY in MGS2 (71 entries there, 0 in
+#     MGS3), so the GAME can be proven from contents even when the file has
+#     been renamed and carries no NexusMods id.
+#   • a base pack is thousands of files; the patches are 2-3. So "is this the
+#     main file or a patch" is a content question, not a size question.
+# ---------------------------------------------------------------------------
+MGS2_ONLY_DIRS = ("us/demo2/", "us/movievr/")
+MGS3_BASE_DIRS = ("us/demo/", "us/movie/", "us/vox/")
+AUDIO_BASE_MIN_FILES = 150      # a full pack; the real ones are 3821 / 6053
+AUDIO_PATCH_MAX_FILES = 20      # a patch; the real ones are 2 and 3
+# m680 is MGS3's ending chapter, which is exactly what the HQ pack replaces.
+HQ_ENDING_SCENE = "m680"
 
 
 def audio_version(path: Path) -> tuple[int, int] | None:
@@ -1918,7 +1932,9 @@ def audio_archive_profile(path: Path) -> dict | None:
     if p.returncode != 0:
         return None
     entries = [ln for ln in p.stdout.splitlines() if ln and not ln.endswith("/")]
+    norm = [e.strip().replace("\\", "/").lower() for e in entries]
     return {
+        "entries": norm,
         "file_count": len(entries),
         "size": path.stat().st_size if path.is_file() else 0,
         "is_audio": entries_look_like_audio(entries),
@@ -1928,36 +1944,48 @@ def audio_archive_profile(path: Path) -> dict | None:
     }
 
 
-def classify_mgs3_role(profile: dict) -> tuple[str | None, bool]:
-    """Best-guess (role, confident) for an MGS3 audio archive from evidence.
+def audio_game_from_entries(entries) -> str | None:
+    """Which game this payload belongs to, from CONTENTS alone, or None.
 
-    Primary signal is content scale (file count); the Nexus version and a
-    name hint corroborate; size is weak support. confident=True only when the
-    signals agree — ambiguous archives return confident=False so the caller
-    asks the user to confirm rather than guessing silently. (Exact per-file
-    signatures aren't hard-coded: the login-gated archives can't be inspected
-    here, and a wrong guess would reject a valid file.)
+    Content beats filenames: this identifies a renamed archive that carries no
+    NexusMods id. Only returns a game when the evidence is positive — a small
+    patch is too little content to prove anything, so it returns None and the
+    caller falls back to the id in the filename (or asks).
     """
-    n = profile["file_count"]
-    size = profile["size"]
-    ver = profile["version"]
-    name = profile.get("name", "")
+    if any(e.startswith(MGS2_ONLY_DIRS) for e in entries):
+        return "mgs2"            # us/demo2 and us/movievr are MGS2-only
+    if len(entries) >= AUDIO_BASE_MIN_FILES and all(
+            any(e.startswith(d) for d in MGS3_BASE_DIRS) for e in entries):
+        return "mgs3"            # a full pack with only MGS3's folders
+    return None
 
-    # Base: a full replacement — many files and/or multi-GB.
-    if n >= AUDIO_BASE_MIN_FILES or size >= AUDIO_BASE_MIN_BYTES:
+
+def classify_mgs3_role(profile: dict) -> tuple[str | None, bool]:
+    """(role, confident) for an MGS3 audio archive, from its contents.
+
+    Matched against the real archives (see the signature notes above), so this
+    works on renamed files. confident=False still means "ask the user" rather
+    than guess, which is what happens for a patch we don't recognise.
+    """
+    entries = profile.get("entries") or []
+    n = profile["file_count"]
+
+    # A full pack is thousands of files; the patches are 2-3.
+    if n >= AUDIO_BASE_MIN_FILES:
         return "base", True
-    # HQ Ending: the filename says so (supporting evidence when present).
-    if "ending" in name or "cutscene" in name:
-        return "hq", True
-    # Update: a small patch tagged v2.x on Nexus.
-    if ver is not None and ver[0] >= 2:
-        return "update", True
-    # Medium-sized, not tagged v2 — most likely the HQ Ending pack.
-    if AUDIO_SMALL_MAX_BYTES < size < AUDIO_BASE_MIN_BYTES:
-        return "hq", True
-    if n <= AUDIO_SMALL_MAX_FILES and size <= AUDIO_SMALL_MAX_BYTES:
-        # Tiny with no distinguishing tag — probably the update, low confidence.
-        return "update", False
+
+    if n and n <= AUDIO_PATCH_MAX_FILES:
+        touches_vox = any(e.startswith("us/vox/") for e in entries)
+        touches_demo = any(e.startswith("us/demo/") for e in entries)
+        ending_only = all(HQ_ENDING_SCENE in Path(e).name for e in entries)
+        # The Update fixes lines in both the cutscene and codec trees.
+        if touches_demo and touches_vox:
+            return "update", True
+        # The HQ pack replaces only the ending cutscenes (scene m680).
+        if touches_demo and not touches_vox and ending_only:
+            return "hq", True
+        # Some other small patch — say so instead of inventing an answer.
+        return None, False
     return None, False
 
 
@@ -1976,42 +2004,48 @@ def validate_audio_for_role(path: Path, game_key: str,
       ambiguous        — right game, but the exact MGS3 component can't be proven
 
     not_audio and wrong_game are hard rejects. Everything else short of a
-    confident match needs the user to confirm — a file without a verifiable
-    game identity is never accepted silently, even if its size/shape happens
-    to resemble a component.
+    confident match needs the user to confirm.
+
+    The GAME is established from the payload where possible, so a renamed
+    archive with no NexusMods id in its name is still accepted silently; the
+    id is only a fallback when the contents can't prove it.
     """
     prof = audio_archive_profile(path)
     if prof is None or not prof["is_audio"]:
         return "not_audio", ("doesn't look like an MGS audio archive — no us/ "
                              "folder or .sdt/.sdx/.xxs files inside")
-    exp_modid = AUDIO_MODID[game_key]
-    other_modid = AUDIO_MODID["mgs3" if game_key == "mgs2" else "mgs2"]
-    if prof["modid"] == other_modid:
-        # Definitely the OTHER game's mod — a hard reject, no override.
-        return "wrong_game", (f"is the {'MGS3' if game_key == 'mgs2' else 'MGS2'} "
-                              "audio mod, not this game's")
-    if prof["modid"] is not None and prof["modid"] != exp_modid:
-        # Some other mod id entirely. Nexus has reorganised these pages before,
-        # forcing authors to re-upload under new ids, so this can't be a hard
-        # reject or a legitimate fresh download would be dead-ended — ask.
-        return "unknown_mod", (f"comes from NexusMods mod #{prof['modid']}, "
-                               f"which isn't the one expected for {game_key.upper()} "
-                               f"(#{exp_modid})")
-    if prof["modid"] is None:
-        # Renamed file: we can't prove which GAME it's for. Never silently
-        # accept it (a renamed MGS2 base could otherwise pass as an MGS3 base
-        # purely on size/file-count) — require an explicit confirmation.
-        return "missing_identity", (f"has no NexusMods mod-id in its name, so "
-                                    f"it can't be confirmed as {game_key.upper()} "
-                                    "audio")
+    other = "mgs3" if game_key == "mgs2" else "mgs2"
+    exp_modid, other_modid = AUDIO_MODID[game_key], AUDIO_MODID[other]
+
+    # 1. Contents are the strongest evidence of which game this is.
+    by_content = audio_game_from_entries(prof["entries"])
+    if by_content == other:
+        return "wrong_game", (f"is the {other.upper()} audio mod — its files "
+                              f"are {other.upper()}'s, not {game_key.upper()}'s")
+
+    # 2. The NexusMods id in the filename, when the contents were inconclusive.
+    if by_content is None:
+        if prof["modid"] == other_modid:
+            return "wrong_game", (f"is from the {other.upper()} audio mod page, "
+                                  f"not {game_key.upper()}'s")
+        if prof["modid"] is not None and prof["modid"] != exp_modid:
+            # Nexus has reorganised these pages before, forcing authors to
+            # re-upload under new ids — so ask rather than dead-end a valid file.
+            return "unknown_mod", (f"comes from NexusMods mod #{prof['modid']}, "
+                                   f"not the one expected for "
+                                   f"{game_key.upper()} (#{exp_modid})")
+
     if game_key == "mgs2":
-        return "ok", "ok"          # right game, single component
+        if by_content == "mgs2" or prof["modid"] == exp_modid:
+            return "ok", "ok"      # right game, and MGS2 has one component
+        return "missing_identity", ("can't be confirmed as the MGS2 audio mod "
+                                    "from its name or its contents")
     guess, confident = classify_mgs3_role(prof)
     if confident and guess == role:
         return "ok", "ok"
     if confident and guess is not None and guess != role:
-        other = AUDIO_SPECS["mgs3"]["roles"][guess]["status"]
-        return "mismatch", f"looks like MGS3 {other}"
+        named = AUDIO_SPECS["mgs3"]["roles"][guess]["status"]
+        return "mismatch", f"looks like {named}"
     return "ambiguous", "an MGS3 audio archive, but the exact component"
 
 

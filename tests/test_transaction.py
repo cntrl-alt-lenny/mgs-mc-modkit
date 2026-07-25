@@ -275,7 +275,7 @@ def test_incremental_install_merges_manifest(tmp_path):
         tx1, install.order_audio_components("mgs3", {"base": base}), _noop)
     tx1.commit()
     base_added = set(json.loads(manifest_path.read_text())["added"])
-    assert "us/stage/clip0000.sdt" in base_added
+    assert "us/demo/clip0000.sdt" in base_added
 
     # Run 2: Update only — must NOT drop the Base files/mods from the manifest.
     upd = build_audio_zip(tmp_path / "update.zip", {"us/patch/fix.sdt": b"p"})
@@ -292,7 +292,7 @@ def test_incremental_install_merges_manifest(tmp_path):
     # Uninstall removes BOTH the Base and Update payloads — nothing orphaned.
     notes, ok = install.uninstall_game(game_dir, _noop)
     assert ok
-    assert not (game_dir / "us" / "stage" / "clip0000.sdt").exists()
+    assert not (game_dir / "us" / "demo" / "clip0000.sdt").exists()
     assert not (game_dir / "us" / "patch" / "fix.sdt").exists()
     assert not (game_dir / install.MODKIT_DIRNAME).exists()
 

@@ -136,25 +136,63 @@ def make_steam_root(tmp_path: Path, account_id: str = "12345678") -> Path:
 # ---------------------------------------------------------------------------
 # Better Audio archive fixtures + a scripted fake UI
 # ---------------------------------------------------------------------------
-# probe_audio_archive() accepts an archive if it contains a us/ folder or any
-# .sdt/.sdx/.xxs file — mimic that real payload shape.
+# These shapes mirror the REAL NexusMods archives, inspected July 2026:
+#   MGS2 Full Version      3821 files  us/demo us/demo2 us/movie us/movievr us/vox
+#   MGS3 main file         6053 files  us/demo us/movie us/vox
+#   MGS3 Update 2.0           3 files  us/demo/_bp/ + us/vox/_bp/
+#   MGS3 HQ Ending            2 files  us/demo/_bp/m680_*x.sdt
 AUDIO_PAYLOAD = {
-    "us/stage/demo.sdt": b"audio-data",
-    "us/sound/vox.sdx": b"audio-data",
+    "us/demo/m010_050_p030.sdt": b"audio-data",
+    "us/vox/rm2s001_01.sdt": b"audio-data",
 }
 
 
 def build_audio_zip(path: Path, extra: dict[str, bytes] | None = None) -> Path:
+    """A small, generic MGS-audio-shaped archive (role deliberately unclear)."""
     files = dict(AUDIO_PAYLOAD)
     if extra:
         files.update(extra)
     return build_zip(path, files)
 
 
-def build_base_audio_zip(path: Path, n: int = 160) -> Path:
-    """A 'base'-shaped archive: many files, so classify_mgs3_role sees a base."""
-    extra = {f"us/stage/clip{i:04d}.sdt": b"audio" for i in range(n)}
-    return build_audio_zip(path, extra)
+def build_mgs3_base_zip(path: Path, n: int = 180) -> Path:
+    """MGS3's main pack: many files, and only MGS3's folders."""
+    files = {}
+    for i in range(n):
+        d = ("demo", "movie", "vox")[i % 3]
+        files[f"us/{d}/clip{i:04d}.sdt"] = b"audio"
+    return build_zip(path, files)
+
+
+def build_mgs2_base_zip(path: Path, n: int = 180) -> Path:
+    """MGS2's pack: identifiable by us/demo2/ and us/movievr/, MGS2-only."""
+    files = {}
+    for i in range(n):
+        d = ("demo", "demo2", "movie", "movievr", "vox")[i % 5]
+        files[f"us/{d}/clip{i:04d}.sdt"] = b"audio"
+    return build_zip(path, files)
+
+
+def build_mgs3_update_zip(path: Path) -> Path:
+    """MGS3 Update 2.0: a tiny patch touching both cutscene and codec trees."""
+    return build_zip(path, {
+        "us/demo/_bp/m570_010_p010.sdt": b"a",
+        "us/demo/_bp/v020_010_p0.sdt": b"a",
+        "us/vox/_bp/rm2s151_01.sdt": b"a",
+    })
+
+
+def build_mgs3_hq_zip(path: Path) -> Path:
+    """MGS3 HQ Ending: two files, ending scene (m680) cutscenes only."""
+    return build_zip(path, {
+        "us/demo/_bp/m680_050_04x.sdt": b"a",
+        "us/demo/_bp/m680_060_05x.sdt": b"a",
+    })
+
+
+# Back-compat alias used by the transaction tests.
+def build_base_audio_zip(path: Path, n: int = 180) -> Path:
+    return build_mgs3_base_zip(path, n)
 
 
 class FakeUI:

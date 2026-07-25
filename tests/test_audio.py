@@ -5,7 +5,8 @@ from pathlib import Path
 
 import install
 from conftest import (FakeUI, build_audio_zip, build_base_audio_zip,
-                      build_zip)
+                      build_mgs2_base_zip, build_mgs3_base_zip,
+                      build_mgs3_hq_zip, build_mgs3_update_zip, build_zip)
 
 
 # Nexus-style names carry the mod-id/version the validator uses as evidence:
@@ -58,35 +59,45 @@ def test_order_subsets(tmp_path):
 
 # -- role classification / validation ---------------------------------------
 def test_role_signatures_distinguished(tmp_path):
-    base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)   # mod #4, many files
-    upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)       # mod #4, v2 tag
-    hq = build_audio_zip(tmp_path / MGS3_HQ_NAME)            # mod #4, "ending"
+    """Roles are told apart by CONTENTS, matching the real archives."""
+    base = build_mgs3_base_zip(tmp_path / MGS3_BASE_NAME)
+    upd = build_mgs3_update_zip(tmp_path / MGS3_UPDATE_NAME)
+    hq = build_mgs3_hq_zip(tmp_path / MGS3_HQ_NAME)
 
     assert install.validate_audio_for_role(base, "mgs3", "base")[0] == "ok"
     assert install.validate_audio_for_role(upd, "mgs3", "update")[0] == "ok"
     assert install.validate_audio_for_role(hq, "mgs3", "hq")[0] == "ok"
-    # A base offered as the update is confidently a mismatch.
+    # Every wrong pairing between the three is caught.
     assert install.validate_audio_for_role(base, "mgs3", "update")[0] == "mismatch"
+    assert install.validate_audio_for_role(upd, "mgs3", "hq")[0] == "mismatch"
+    assert install.validate_audio_for_role(hq, "mgs3", "update")[0] == "mismatch"
 
 
-def test_renamed_file_needs_confirmation_not_silent_pass(tmp_path):
-    # Renamed base (no mod-id): its game identity can't be verified, so it must
-    # NOT silently pass — even though its shape looks like a base.
-    renamed = build_base_audio_zip(tmp_path / "my-drive-copy-final.zip")
-    assert install.validate_audio_for_role(
-        renamed, "mgs3", "base")[0] == "missing_identity"
+def test_renamed_files_are_recognised_by_contents(tmp_path):
+    """A Google-Drive copy with the Nexus name lost still works: the payload
+    itself identifies the game and the component."""
+    for builder, role in ((build_mgs3_base_zip, "base"),
+                          (build_mgs3_update_zip, "update"),
+                          (build_mgs3_hq_zip, "hq")):
+        p = builder(tmp_path / f"my copy {role}.zip")
+        assert install.validate_audio_for_role(p, "mgs3", role)[0] == "ok", role
+    p = build_mgs2_base_zip(tmp_path / "audio backup final.zip")
+    assert install.validate_audio_for_role(p, "mgs2", "base")[0] == "ok"
 
 
-def test_renamed_mgs2_not_silently_accepted_as_mgs3(tmp_path):
-    # The exact danger the reviewer flagged: a big renamed MGS2 base offered as
-    # the MGS3 base. No mod-id -> not accepted on size/shape alone.
-    renamed_mgs2 = build_base_audio_zip(tmp_path / "audio-backup.zip")
-    assert install.validate_audio_for_role(
-        renamed_mgs2, "mgs3", "base")[0] == "missing_identity"
+def test_renamed_mgs2_still_rejected_for_mgs3(tmp_path):
+    """The danger case: a renamed MGS2 pack offered as MGS3's. Its contents
+    give it away (us/demo2 and us/movievr are MGS2-only), so no name needed."""
+    renamed_mgs2 = build_mgs2_base_zip(tmp_path / "audio-backup.zip")
+    verdict, msg = install.validate_audio_for_role(renamed_mgs2, "mgs3", "base")
+    assert verdict == "wrong_game"
+    assert "MGS2" in msg
 
 
 def test_ambiguous_when_component_unprovable(tmp_path):
-    amb = build_audio_zip(tmp_path / MGS3_AMBIG_NAME)   # right game, unclear role
+    """A small patch that matches no known signature is not guessed at."""
+    amb = build_zip(tmp_path / MGS3_AMBIG_NAME,
+                    {"us/movie/something.sdt": b"a"})   # right game, odd shape
     assert install.validate_audio_for_role(amb, "mgs3", "update")[0] == "ambiguous"
     assert install.validate_audio_for_role(amb, "mgs3", "hq")[0] == "ambiguous"
 
@@ -101,12 +112,17 @@ def test_non_audio_rejected(tmp_path):
     assert install.validate_audio_for_role(p, "mgs3", "base")[0] == "not_audio"
 
 
-def test_mgs2_ok_with_modid_missing_identity_without(tmp_path):
+def test_mgs2_identified_by_name_or_by_contents(tmp_path):
+    # By Nexus id in the name...
     good = build_audio_zip(tmp_path / MGS2_BASE_NAME)
     assert install.validate_audio_for_role(good, "mgs2", "base")[0] == "ok"
-    renamed = build_audio_zip(tmp_path / "renamed.zip")
+    # ...or by its MGS2-only folders when renamed.
     assert install.validate_audio_for_role(
-        renamed, "mgs2", "base")[0] == "missing_identity"
+        build_mgs2_base_zip(tmp_path / "renamed.zip"), "mgs2", "base")[0] == "ok"
+    # Neither -> ask, never a silent pass.
+    assert install.validate_audio_for_role(
+        build_audio_zip(tmp_path / "mystery.zip"),
+        "mgs2", "base")[0] == "missing_identity"
 
 
 # -- interactive picker: hardened wrong-file handling -----------------------
@@ -126,7 +142,7 @@ def test_wrong_game_rejected_outright(tmp_path):
 
 
 def test_missing_identity_requires_confirmation(tmp_path):
-    renamed = build_base_audio_zip(tmp_path / "renamed.zip")
+    renamed = build_audio_zip(tmp_path / "renamed.zip")   # too little to prove
     ui = FakeUI(files=[str(renamed)], yesno=[True])       # picker opens first
     assert install.request_audio_archive(
         ui, "mgs3", "base", {}) == renamed.resolve()
@@ -144,7 +160,7 @@ def test_cancel_file_pick_no_nexus_nag(monkeypatch):
 
 
 def test_same_archive_two_roles_rejected(tmp_path):
-    base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
+    base = build_mgs3_base_zip(tmp_path / MGS3_BASE_NAME)
     chosen = {str(base.resolve()): ("mgs3", "base")}
     ui = FakeUI(menu=["skip"], files=[str(base)])
     assert install.request_audio_archive(ui, "mgs3", "update", chosen) is None
@@ -153,37 +169,37 @@ def test_same_archive_two_roles_rejected(tmp_path):
 
 # -- full collection: independence ------------------------------------------
 def test_collect_base_only(tmp_path):
-    base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
+    base = build_mgs3_base_zip(tmp_path / MGS3_BASE_NAME)
     ui = FakeUI(checklist=[["mgs3:base"]], files=[str(base)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["base"]
 
 
 def test_collect_update_only(tmp_path):
-    upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
+    upd = build_mgs3_update_zip(tmp_path / MGS3_UPDATE_NAME)
     ui = FakeUI(checklist=[["mgs3:update"]], files=[str(upd)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["update"]
 
 
 def test_collect_hq_only(tmp_path):
-    hq = build_audio_zip(tmp_path / MGS3_HQ_NAME)
+    hq = build_mgs3_hq_zip(tmp_path / MGS3_HQ_NAME)
     ui = FakeUI(checklist=[["mgs3:hq"]], files=[str(hq)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["hq"]
 
 
 def test_collect_only_checked_request_files(tmp_path):
-    upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
+    upd = build_mgs3_update_zip(tmp_path / MGS3_UPDATE_NAME)
     ui = FakeUI(checklist=[["mgs3:update"]], files=[str(upd)])
     install.collect_audio_archives(ui, ["mgs3"])
     assert ui._menu == [] and ui._files == []           # exactly one request
 
 
 def test_collect_all_ordered(tmp_path):
-    base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
-    hq = build_audio_zip(tmp_path / MGS3_HQ_NAME)
-    upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
+    base = build_mgs3_base_zip(tmp_path / MGS3_BASE_NAME)
+    hq = build_mgs3_hq_zip(tmp_path / MGS3_HQ_NAME)
+    upd = build_mgs3_update_zip(tmp_path / MGS3_UPDATE_NAME)
     ui = FakeUI(checklist=[["mgs3:base", "mgs3:hq", "mgs3:update"]],
                 files=[str(base), str(hq), str(upd)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
@@ -273,8 +289,8 @@ def test_summary_uses_short_names_under_a_game_heading(tmp_path):
 
 def test_one_dialog_per_file_on_the_happy_path(tmp_path):
     """Ticking the box is consent; the picker opens directly (no extra menu)."""
-    base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
-    upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
+    base = build_mgs3_base_zip(tmp_path / MGS3_BASE_NAME)
+    upd = build_mgs3_update_zip(tmp_path / MGS3_UPDATE_NAME)
     ui = FakeUI(checklist=[["mgs3:base", "mgs3:update"]],
                 files=[str(base), str(upd)])          # NO menu entries needed
     audio = install.collect_audio_archives(ui, ["mgs3"])
@@ -301,3 +317,43 @@ def test_bonus_folder_archive_is_rejected(tmp_path):
     p = build_zip(tmp_path / "extras-4-1-0-1700000000.zip",
                   {"bonus/readme.txt": b"hi", "bonus/art.png": b"x"})
     assert install.validate_audio_for_role(p, "mgs3", "base")[0] == "not_audio"
+
+
+# ---------------------------------------------------------------------------
+# Signatures taken from the REAL NexusMods archives (inspected July 2026).
+# These lock in the exact shapes so a refactor can't silently break detection.
+#   MGS2 Full Version      3821 files  us/demo us/demo2 us/movie us/movievr us/vox
+#   MGS3 main file         6053 files  us/demo us/movie us/vox
+#   MGS3 Update 2.0           3 files  us/demo/_bp/ + us/vox/_bp/
+#   MGS3 HQ Ending            2 files  us/demo/_bp/m680_*x.sdt
+# ---------------------------------------------------------------------------
+REAL_MGS2_BASE = ["us/demo/m01.sdt", "us/demo2/t01.sdt", "us/movie/mv.sdt",
+                  "us/movievr/vr.sdt", "us/vox/v.sdt"] + [
+    f"us/demo/f{i}.sdt" for i in range(200)]
+REAL_MGS3_BASE = [f"us/{d}/f{i}.sdt"
+                  for i, d in enumerate(("demo", "movie", "vox") * 70)]
+REAL_MGS3_UPDATE = ["us/demo/_bp/m570_010_p010.sdt",
+                    "us/demo/_bp/v020_010_p0.sdt",
+                    "us/vox/_bp/rm2s151_01.sdt"]
+REAL_MGS3_HQ = ["us/demo/_bp/m680_050_04x.sdt",
+                "us/demo/_bp/m680_060_05x.sdt"]
+
+
+def test_real_payloads_identify_their_game():
+    assert install.audio_game_from_entries(REAL_MGS2_BASE) == "mgs2"
+    assert install.audio_game_from_entries(REAL_MGS3_BASE) == "mgs3"
+    # The patches are too small to prove a game; that's honest, not a failure.
+    assert install.audio_game_from_entries(REAL_MGS3_UPDATE) is None
+    assert install.audio_game_from_entries(REAL_MGS3_HQ) is None
+
+
+def test_real_payloads_identify_their_role():
+    def role(entries):
+        return install.classify_mgs3_role(
+            {"entries": entries, "file_count": len(entries), "size": 0,
+             "version": None, "name": "x.zip"})
+    assert role(REAL_MGS3_BASE) == ("base", True)
+    assert role(REAL_MGS3_UPDATE) == ("update", True)
+    assert role(REAL_MGS3_HQ) == ("hq", True)
+    # An unrecognised patch is reported as unknown rather than guessed.
+    assert role(["us/movie/odd.sdt"]) == (None, False)
