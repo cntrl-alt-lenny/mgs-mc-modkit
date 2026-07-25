@@ -286,8 +286,8 @@ def test_incremental_install_merges_manifest(tmp_path):
     m2 = json.loads(manifest_path.read_text())
     assert base_added <= set(m2["added"])                 # Base files carried over
     assert "us/patch/fix.sdt" in m2["added"]              # Update file recorded
-    assert "Better Audio — Base 1.0" in m2["mods"]        # both mods present
-    assert "Better Audio — Update 2.0" in m2["mods"]
+    assert "MGS3 Better Audio" in m2["mods"]              # both mods present
+    assert "MGS3 Better Audio update" in m2["mods"]
 
     # Uninstall removes BOTH the Base and Update payloads — nothing orphaned.
     notes, ok = install.uninstall_game(game_dir, _noop)

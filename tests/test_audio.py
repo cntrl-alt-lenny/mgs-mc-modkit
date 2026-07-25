@@ -113,69 +113,69 @@ def test_mgs2_ok_with_modid_missing_identity_without(tmp_path):
 def test_not_audio_rejected_outright(tmp_path):
     bad = build_zip(tmp_path / "notes.zip", {"x.txt": b"no"})
     # No yesno is scripted: if the flow offered "use anyway?" it would IndexError.
-    ui = FakeUI(menu=["select", "skip"], files=[str(bad)])
+    ui = FakeUI(menu=["skip"], files=[str(bad)])
     assert install.request_audio_archive(ui, "mgs3", "base", {}) is None
     assert ui.infos                                     # told it was rejected
 
 
 def test_wrong_game_rejected_outright(tmp_path):
     p = build_audio_zip(tmp_path / MGS2_BASE_NAME)      # mod #3, offered to MGS3
-    ui = FakeUI(menu=["select", "skip"], files=[str(p)])
+    ui = FakeUI(menu=["skip"], files=[str(p)])
     assert install.request_audio_archive(ui, "mgs3", "base", {}) is None
     assert ui.infos
 
 
 def test_missing_identity_requires_confirmation(tmp_path):
     renamed = build_base_audio_zip(tmp_path / "renamed.zip")
-    ui = FakeUI(menu=["select"], files=[str(renamed)], yesno=[True])
+    ui = FakeUI(files=[str(renamed)], yesno=[True])       # picker opens first
     assert install.request_audio_archive(
         ui, "mgs3", "base", {}) == renamed.resolve()
     # Declining sends it back to the menu, then skip -> None.
-    ui2 = FakeUI(menu=["select", "skip"], files=[str(renamed)], yesno=[False])
+    ui2 = FakeUI(menu=["skip"], files=[str(renamed)], yesno=[False])
     assert install.request_audio_archive(ui2, "mgs3", "base", {}) is None
 
 
 def test_cancel_file_pick_no_nexus_nag(monkeypatch):
     calls = []
     monkeypatch.setattr(install, "open_url", lambda u: calls.append(u) or True)
-    ui = FakeUI(menu=["select", "skip"], files=[None])
+    ui = FakeUI(menu=["skip"], files=[None])             # cancel the picker
     assert install.request_audio_archive(ui, "mgs3", "base", {}) is None
-    assert calls == []
+    assert calls == []                                   # Nexus never opened
 
 
 def test_same_archive_two_roles_rejected(tmp_path):
     base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
     chosen = {str(base.resolve()): ("mgs3", "base")}
-    ui = FakeUI(menu=["select", "skip"], files=[str(base)])
+    ui = FakeUI(menu=["skip"], files=[str(base)])
     assert install.request_audio_archive(ui, "mgs3", "update", chosen) is None
-    assert ui.infos
+    assert ui.infos                                 # told it's already in use
 
 
 # -- full collection: independence ------------------------------------------
 def test_collect_base_only(tmp_path):
     base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
-    ui = FakeUI(checklist=[["mgs3:base"]], menu=["select"], files=[str(base)])
+    ui = FakeUI(checklist=[["mgs3:base"]], files=[str(base)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["base"]
 
 
 def test_collect_update_only(tmp_path):
     upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
-    ui = FakeUI(checklist=[["mgs3:update"]], menu=["select"], files=[str(upd)])
+    ui = FakeUI(checklist=[["mgs3:update"]], files=[str(upd)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["update"]
 
 
 def test_collect_hq_only(tmp_path):
     hq = build_audio_zip(tmp_path / MGS3_HQ_NAME)
-    ui = FakeUI(checklist=[["mgs3:hq"]], menu=["select"], files=[str(hq)])
+    ui = FakeUI(checklist=[["mgs3:hq"]], files=[str(hq)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["hq"]
 
 
 def test_collect_only_checked_request_files(tmp_path):
     upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
-    ui = FakeUI(checklist=[["mgs3:update"]], menu=["select"], files=[str(upd)])
+    ui = FakeUI(checklist=[["mgs3:update"]], files=[str(upd)])
     install.collect_audio_archives(ui, ["mgs3"])
     assert ui._menu == [] and ui._files == []           # exactly one request
 
@@ -185,7 +185,6 @@ def test_collect_all_ordered(tmp_path):
     hq = build_audio_zip(tmp_path / MGS3_HQ_NAME)
     upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
     ui = FakeUI(checklist=[["mgs3:base", "mgs3:hq", "mgs3:update"]],
-                menu=["select", "select", "select"],
                 files=[str(base), str(hq), str(upd)])
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["base", "hq", "update"]
@@ -199,7 +198,7 @@ def test_collect_cancel_skips_all():
 def test_recommendation_note_base_without_update(tmp_path):
     audio = {"mgs3": install.order_audio_components(
         "mgs3", {"base": tmp_path / "b.zip"})}
-    assert "Update 2.0" in install.audio_recommendation_note(audio)
+    assert "update" in install.audio_recommendation_note(audio).lower()
     audio2 = {"mgs3": install.order_audio_components(
         "mgs3", {"base": tmp_path / "b.zip", "update": tmp_path / "u.zip"})}
     assert install.audio_recommendation_note(audio2) == ""
@@ -214,8 +213,8 @@ def test_manifest_update_only(tmp_path):
     tx = install.InstallTxn(game_dir, "mgs3", lambda m: None)
     install.install_better_audio(tx, comps, lambda m: None)
     tx.commit()
-    assert "Better Audio — Update 2.0" in tx.mods
-    assert "Better Audio — Base 1.0" not in tx.mods
+    assert "MGS3 Better Audio update" in tx.mods
+    assert "MGS3 Better Audio" not in tx.mods
 
 
 def test_manifest_records_each_component(tmp_path):
@@ -230,8 +229,8 @@ def test_manifest_records_each_component(tmp_path):
     tx = install.InstallTxn(game_dir, "mgs3", lambda m: None)
     install.install_better_audio(tx, comps, lambda m: None)
     tx.commit()
-    assert {"Better Audio — Base 1.0", "Better Audio — HQ Ending",
-            "Better Audio — Update 2.0"} <= set(tx.mods)
+    assert {"MGS3 Better Audio", "MGS3 HQ ending cutscenes",
+            "MGS3 Better Audio update"} <= set(tx.mods)
 
 
 def test_extraction_progress_reported(tmp_path):
@@ -247,3 +246,37 @@ def test_extraction_progress_reported(tmp_path):
     assert seen                                 # progress was reported
     assert seen[-1] == 1.0                      # finishes at 100%
     assert all(0.0 <= f <= 1.0 for f in seen)
+
+
+# -- naming clarity (user feedback: the old names were bizarre) --------------
+def test_every_audio_name_says_which_game():
+    """No user-facing audio label may be game-ambiguous like 'Base 2.0'."""
+    for game, spec in install.AUDIO_SPECS.items():
+        up = game.upper()
+        for role, r in spec["roles"].items():
+            for field in ("status", "checklist", "log"):
+                assert up in r[field], (game, role, field, r[field])
+            # ...and no bare version-soup names.
+            assert r["status"] not in ("Base 1.0", "Base 2.0", "Update 2.0")
+            assert r["nexus"]              # tells the user what to look for
+            assert r["short"]              # short form for the summary
+
+
+def test_summary_uses_short_names_under_a_game_heading(tmp_path):
+    audio = {"mgs3": install.order_audio_components(
+        "mgs3", {"base": tmp_path / "main.zip", "update": tmp_path / "upd.zip"})}
+    text = install.audio_status_text(audio)
+    assert "MGS3 audio" in text                       # game heading
+    assert "main.zip" in text and "upd.zip" in text   # actual filenames shown
+    assert "Base 1.0" not in text                     # no version soup
+
+
+def test_one_dialog_per_file_on_the_happy_path(tmp_path):
+    """Ticking the box is consent; the picker opens directly (no extra menu)."""
+    base = build_base_audio_zip(tmp_path / MGS3_BASE_NAME)
+    upd = build_audio_zip(tmp_path / MGS3_UPDATE_NAME)
+    ui = FakeUI(checklist=[["mgs3:base", "mgs3:update"]],
+                files=[str(base), str(upd)])          # NO menu entries needed
+    audio = install.collect_audio_archives(ui, ["mgs3"])
+    assert [c["role"] for c in audio["mgs3"]] == ["base", "update"]
+    assert ui._files == []                            # both pickers consumed

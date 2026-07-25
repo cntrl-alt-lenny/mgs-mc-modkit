@@ -1308,8 +1308,9 @@ def install_better_audio(tx: InstallTxn, components: list[dict], log,
                 f"missing after extraction (e.g. {missing[0]}). The archive "
                 "may be corrupt — re-download it and re-run this kit.")
         log(f"    ✓ {comp['log']}: all {len(rels)} files verified on disk")
-        # Record each component separately in the manifest.
-        tx.note_mod(f"Better Audio — {comp['status']}", comp["filename"])
+        # Record each component separately in the manifest. The status name
+        # already names the game, so it needs no prefix.
+        tx.note_mod(comp["status"], comp["filename"])
 
 
 def install_m2fix(tx: InstallTxn, tmp: Path, opts: dict, log) -> None:
@@ -1659,24 +1660,45 @@ AUDIO_SPECS = {
     "mgs2": {
         "order": ["base"],
         "roles": {
-            "base": {"status": "Base 2.0", "log": "MGS2 AUDIO BASE 2.0",
-                     "checklist": "MGS2 Better Audio — Full Version 2.0",
-                     "default": True},
+            "base": {
+                "status": "MGS2 Better Audio",
+                "short": "Better Audio",
+                "checklist": "MGS2 — Better Audio",
+                "nexus": 'the file called "Full Version"',
+                "log": "MGS2 Better Audio",
+                "default": True,
+            },
         },
     },
     "mgs3": {
         "order": ["base", "hq", "update"],       # HQ before Update; Update last
         "roles": {
-            "base": {"status": "Base 1.0", "log": "MGS3 AUDIO BASE 1.0",
-                     "checklist": "MGS3 Better Audio — Base 1.0",
-                     "default": True},
-            "hq": {"status": "HQ Ending", "log": "MGS3 HQ ENDING — OPTIONAL",
-                   "checklist": "MGS3 HQ Ending Cutscenes",
-                   "default": False, "note": HQ_ENDING_DISCLAIMER},
-            "update": {"status": "Update 2.0",
-                       "log": "MGS3 UPDATE 2.0 — OPTIONAL PATCH",
-                       "checklist": "MGS3 Better Audio — Update 2.0",
-                       "default": True, "note": UPDATE_NOTE},
+            "base": {
+                "status": "MGS3 Better Audio",
+                "short": "Better Audio (main file)",
+                "checklist": "MGS3 — Better Audio (main file)",
+                "nexus": "the main file, shown as version 1.0",
+                "log": "MGS3 Better Audio",
+                "default": True,
+            },
+            "hq": {
+                "status": "MGS3 HQ ending cutscenes",
+                "short": "HQ ending cutscenes",
+                "checklist": "MGS3 — HQ ending cutscenes (optional)",
+                "nexus": 'the file called "HQ Ending Cutscenes"',
+                "log": "MGS3 HQ ending cutscenes (optional)",
+                "default": False,
+                "note": HQ_ENDING_DISCLAIMER,
+            },
+            "update": {
+                "status": "MGS3 Better Audio update",
+                "short": "Audio update",
+                "checklist": "MGS3 — Better Audio update (recommended)",
+                "nexus": 'the small file called "Update 2.0" (about 25 MB)',
+                "log": "MGS3 Better Audio update",
+                "default": True,
+                "note": UPDATE_NOTE,
+            },
         },
     },
 }
@@ -1831,8 +1853,8 @@ def order_audio_components(game_key: str, provided: dict) -> list[dict]:
         if p is not None:
             r = spec["roles"][role]
             out.append({"game": game_key, "role": role, "log": r["log"],
-                        "status": r["status"], "path": p,
-                        "filename": Path(p).name})
+                        "status": r["status"], "short": r["short"],
+                        "path": p, "filename": Path(p).name})
     return out
 
 
@@ -1848,43 +1870,45 @@ def build_audio_checklist(hdfix_keys) -> list[tuple[str, str, bool]]:
         if game not in hdfix_keys:
             continue
         r = AUDIO_SPECS[game]["roles"][role]
-        label = r["checklist"]
-        if role == "update":
-            label += " (recommended)"
-        elif role == "hq":
-            label += " (optional)"
-        # Rows must stay short: kdialog checklist rows do not wrap, so a long
-        # label is ellipsized or pushes the dialog past the Deck's 1280px
-        # screen. Longer explanations belong in the dialog's header text —
-        # see AUDIO_CHECKLIST_TEXT.
-        items.append((f"{game}:{role}", label[:CHECKLIST_LABEL_MAX],
+        # Labels are written game-first and jargon-free in AUDIO_SPECS. Rows
+        # must stay short: kdialog checklist rows do not wrap, so a long label
+        # is ellipsized or pushes the dialog past the Deck's 1280px screen.
+        # Longer explanations belong in the header — see AUDIO_CHECKLIST_TEXT.
+        items.append((f"{game}:{role}", r["checklist"][:CHECKLIST_LABEL_MAX],
                       r["default"]))
     return items
 
 
 def audio_status_text(audio: dict) -> str:
-    """Per-game component block (with chosen filenames) for the summary."""
+    """Per-game audio block (with chosen filenames) for the summary screen.
+
+    Rows use the short role names, since the game is already the heading.
+    """
     blocks = []
     for key in ("mgs2", "mgs3"):
         if key not in audio:
             continue
         spec = AUDIO_SPECS[key]
         by_role = {c["role"]: c for c in audio[key]}
-        lines = [f"{key.upper()} Better Audio"]
+        lines = [f"{key.upper()} audio"]
         for role in spec["order"]:
-            st = spec["roles"][role]["status"]
+            r = spec["roles"][role]
             c = by_role.get(role)
-            lines.append(f"  {st}: " + (c["filename"] if c else "not selected"))
+            if c is None and not r["default"]:
+                continue          # don't list opt-in extras nobody asked for
+            lines.append(f"  {r['short']}: "
+                         + (c["filename"] if c else "not chosen"))
         blocks.append("\n".join(lines))
     return "\n\n".join(blocks)
 
 
 def audio_recommendation_note(audio: dict) -> str:
-    """One concise note if MGS3 base is installed without the recommended patch."""
+    """One concise note if MGS3's main file goes in without its update."""
     comps = audio.get("mgs3", [])
     roles = {c["role"] for c in comps}
     if "base" in roles and "update" not in roles:
-        return "Note: MGS3 Update 2.0 (recommended patch) was not selected."
+        return ("Note: the recommended MGS3 audio update wasn't chosen. You "
+                "can add it later by running this again.")
     return ""
 
 
@@ -1899,53 +1923,65 @@ def request_audio_archive(ui: UI, game_key: str, role: str,
     """
     rspec = AUDIO_SPECS[game_key]["roles"][role]
     nexus = GAMES[game_key]["audio_page"]
+    title = rspec["status"]                      # e.g. "MGS3 Better Audio update"
+    # Straight to the file picker: ticking the box in the checklist already said
+    # "yes, I want this". The menu is only shown if that picker is cancelled.
+    sel = ui.pick_archive_file(f"Choose your {title} file")
     while True:
+        if sel:
+            p = Path(sel).resolve()
+            verdict = _accept_audio_file(ui, p, game_key, role, chosen, rspec)
+            if verdict is not None:
+                return verdict
         choice = ui.menu(
-            f"Audio file — {rspec['status']}",
-            f"Provide the {rspec['status']} archive:",
-            [("select", "Select a file…"),
-             ("nexus", "Open Nexus page"),
-             ("skip", "Skip this one")])
+            title,
+            f"On NexusMods this is {rspec['nexus']}.\n\n"
+            "What would you like to do?",
+            [("select", "Choose the file…"),
+             ("nexus", "Open the NexusMods page"),
+             ("skip", f"Skip {title}")])
         if choice in (None, "skip"):
             return None
         if choice == "nexus":
             if not open_url(nexus):
                 ui.info(f"Open this page to download it:\n{nexus}")
             else:
-                ui.info("Download it, then pick “Select a file…”.")
+                ui.info("Once it has downloaded, choose “Choose the file…”.")
+            sel = None
             continue
-        sel = ui.pick_archive_file(f"Select the {rspec['status']} archive")
-        if not sel:
-            continue                     # cancel returns to this component's menu
-        p = Path(sel).resolve()
-        prior = chosen.get(str(p))
-        if prior is not None:
-            other = AUDIO_SPECS[prior[0]]["roles"][prior[1]]["status"]
-            ui.info(f"{p.name}\nis already selected for {other}. "
-                    "Pick a different file.")
-            continue
-        verdict, msg = validate_audio_for_role(p, game_key, role)
-        if verdict == "ok":
-            return p
-        if verdict in ("not_audio", "wrong_game"):
-            # Hard reject — no "use it anyway". Back to the menu for another file.
-            ui.info(f"{p.name}\n{msg}.\n\nRejected — pick a different file.")
-            continue
-        if verdict == "missing_identity":
-            if ui.yesno(f"{p.name}\n{msg}.\n\n"
-                        f"Use it as {rspec['status']} anyway?"):
-                return p
-            continue
-        if verdict == "mismatch":
-            if ui.yesno(f"{p.name}\n{msg}, not {rspec['status']}.\n\n"
-                        f"Use it as {rspec['status']} anyway?"):
-                return p
-            continue
-        # ambiguous
-        if ui.yesno(f"This appears to be {msg} could not be confirmed.\n\n"
-                    f"Continue using it as {rspec['status']}?"):
-            return p
-        # otherwise loop back to the menu
+        sel = ui.pick_archive_file(f"Choose your {title} file")
+
+
+def _accept_audio_file(ui: UI, p: Path, game_key: str, role: str,
+                       chosen: dict[str, tuple], rspec: dict) -> Path | None:
+    """Vet one chosen file. Returns it if usable, else None to re-ask.
+
+    Files that are clearly not MGS audio, or belong to the other game, are
+    rejected outright. Anything the payload can't prove is confirmed by the
+    user rather than silently accepted.
+    """
+    name = rspec["status"]
+    prior = chosen.get(str(p))
+    if prior is not None:
+        other = AUDIO_SPECS[prior[0]]["roles"][prior[1]]["status"]
+        ui.info(f"{p.name}\n\nThat file is already being used for {other}. "
+                "Please choose a different one.")
+        return None
+    verdict, msg = validate_audio_for_role(p, game_key, role)
+    if verdict == "ok":
+        return p
+    if verdict in ("not_audio", "wrong_game"):
+        ui.info(f"{p.name}\n\nThis {msg}.\n\nPlease choose a different file.")
+        return None
+    if verdict == "missing_identity":
+        return p if ui.yesno(f"{p.name}\n\nThis {msg}.\n\n"
+                             f"Use it as your {name} file anyway?") else None
+    if verdict == "mismatch":
+        return p if ui.yesno(f"{p.name}\n\nThis {msg}, not {name}.\n\n"
+                             f"Use it as your {name} file anyway?") else None
+    # ambiguous — right game, but the exact file can't be confirmed
+    return p if ui.yesno(f"{p.name}\n\nThis appears to be {msg} could not be "
+                         f"confirmed.\n\nUse it as your {name} file?") else None
 
 
 def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
@@ -2324,9 +2360,9 @@ def main() -> int:
         else:
             bits = [f"MGSHDFix {HDFIX_VERSION}"]
             if key in audio_archives:
-                bits.append("Better Audio ["
-                            + ", ".join(c["status"] for c in audio_archives[key])
-                            + "]")
+                bits.append("Better Audio ("
+                            + ", ".join(c["short"] for c in audio_archives[key])
+                            + ")")
             bits.append(f"Bugfix Compilation {g['bugfix_version']} (Base)")
             bits.append("tuned MGSHDFix.settings")
         plan.append(f"• {g['short']}  →  {d}\n    {' + '.join(bits)}")
