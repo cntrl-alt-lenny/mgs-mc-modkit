@@ -20,7 +20,7 @@
 > fiddly (MGSHDFix won't even boot without a config file its Windows-only tool
 > generates). This kit makes the best *vanilla-faithful* setup as close to
 > one-click as possible, and does it **safely** — checksummed downloads,
-> staged extraction, backups, and a real uninstall.
+> staged extraction, backups, and real repair/uninstall.
 
 ## 🎯 What it does
 
@@ -28,7 +28,7 @@
 - 📥 **Installs the essential fix mods** in the exact required order, straight from the authors' official releases
 - ⚙️ **Writes a known-good config** (MGSHDFix won't launch without one) and applies the Konami launcher's own options so it can be skipped
 - 🔒 **Verifies every download** against a pinned SHA-256 and stages/​path-checks archives before touching your game
-- ♻️ **Transactional + reversible** — backups, rollback on failure, and a one-command `--uninstall`
+- ♻️ **Transactional + reversible** — backups, crash-safe rollback, and built-in repair/uninstall from the same shortcut
 - 🌿 **Vanilla-faithful only** — fixes and restorations, never AI-upscaled texture packs
 
 ## 🎮 Per-game
@@ -112,8 +112,10 @@ rehosted here.**
 | ✅ **Checksummed downloads** | Every auto-fetched archive is verified against a pinned SHA-256 before it's touched — a corrupted or tampered file never reaches your game folder |
 | ✅ **Transactional installs** | Archives are extracted to a staging area and every path is validated (no `../` traversal, no absolute paths, no symlinks) before anything is copied in |
 | ✅ **Backups + rollback** | Fix-mod files are backed up and every change recorded, so a mid-install failure rolls that game back (and a failed re-install falls back to your previous working setup). All archives are downloaded *before* anything is written, so a dropped connection can't strand you |
-| ✅ **One-command uninstall** | `python3 install.py --uninstall` reverses everything using the recorded manifest |
-| ✅ **Tested** | A [CI](.github/workflows/ci.yml) test-suite covers discovery, every game combo, malicious/corrupt archives, rollback, idempotent re-installs and uninstall |
+| ✅ **Crash-safe** | An intent journal is flushed to disk before any file is moved, so a power loss mid-install can't make the next run mistake mod files for your originals. Backups are never overwritten — the copy closest to your original always wins, and a damaged record is a hard stop, never a silent "fresh install" |
+| ✅ **Won't fill your drive** | Free space is checked against each archive's real unpacked size before extracting, so a full microSD fails up front instead of halfway through |
+| ✅ **Repair & uninstall built in** | Run the shortcut again any time: it detects an existing install and offers *install/repair* or *remove the mods*. Even if the record is lost, your backed-up originals are still restored |
+| ✅ **Tested** | A [CI](.github/workflows/ci.yml) test-suite (96 tests) covers discovery, every game combo, malicious/corrupt archives, rollback, interrupted installs, incremental re-installs and uninstall |
 
 <sub>One honest caveat: the Better Audio Mod overwrites some multi-GB stock game
 files, which are too large to back up. Those specific files are restored with
@@ -124,8 +126,8 @@ reversible.</sub>
 (needs `bsdtar`). Bumping a mod version? `python3 tools/refresh_checksums.py`
 prints the new hashes.</sub>
 
-<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.6.0`**.
-To cut a release, push a matching tag (`git tag v1.6.0 && git push --tags`) —
+<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.7.0`**.
+To cut a release, push a matching tag (`git tag v1.7.0 && git push --tags`) —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's baked-in tag/hash doesn't match `install.py`**, then publishes
 `install.py` + a `SHA256SUMS` file. After editing `install.py`, update the
@@ -299,19 +301,27 @@ removed, and startup notices are skipped.
 
 <br>
 
-**Clean uninstall (recommended):** re-run the installer with `--uninstall`:
+**Just double-click the installer shortcut again.** It notices the games are
+already set up and asks what you want to do:
 
-```bash
-python3 install.py --uninstall
-```
+- **Install or repair mods** — re-applies everything (safe to do any time, and
+  the way to add the audio packs later)
+- **Remove the mods** — full uninstall
+- **Quit**
+
+> 🔑 **Keep the shortcut.** It's your repair and uninstall button, not just an
+> installer. (Older versions offered to delete it — they shouldn't have.)
+
+Prefer the terminal? `python3 install.py --uninstall` goes straight to removal.
 
 Every install is **transactional** — the kit records exactly which files it
 added and backs up any it overwrote in a hidden `mgs-modkit/` folder inside the
-game directory. `--uninstall` reads that manifest, removes the files it added,
+game directory. Uninstall reads that record, removes the files it added,
 restores the originals it backed up, and clears the obsolete legacy
 `MGSM2Fix.asi` that upstream warns can clash with the unified 3.x release. Your
-game saves are never touched. (Multi-GB Better Audio assets are recorded but
-not backed up — use *Verify integrity* below to restore those.)
+game saves are never touched. If something couldn't be reverted, the backups are
+**kept** so you can retry rather than being deleted. (Multi-GB Better Audio
+assets are recorded but not backed up — use *Verify integrity* below for those.)
 
 **Manual revert to stock:** Steam → the game → *Properties → Installed Files →
 Verify integrity of game files*. To also delete the added files by hand:
