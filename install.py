@@ -74,7 +74,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.7.0"
+MODKIT_VERSION = "1.8.0"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -407,9 +407,15 @@ STEAMID64_BASE = 76561197960265728
 # ---------------------------------------------------------------------------
 class UI:
     def __init__(self) -> None:
+        # Without a display, every kdialog/zenity call exits non-zero: info()
+        # and error() vanish and yesno() reads as "No", so the run would abort
+        # with no visible reason (a real problem when SSH'd into a Deck). Fall
+        # back to the terminal, which works end to end.
+        has_display = bool(os.environ.get("DISPLAY")
+                           or os.environ.get("WAYLAND_DISPLAY"))
         self.kind = (
-            "kdialog" if shutil.which("kdialog")
-            else "zenity" if shutil.which("zenity")
+            "kdialog" if has_display and shutil.which("kdialog")
+            else "zenity" if has_display and shutil.which("zenity")
             else "term"
         )
         # The folder the file picker opens in — starts at Downloads, then
@@ -432,14 +438,27 @@ class UI:
         else:
             print(f"\n=== {title} ===\n{text}\n")
 
-    def error(self, text: str, title: str = "MGS Deck Mod Kit — Error") -> None:
+    def error(self, text: str, title: str = "MGS Deck Mod Kit — Error",
+              details: str | None = None) -> None:
+        """Show an error. `details` goes in an expandable pane where supported.
+
+        Keeps the headline readable on an 800p screen instead of dumping hashes
+        and recovery paragraphs into one box.
+        """
         if self.kind == "kdialog":
-            self._run(["kdialog", "--title", title, "--error", text])
+            if details:
+                self._run(["kdialog", "--title", title, "--detailederror",
+                           text, details])
+            else:
+                self._run(["kdialog", "--title", title, "--error", text])
         elif self.kind == "zenity":
+            body = text if not details else f"{text}\n\n{details}"
             self._run(["zenity", "--error", "--title", title,
-                       "--no-wrap", "--text", text])
+                       "--no-wrap", "--text", body])
         else:
             print(f"\n!!! {title} !!!\n{text}\n", file=sys.stderr)
+            if details:
+                print(f"{details}\n", file=sys.stderr)
 
     def yesno(self, text: str, title: str = "MGS Deck Mod Kit") -> bool:
         if self.kind == "kdialog":
@@ -465,12 +484,18 @@ class UI:
     def pick_file(self, text: str, start: Path | None = None) -> str | None:
         start_s = str(start or (Path.home() / "Downloads"))
         if self.kind == "kdialog":
+            # The filter MUST be the described "Name (globs)" form: KF5-era
+            # kdialog silently ignored a bare glob and showed every file
+            # (KDE bug 467868); the described form works on both generations.
             rc, out = self._run(["kdialog", "--title", text,
-                                 "--getopenfilename", start_s, "*.zip *.7z *.rar"])
+                                 "--getopenfilename", start_s,
+                                 "Mod archives (*.zip *.7z *.rar)"])
             return out or None if rc == 0 else None
         if self.kind == "zenity":
             rc, out = self._run(["zenity", "--file-selection", "--title", text,
-                                 "--filename", start_s + "/"])
+                                 "--filename", start_s + "/",
+                                 "--file-filter=Mod archives | *.zip *.7z *.rar",
+                                 "--file-filter=All files | *"])
             return out or None if rc == 0 else None
         ans = input(f"{text}\nPath to archive (blank to skip): ").strip()
         return ans or None
@@ -581,8 +606,7 @@ class Progress:
             except OSError:
                 self._proc = None
         elif kind == "kdialog" and shutil.which("kdialog"):
-            self._qdbus = (shutil.which("qdbus") or shutil.which("qdbus6")
-                           or shutil.which("qdbus-qt5"))
+            self._qdbus = find_qdbus()
             if self._qdbus:
                 try:
                     r = subprocess.run(
@@ -709,20 +733,24 @@ def download(url: str, dest: Path, log, sha256: str | None = None) -> None:
                 break
             h.update(chunk)
             f.write(chunk)
+    name = url.rsplit("/", 1)[-1]
     if dest.stat().st_size == 0:
         dest.unlink(missing_ok=True)
-        raise RuntimeError(f"Downloaded 0 bytes from {url}")
+        raise RuntimeError(
+            f"The download of {name} arrived empty. Check your internet "
+            "connection and run the installer again. Nothing was changed.")
     if sha256 is not None:
         got = h.hexdigest()
         if got.lower() != sha256.lower():
             dest.unlink(missing_ok=True)
+            # Keep the digests out of the message the user reads — they're in
+            # the log for bug reports.
+            log(f"    ✗ {name}: expected {sha256}, got {got}")
             raise RuntimeError(
-                "Checksum mismatch — refusing to install a file that doesn't "
-                f"match its pinned hash.\n\n  {url.rsplit('/', 1)[-1]}\n"
-                f"  expected {sha256}\n  got      {got}\n\n"
-                "The download was corrupted or the release was changed. "
-                "Nothing was written to your game folder.")
-        log(f"    ✓ sha256 verified")
+                f"The download of {name} didn't arrive intact, so it was not "
+                "installed.\n\nThis is usually a dropped connection — run the "
+                "installer again. Nothing was changed in your game folder.")
+        log("    ✓ download verified")
 
 
 def sha256_file(path: Path) -> str:
@@ -959,6 +987,7 @@ class InstallTxn:
         self.added: list[str] = []
         self.overwritten: list[dict] = []
         self.mods: dict[str, str] = {}
+        self.settings: dict = {}        # user choices, persisted for re-runs
         self._added_set: set[str] = set()
         self._backed_up: set[str] = set()
         # Rollback bookkeeping, tracked separately from the uninstall manifest:
@@ -1186,6 +1215,10 @@ class InstallTxn:
             "added": merged_added,
             "overwritten": self.overwritten,
         }
+        # Remember the user's choices so a later run can pre-answer instead of
+        # asking everything again (see load_saved_opts).
+        if self.settings:
+            manifest["settings"] = self.settings
         self.root.mkdir(parents=True, exist_ok=True)
         (self.root / MANIFEST_NAME).write_text(
             json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
@@ -1395,8 +1428,32 @@ def steamid64s(steam_root: Path) -> list[int]:
 
 
 def _read_launcher_sv(path: Path) -> dict[str, str]:
+    """Parse the launcher's save. Raises ValueError on anything unexpected.
+
+    A hand-edited or corrupt save could hold non-lists or non-strings; a raw
+    TypeError from zip() would escape the caller's handler and surface as a
+    traceback, so shape problems are normalised to ValueError here.
+    """
     data = json.loads(path.read_text(encoding="utf-8-sig"))
-    return dict(zip(data["keyList"], data["valueList"]))
+    if not isinstance(data, dict):
+        raise ValueError("launcher save is not a JSON object")
+    keys, vals = data.get("keyList"), data.get("valueList")
+    if not isinstance(keys, list) or not isinstance(vals, list):
+        raise ValueError("launcher save is missing its key/value lists")
+    if not all(isinstance(k, str) for k in keys):
+        raise ValueError("launcher save has non-text keys")
+    # Values are written back as JSON strings; coerce simple scalars so a save
+    # holding 1 instead of "1" doesn't abort the whole step.
+    out: dict[str, str] = {}
+    for k, v in zip(keys, vals):
+        if isinstance(v, bool) or v is None:
+            raise ValueError(f"launcher save has an unusable value for {k!r}")
+        if isinstance(v, (int, float)):
+            v = str(v)
+        if not isinstance(v, str):
+            raise ValueError(f"launcher save has an unusable value for {k!r}")
+        out[k] = v
+    return out
 
 
 def _launcher_sv_bytes(keys: list[str], vals: list[str]) -> bytes:
@@ -1747,6 +1804,35 @@ def open_url(url: str) -> bool:
         return False
 
 
+def find_qdbus() -> str | None:
+    """Locate a qdbus binary. Naming varies: Arch/SteamOS ships qdbus6."""
+    for name in ("qdbus", "qdbus6", "qdbus-qt6", "qdbus-qt5"):
+        p = shutil.which(name)
+        if p:
+            return p
+    return None
+
+
+def copy_to_clipboard(text: str) -> bool:
+    """Put `text` on the KDE clipboard via klipper's D-Bus interface.
+
+    Lets the user paste the launch options straight into Steam instead of
+    transcribing them. Best-effort: returns False if klipper isn't reachable
+    (no display, non-KDE session, widget disabled), and nothing else changes.
+    """
+    qdbus = find_qdbus()
+    if not qdbus:
+        return False
+    try:
+        r = subprocess.run(
+            [qdbus, "org.kde.klipper", "/klipper",
+             "org.kde.klipper.klipper.setClipboardContents", text],
+            capture_output=True, text=True, timeout=10)
+        return r.returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 # -- role identification (unit-tested) --------------------------------------
 def audio_archive_profile(path: Path) -> dict | None:
     """Structural profile of an archive, or None if unreadable/not an archive."""
@@ -1807,7 +1893,8 @@ def validate_audio_for_role(path: Path, game_key: str,
     Returns (verdict, message). verdict is one of:
       ok               — confidently matches; use it silently
       not_audio        — not an MGS audio archive at all  (REJECT outright)
-      wrong_game       — Nexus mod-id is for the other game  (REJECT outright)
+      wrong_game       — the OTHER game's audio mod  (REJECT outright)
+      unknown_mod      — some other Nexus mod id; ask (pages get re-uploaded)
       missing_identity — audio, but no Nexus mod-id to confirm the GAME; a
                          renamed file can't be size-guessed into a silent pass
       mismatch         — confidently looks like a DIFFERENT MGS3 component
@@ -1823,9 +1910,18 @@ def validate_audio_for_role(path: Path, game_key: str,
         return "not_audio", ("doesn't look like an MGS audio archive — no us/ "
                              "folder or .sdt/.sdx/.xxs files inside")
     exp_modid = AUDIO_MODID[game_key]
+    other_modid = AUDIO_MODID["mgs3" if game_key == "mgs2" else "mgs2"]
+    if prof["modid"] == other_modid:
+        # Definitely the OTHER game's mod — a hard reject, no override.
+        return "wrong_game", (f"is the {'MGS3' if game_key == 'mgs2' else 'MGS2'} "
+                              "audio mod, not this game's")
     if prof["modid"] is not None and prof["modid"] != exp_modid:
-        return "wrong_game", (f"is NexusMods mod #{prof['modid']}, but this "
-                              f"game's Better Audio is mod #{exp_modid}")
+        # Some other mod id entirely. Nexus has reorganised these pages before,
+        # forcing authors to re-upload under new ids, so this can't be a hard
+        # reject or a legitimate fresh download would be dead-ended — ask.
+        return "unknown_mod", (f"comes from NexusMods mod #{prof['modid']}, "
+                               f"which isn't the one expected for {game_key.upper()} "
+                               f"(#{exp_modid})")
     if prof["modid"] is None:
         # Renamed file: we can't prove which GAME it's for. Never silently
         # accept it (a renamed MGS2 base could otherwise pass as an MGS3 base
@@ -1973,6 +2069,9 @@ def _accept_audio_file(ui: UI, p: Path, game_key: str, role: str,
     if verdict in ("not_audio", "wrong_game"):
         ui.info(f"{p.name}\n\nThis {msg}.\n\nPlease choose a different file.")
         return None
+    if verdict == "unknown_mod":
+        return p if ui.yesno(f"{p.name}\n\nThis {msg}.\n\n"
+                             f"Use it as your {name} file anyway?") else None
     if verdict == "missing_identity":
         return p if ui.yesno(f"{p.name}\n\nThis {msg}.\n\n"
                              f"Use it as your {name} file anyway?") else None
@@ -2104,6 +2203,44 @@ def already_modded(found: dict) -> list[str]:
     """Game keys that carry a record from a previous run of this kit."""
     return [k for k, (d, _r) in found.items()
             if (d / MODKIT_DIRNAME / MANIFEST_NAME).is_file()]
+
+
+# Only these keys are restored from a previous run — anything else in a manifest
+# is ignored, so a hand-edited or future-version record can't inject values.
+SAVED_OPT_KEYS = ("button_icons", "audio_mode", "hq_movies", "skip_splash",
+                  "skip_launcher", "update_check")
+
+
+def load_saved_opts(found: dict) -> dict:
+    """Settings chosen on a previous run, so re-runs don't re-ask everything.
+
+    Reads the newest manifest that has a settings block. Unparseable records are
+    ignored here (the install path raises on those, separately).
+    """
+    best: dict = {}
+    best_stamp = ""
+    for _k, (d, _r) in found.items():
+        mf = d / MODKIT_DIRNAME / MANIFEST_NAME
+        if not mf.is_file():
+            continue
+        try:
+            data = json.loads(mf.read_text(encoding="utf-8"))
+            saved = data.get("settings")
+            if not isinstance(saved, dict):
+                continue
+            stamp = str(data.get("installed_utc", ""))
+        except (ValueError, OSError):
+            continue
+        if stamp >= best_stamp:
+            best_stamp = stamp
+            best = saved
+    out = {}
+    for k in SAVED_OPT_KEYS:
+        if k in best:
+            v = best[k]
+            if isinstance(v, (bool, str)):
+                out[k] = v
+    return out
 
 
 def choose_mode(ui: UI, found: dict) -> str | None:
@@ -2289,108 +2426,65 @@ def main() -> int:
         "hq_movies": True, "skip_splash": True,
         "update_check": False, "skip_launcher": True,
     }
-    if hdfix_sel:
-        # Detection only reorders the menu so the likeliest choice is
-        # preselected — every option stays available on every device.
-        icon_items = [
-            ("Steam Deck", "Steam Deck — matches the Deck's physical buttons"),
-            ("Xbox One", "Xbox — Steam Machine / Xbox-style pads"),
-            ("PlayStation 5", "PlayStation 5 — for a DualSense"),
-            ("PlayStation 2", "PlayStation 2 — authentic, restored by the Bugfix mod"),
-            ("Keyboard / Mouse", "Keyboard / Mouse"),
-        ]
-        if device != "steam_deck":
-            icon_items.insert(0, icon_items.pop(1))    # Xbox first
-        opts["button_icons"] = ui.menu(
-            "Controller Button Icons",
-            "Which button prompts should MGS2/MGS3 show?",
-            icon_items,
-        ) or icon_items[0][0]
-
-        opts["audio_mode"] = ui.menu(
-            "Audio Output",
-            "How are you listening?",
-            [("Stereo (2.0)", "Stereo — handheld, headphones, TV speakers "
-                              "(right for most setups, incl. docked)"),
-             ("Surround Sound (5.1)", "5.1 Surround — ONLY with a real "
-                                      "surround receiver / speaker setup")],
-        ) or "Stereo (2.0)"
-
-    # Build the extras checklist from whatever's actually selected.
-    # (No MGS3 high-res texture option: Konami's official texture pack can be
-    # installed on the Steam Deck but cannot be used in-game, so the kit
-    # always leaves HiresoTexture=0.)
-    extra_items: list[tuple[str, str, bool]] = []
-    if hdfix_sel:
-        extra_items += [
-            ("hq_movies", "High-quality cinematics  (set for you — no "
-                          "launcher trip needed)", True),
-            ("skip_splash", "Skip the unskippable KONAMI intro logos", True),
-        ]
-    if hdfix_sel or m2fix_sel:
-        skip_label = ("Boot straight into the games ("
-                      + " / ".join(filter(None, [
-                          "skip MGS2/3's Konami launcher" if hdfix_sel else "",
-                          "MGS1 re-boots your last-picked version"
-                          if m2fix_sel else ""])) + ")")
-        extra_items += [
-            ("skip_launcher", skip_label, True),
-            ("update_check", "Check for mod updates on launch", False),
-        ]
-    if extra_items:
-        extras = ui.checklist(
-            "Extra Options", "Optional tweaks (recommended defaults shown):",
-            extra_items,
-        )
-        # None == the user cancelled the dialog: keep the recommended
-        # defaults rather than reading a cancel as "turn everything off".
-        if extras is not None:
-            for tag, _, _ in extra_items:
-                opts[tag] = tag in extras
+    # Defaults are the recommended answers for every one of these, so they are
+    # NOT asked up front any more — the summary screen lists them and offers a
+    # "Change settings" branch for anyone who wants something else.
+    if device != "steam_deck":
+        opts["button_icons"] = "Xbox One"
+    # A previous run's choices win over the generic defaults, so someone who
+    # picked 5.1 sound or PS2 buttons doesn't have to set them again.
+    saved = load_saved_opts(found)
+    if saved:
+        opts.update(saved)
+        log(f"  Reusing your settings from last time ({len(saved)} options).")
 
     # 4. Better Audio Mod — one checklist, then explicit per-archive picking.
     audio_archives = collect_audio_archives(ui, hdfix_sel)
 
-    # 5. Confirm ------------------------------------------------------------
-    plan = []
-    for key in found:
-        g, (d, _) = GAMES[key], found[key]
-        if g.get("kind", "hdfix") == "m2fix":
-            bits = [f"MGSM2Fix {M2FIX_VERSION} (vanilla defaults)"]
-        else:
-            bits = [f"MGSHDFix {HDFIX_VERSION}"]
-            if key in audio_archives:
-                bits.append("Better Audio ("
-                            + ", ".join(c["short"] for c in audio_archives[key])
-                            + ")")
-            bits.append(f"Bugfix Compilation {g['bugfix_version']} (Base)")
-            bits.append("tuned MGSHDFix.settings")
-        plan.append(f"• {g['short']}  →  {d}\n    {' + '.join(bits)}")
+    # 5. One review screen. Settings are shown, not asked — "Change settings"
+    #    is there for anyone who wants something other than the recommendation.
+    while True:
+        plan = []
+        for key in found:
+            g, (d, _) = GAMES[key], found[key]
+            if g.get("kind", "hdfix") == "m2fix":
+                bits = ["MGSM2Fix"]
+            else:
+                bits = ["MGSHDFix", "Community Bugfix pack", "tuned settings"]
+                if key in audio_archives:
+                    bits.insert(1, "Better Audio (" + ", ".join(
+                        c["short"] for c in audio_archives[key]) + ")")
+            plan.append(f"• {g['short']}:  {' + '.join(bits)}")
 
-    target_dir = next(iter(found.values()))[0]
-    summary = (
-        f"Device: {'Steam Deck (detected)' if device == 'steam_deck' else 'Linux / SteamOS PC'}"
-        f"    Free space: {free_gb(target_dir):.0f} GB\n\n")
-    if hdfix_sel:
-        summary = (
-            f"Button icons: {opts['button_icons']}    "
-            f"Audio: {opts['audio_mode']}\n"
-            f"Skip logos: {'yes' if opts['skip_splash'] else 'no'}    "
-            f"Skip launcher: {'yes' if opts['skip_launcher'] else 'no'}\n\n"
-            + summary)
-    audio_block = audio_status_text(audio_archives)
-    if audio_block:
-        summary += "Better Audio components:\n" + audio_block + "\n\n"
+        target_dir = next(iter(found.values()))[0]
+        settings = []
+        if hdfix_sel:
+            settings.append(f"Buttons: {opts['button_icons']}    "
+                            f"Sound: {opts['audio_mode']}")
+            settings.append(
+                f"Skip intro logos: {'yes' if opts['skip_splash'] else 'no'}"
+                f"    Boot straight in: "
+                f"{'yes' if opts['skip_launcher'] else 'no'}")
+        audio_block = audio_status_text(audio_archives)
         note = audio_recommendation_note(audio_archives)
-        if note:
-            summary += note + "\n\n"
-    elif hdfix_sel:
-        summary += "Better Audio: skipped\n\n"
-    if not ui.yesno(
-        "Ready to install:\n\n" + "\n".join(plan) + "\n\n" + summary +
-        "Make sure THE GAMES AND STEAM'S DOWNLOADS ARE CLOSED. Proceed?"
-    ):
-        return 0
+
+        body = ("Ready to go:\n\n" + "\n".join(plan) + "\n\n"
+                + ("\n".join(settings) + "\n\n" if settings else "")
+                + (audio_block + "\n\n" if audio_block
+                   else ("Better Audio: not installing\n\n" if hdfix_sel else ""))
+                + (note + "\n\n" if note else "")
+                + f"Free space: {free_gb(target_dir):.0f} GB\n\n"
+                + "Close the games and let any Steam downloads finish first.")
+
+        choice = ui.menu("Ready to install", body,
+                         [("go", "Install now"),
+                          ("opts", "Change settings…"),
+                          ("cancel", "Cancel")])
+        if choice in (None, "cancel"):
+            return 0
+        if choice == "go":
+            break
+        ask_options(ui, opts, hdfix_sel, m2fix_sel)      # then loop and re-show
 
     # 6. Do the work --------------------------------------------------------
     # Each game is installed in its own transaction: on any failure that game
@@ -2412,6 +2506,7 @@ def main() -> int:
                     prog.update(f"{short} — {text}", (idx + frac) / total * 100)
 
                 tx = InstallTxn(game_dir, key, log)
+                tx.settings = {k: opts[k] for k in SAVED_OPT_KEYS if k in opts}
                 try:
                     stage("Preparing", 0.05)
                     if g.get("kind", "hdfix") == "m2fix":
@@ -2489,44 +2584,121 @@ def main() -> int:
     lo_lines = [f"   {GAMES[key]['short']}:  {launch_option_for(key)}"
                 for key in ("mgs1", "mgs2", "mgs3") if key in found]
 
-    # Offer to drop a copy-paste reference on the Desktop (recommended).
-    saved_path = None
-    if ui.yesno(
-        "Save the Steam launch options to a text file on your Desktop?\n\n"
-        "It's the one manual step, so a copy you can open and paste from "
-        "later is handy.\n\n(Recommended: Yes)"
-    ):
-        saved_path = save_launch_options_file(ui, list(found.keys()), log)
-    saved_note = (f"Saved a copy to {saved_path.name} on your Desktop.\n\n"
+    # Always write the reference file — it's tiny, it's the one step we can't
+    # do for the user, and the old "save it? (recommended: yes)" prompt was a
+    # question whose answer was never in doubt.
+    saved_path = save_launch_options_file(ui, list(found.keys()), log)
+    saved_note = (f"They're also saved in “{saved_path.name}” on your Desktop.\n"
                   if saved_path else "")
 
     tips = []
     if hdfix_sel:
         if opts["skip_launcher"]:
-            tips.append("• Launcher skipped, HQ cinematics ON. (To restore it: "
-                        "Skip Launcher=0 in plugins/MGSHDFix.settings.)")
+            tips.append("• MGS2/MGS3 boot straight in, with high-quality "
+                        "cinematics on.")
         else:
-            tips.append("• The Konami launcher still shows — options are "
-                        "preset, just hit Play.")
-        tips.append("• Docked / on a TV at 720p? Properties → Game Resolution "
-                    "→ Native.")
-        tips.append("• A “missing config key” error later? Run plugins/"
-                    "'MGSHDFix Config Tool.exe' → Save and Exit.")
+            tips.append("• The Konami launcher still appears — its settings are "
+                        "already done, just press Play.")
+        tips.append("• Playing on a TV and it looks soft? In Steam set "
+                    "Properties → Game Resolution to Native.")
     if any(GAMES[k].get("kind") == "m2fix" for k in found):
-        tips.append("• MGS1 first boot: pick METAL GEAR SOLID (US), Max "
-                    "resolution, 4:3.")
+        tips.append("• MGS1 asks which version to play the first time: choose "
+                    "METAL GEAR SOLID (US), Max resolution, 4:3.")
 
     ui.info(
-        f"✅ Done — {names} modded and verified!\n\n"
-        "ONE manual step (Steam reverts script edits, so do it in Steam):\n"
-        "right-click each game → Properties → Launch Options, paste its line:\n\n"
+        f"✅ All done — {names} is modded and checked.\n\n"
+        "ONE thing left, which only you can do in Steam:\n"
+        "right-click each game → Properties → Launch Options, and paste its "
+        "line.\n\n"
         + "\n".join(lo_lines) + "\n\n"
         + saved_note
         + "\n".join(tips)
-        + "\n\nKeep the desktop shortcut — running it again lets you repair "
-          "the mods, add the audio packs later, or remove everything."
+        + "\n\nKeep the desktop shortcut — run it again any time to repair the "
+          "mods, add the audio packs, or remove everything."
     )
+    offer_clipboard_copy(ui, list(found.keys()))
     return 0
+
+
+def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
+    """The 'Change settings' branch — only reached if the user asks for it.
+
+    Every option here already defaults to the recommended answer, which is why
+    it is not on the main path.
+    """
+    if hdfix_sel:
+        icon_items = [
+            ("Steam Deck", "Steam Deck buttons"),
+            ("Xbox One", "Xbox buttons"),
+            ("PlayStation 5", "PlayStation 5 buttons"),
+            ("PlayStation 2", "PlayStation 2 buttons (as the originals had)"),
+            ("Keyboard / Mouse", "Keyboard and mouse"),
+        ]
+        if opts.get("device") != "steam_deck":
+            icon_items.insert(0, icon_items.pop(1))    # Xbox first
+        opts["button_icons"] = ui.menu(
+            "Button prompts",
+            "Which controller buttons should the games show?",
+            icon_items) or opts["button_icons"]
+
+        opts["audio_mode"] = ui.menu(
+            "Sound",
+            "How are you listening?",
+            [("Stereo (2.0)", "Headphones, the Deck, or a TV (best for most)"),
+             ("Surround Sound (5.1)", "A real 5.1 surround speaker setup")],
+        ) or opts["audio_mode"]
+
+    extra_items: list[tuple[str, str, bool]] = []
+    if hdfix_sel:
+        extra_items += [
+            ("hq_movies", "High-quality cutscenes", opts["hq_movies"]),
+            ("skip_splash", "Skip the KONAMI intro logos", opts["skip_splash"]),
+        ]
+    if hdfix_sel or m2fix_sel:
+        extra_items += [
+            ("skip_launcher", "Boot straight into the games",
+             opts["skip_launcher"]),
+            # Left available but off: the mod versions here are pinned to match
+            # the settings file this kit writes, so chasing updates can break
+            # launching. See the pinned-version note at the top of this file.
+            ("update_check", "Let the mods check for their own updates",
+             opts["update_check"]),
+        ]
+    if extra_items:
+        extras = ui.checklist("Extras", "Tick what you want:", extra_items)
+        # Cancel keeps the current values rather than reading as "all off".
+        if extras is not None:
+            for tag, _, _ in extra_items:
+                opts[tag] = tag in extras
+
+
+def offer_clipboard_copy(ui: UI, found_keys) -> None:
+    """Let the user copy each game's launch-option line, ready to paste.
+
+    Skipped silently when the clipboard isn't reachable (non-KDE session, no
+    klipper), because the .txt file and the dialog already carry the text.
+    """
+    keys = [k for k in ("mgs1", "mgs2", "mgs3") if k in found_keys]
+    if not keys or ui.kind == "term" or not find_qdbus():
+        return
+    while True:
+        items = [(k, f"Copy the {GAMES[k]['short']} line") for k in keys]
+        items.append(("done", "Nothing else, thanks"))
+        choice = ui.menu(
+            "Copy launch options",
+            "Copy a line here, then paste it into Steam with Ctrl+V.",
+            items)
+        if choice in (None, "done"):
+            return
+        if choice in GAMES:
+            if copy_to_clipboard(launch_option_for(choice)):
+                ui.info(f"Copied the {GAMES[choice]['short']} line.\n\n"
+                        "In Steam: right-click the game → Properties → "
+                        "Launch Options → Ctrl+V.")
+            else:
+                ui.info("Couldn't reach the clipboard on this system — copy "
+                        "the line from the text file on your Desktop instead.")
+                return
 
 
 if __name__ == "__main__":

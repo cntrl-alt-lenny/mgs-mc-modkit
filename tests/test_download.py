@@ -40,7 +40,7 @@ def test_good_checksum_passes(fake_net, tmp_path):
 
 def test_bad_checksum_raises_and_deletes(fake_net, tmp_path):
     dest = tmp_path / "a.zip"
-    with pytest.raises(RuntimeError, match="Checksum mismatch"):
+    with pytest.raises(RuntimeError, match="didn't arrive intact"):
         install.download("http://x/a.zip", dest, lambda m: None,
                          sha256="00" * 32)
     assert not dest.exists()          # partial file cleaned up
@@ -56,7 +56,7 @@ def test_empty_download_raises(monkeypatch, tmp_path):
     monkeypatch.setattr(install.urllib.request, "urlopen",
                         lambda req, timeout=0: FakeResp(b""))
     dest = tmp_path / "a.zip"
-    with pytest.raises(RuntimeError, match="0 bytes"):
+    with pytest.raises(RuntimeError, match="arrived empty"):
         install.download("http://x/a.zip", dest, lambda m: None)
     assert not dest.exists()
 
@@ -68,3 +68,16 @@ def test_pinned_hashes_are_lowercase_hex():
         assert len(h) == 64
         assert h == h.lower()
         int(h, 16)                    # valid hex
+
+
+def test_checksum_error_keeps_digests_out_of_the_message(fake_net, tmp_path):
+    """A tired user shouldn't be shown two 64-char hashes; the log gets them."""
+    import pytest
+    logs = []
+    dest = tmp_path / "a.zip"
+    with pytest.raises(RuntimeError) as ei:
+        install.download("http://x/a.zip", dest, logs.append, sha256="00" * 32)
+    msg = str(ei.value)
+    assert "00" * 32 not in msg                  # no digest in the dialog text
+    assert "run the installer again" in msg      # tells them what to do
+    assert any("00" * 32 in m for m in logs)     # but it IS in the log

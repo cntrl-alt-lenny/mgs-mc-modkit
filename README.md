@@ -56,14 +56,14 @@ Download <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</c
 <br><br><sub>The installer shows one checklist where <b>every component is independently selectable</b> — tick what you want (e.g. just Update 2.0 if you already have the base), then point at each file. An "Open Nexus page" button is there if you still need it.</sub>
 </td></tr>
 <tr><td align="center"><h3>3</h3></td><td>
-<b>Double-click the installer.</b> Answer a few questions. Done.
+<b>Double-click the installer.</b> It shows one review screen — press <b>Install now</b>, or <i>Change settings…</i> if you want something other than the recommended setup. Done.
 </td></tr>
 <tr><td align="center"><h3>4</h3></td><td>
 In Steam, for <b>each</b> game → <i>Properties → Launch Options</i>, paste
 <b>its</b> line:<br><br>
 <b>MGS2 & MGS3:</b> <code>WINEDLLOVERRIDES="wininet,winhttp=n,b" %command%</code><br>
 <b>MGS1:</b> <code>WINEDLLOVERRIDES="dinput8=n,b;d3d11=n,b" %command%</code>
-<br><br><sub>The installer offers to save these to <b><code>MGS Steam Launch Options.txt</code></b> on your Desktop, so you can copy-paste them without switching back here.</sub>
+<br><br><sub>The installer saves these to <b><code>MGS Steam Launch Options.txt</code></b> on your Desktop and offers a <b>Copy to clipboard</b> button for each game, so you can just paste into Steam with Ctrl+V.</sub>
 </td></tr>
 </table>
 
@@ -115,7 +115,8 @@ rehosted here.**
 | ✅ **Crash-safe** | An intent journal is flushed to disk before any file is moved, so a power loss mid-install can't make the next run mistake mod files for your originals. Backups are never overwritten — the copy closest to your original always wins, and a damaged record is a hard stop, never a silent "fresh install" |
 | ✅ **Won't fill your drive** | Free space is checked against each archive's real unpacked size before extracting, so a full microSD fails up front instead of halfway through |
 | ✅ **Repair & uninstall built in** | Run the shortcut again any time: it detects an existing install and offers *install/repair* or *remove the mods*. Even if the record is lost, your backed-up originals are still restored |
-| ✅ **Tested** | A [CI](.github/workflows/ci.yml) test-suite (96 tests) covers discovery, every game combo, malicious/corrupt archives, rollback, interrupted installs, incremental re-installs and uninstall |
+| ✅ **Remembers your choices** | Settings you picked are saved, so a later run to add an audio pack doesn't ask everything again |
+| ✅ **Tested** | A [CI](.github/workflows/ci.yml) test-suite (112 tests) covers discovery, every game combo, malicious/corrupt archives, rollback, interrupted installs, incremental re-installs and uninstall |
 
 <sub>One honest caveat: the Better Audio Mod overwrites some multi-GB stock game
 files, which are too large to back up. Those specific files are restored with
@@ -126,8 +127,8 @@ reversible.</sub>
 (needs `bsdtar`). Bumping a mod version? `python3 tools/refresh_checksums.py`
 prints the new hashes.</sub>
 
-<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.7.0`**.
-To cut a release, push a matching tag (`git tag v1.7.0 && git push --tags`) —
+<sub>🛠️ **Maintainers:** the shortcut pins the installer to release **`v1.8.0`**.
+To cut a release, push a matching tag (`git tag v1.8.0 && git push --tags`) —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's baked-in tag/hash doesn't match `install.py`**, then publishes
 `install.py` + a `SHA256SUMS` file. After editing `install.py`, update the
@@ -165,9 +166,13 @@ you get the good cutscenes *and* skip the launcher.
 </details>
 
 <details>
-<summary><b>🎚️ Options you'll be asked</b></summary>
+<summary><b>🎚️ Settings and their defaults</b></summary>
 
 <br>
+
+These are **not** asked one by one — the review screen shows them and you press
+*Install now*. Everything is reachable behind **Change settings…** if you want
+something different, and your choices are remembered for next time.
 
 | Option | Default |
 |:--|:--|
