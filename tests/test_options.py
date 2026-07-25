@@ -257,3 +257,65 @@ def test_missing_dialog_binary_degrades(monkeypatch, capsys):
     monkeypatch.setattr("builtins.input", lambda *a, **k: "y")
     assert ui.yesno("proceed?") is True
     assert ui.kind == "term"
+
+
+# ---------------------------------------------------------------------------
+# App icon: install it, and retheme only OUR shortcuts
+# ---------------------------------------------------------------------------
+def test_embedded_icon_matches_the_asset():
+    """install.py is the only file users download, so the icon is embedded."""
+    disk = (Path(__file__).resolve().parents[1] / "assets" / "icon.svg").read_text()
+    assert install.APP_ICON_SVG.strip() == disk.strip()
+    assert install.APP_ICON_SVG.lstrip().startswith("<svg")
+    assert "</svg>" in install.APP_ICON_SVG
+
+
+def _fake_home(monkeypatch, tmp_path):
+    desk = tmp_path / "Desktop"
+    desk.mkdir()
+    (tmp_path / ".local/share/applications").mkdir(parents=True)
+    monkeypatch.setattr(install.Path, "home", staticmethod(lambda: tmp_path))
+    monkeypatch.setattr(install, "resolve_desktop_dir", lambda: desk)
+    monkeypatch.setattr(install.shutil, "which", lambda n: None)  # no cache tools
+    return desk
+
+
+def test_icon_installed_into_user_theme(monkeypatch, tmp_path):
+    _fake_home(monkeypatch, tmp_path)
+    assert install.install_app_icon(lambda m: None) is True
+    icon = (tmp_path / ".local/share/icons/hicolor/scalable/apps"
+            / f"{install.APP_ICON_NAME}.svg")
+    assert icon.is_file()
+    assert icon.read_text().lstrip().startswith("<svg")
+
+
+def test_retheme_touches_only_our_shortcuts(monkeypatch, tmp_path):
+    desk = _fake_home(monkeypatch, tmp_path)
+    ours = desk / "Install-MGS-Mods.desktop"
+    ours.write_text("[Desktop Entry]\nIcon=applications-games\n"
+                    "Exec=bash -c 'curl .../mgs-mc-deck-modkit/releases/x'\n")
+    other = desk / "Firefox.desktop"
+    other.write_text("[Desktop Entry]\nIcon=firefox\nExec=firefox\n")
+    before = other.read_text()
+
+    assert install.retheme_shortcuts(lambda m: None) == 1
+    assert f"Icon={install.APP_ICON_NAME}" in ours.read_text()
+    assert other.read_text() == before          # somebody else's file: untouched
+
+
+def test_retheme_is_idempotent(monkeypatch, tmp_path):
+    desk = _fake_home(monkeypatch, tmp_path)
+    (desk / "k.desktop").write_text(
+        f"[Desktop Entry]\nIcon={install.APP_ICON_NAME}\n"
+        "Exec=bash -c 'mgs-mc-deck-modkit'\n")
+    assert install.retheme_shortcuts(lambda m: None) == 0
+
+
+def test_branding_never_raises(monkeypatch, tmp_path):
+    """Cosmetic only — a read-only home must not break the install."""
+    _fake_home(monkeypatch, tmp_path)
+
+    def boom(*a, **k):
+        raise OSError("read-only file system")
+    monkeypatch.setattr(install.Path, "mkdir", boom)
+    install.apply_branding(lambda m: None)      # must not raise

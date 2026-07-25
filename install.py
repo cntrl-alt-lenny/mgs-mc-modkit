@@ -74,7 +74,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.10.0"
+MODKIT_VERSION = "1.11.0"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -2302,6 +2302,133 @@ def save_launch_options_file(ui: UI, found_keys, log,
 
 
 # ---------------------------------------------------------------------------
+# Application icon.
+#
+# The .desktop shortcut is the only file the user downloads, and Icon= can only
+# name a theme icon or an absolute path — it can't carry image data. So the
+# shipped shortcut uses a stock icon (never a broken one), and on first run we
+# install this icon into the user's own icon theme and repoint the shortcut at
+# it. Purely cosmetic: every failure here is ignored.
+# ---------------------------------------------------------------------------
+APP_ICON_NAME = "mgs-mod-kit"
+APP_ICON_SVG = """\
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="MGS Master Collection Mod Kit">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17222d"/>
+      <stop offset="1" stop-color="#090e13"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4ade80"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="topF" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8b071"/>
+      <stop offset="1" stop-color="#d29a58"/>
+    </linearGradient>
+    <linearGradient id="leftF" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a97331"/>
+      <stop offset="1" stop-color="#8a5a22"/>
+    </linearGradient>
+    <linearGradient id="rightF" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c68a45"/>
+      <stop offset="1" stop-color="#a56f2c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- tile -->
+  <rect width="128" height="128" rx="27" fill="url(#tile)"/>
+  <g stroke="#22323f" stroke-width="1" opacity="0.55">
+    <path d="M32 10V118M64 10V118M96 10V118"/>
+    <path d="M10 40H118M10 72H118M10 104H118"/>
+  </g>
+  <rect x="1.5" y="1.5" width="125" height="125" rx="25.5" fill="none"
+        stroke="url(#accent)" stroke-width="3" opacity="0.55"/>
+
+  <!-- isometric cardboard box -->
+  <g stroke="#553613" stroke-width="3" stroke-linejoin="round">
+    <path d="M64 30 L100 50 L64 70 L28 50 Z" fill="url(#topF)"/>
+    <path d="M28 50 L64 70 L64 104 L28 84 Z" fill="url(#leftF)"/>
+    <path d="M100 50 L64 70 L64 104 L100 84 Z" fill="url(#rightF)"/>
+  </g>
+
+  <!-- flap seam across the lid, and packing tape over it -->
+  <path d="M28 50 L100 50" stroke="#6d451a" stroke-width="2.5" opacity="0.85"/>
+  <path d="M46 40 L82 60" stroke="#f0d3a6" stroke-width="7" opacity="0.5"
+        stroke-linecap="round"/>
+  <!-- tape running down the front corner -->
+  <path d="M64 70 L64 104" stroke="#6d451a" stroke-width="2.5" opacity="0.6"/>
+</svg>
+"""
+
+
+def install_app_icon(log) -> bool:
+    """Write the icon into ~/.local/share/icons and refresh the icon cache."""
+    theme = Path.home() / ".local/share/icons/hicolor"
+    dest = theme / "scalable/apps" / f"{APP_ICON_NAME}.svg"
+    try:
+        if dest.is_file() and dest.read_text(encoding="utf-8") == APP_ICON_SVG:
+            return True                      # already current
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(APP_ICON_SVG, encoding="utf-8")
+    except OSError:
+        return False
+    for cmd in (["gtk-update-icon-cache", "-qtf", str(theme)],
+                ["kbuildsycoca6"], ["kbuildsycoca5"]):
+        if shutil.which(cmd[0]):
+            try:
+                subprocess.run(cmd, capture_output=True, timeout=30)
+            except (OSError, subprocess.SubprocessError):
+                pass
+    log(f"    ✓ installed the app icon ({APP_ICON_NAME})")
+    return True
+
+
+def retheme_shortcuts(log) -> int:
+    """Point OUR shortcuts at the installed icon. Returns how many changed.
+
+    Only files whose Exec refers to this project are touched, so nothing else
+    on the user's Desktop can be modified.
+    """
+    changed = 0
+    seen: set[Path] = set()
+    for d in (resolve_desktop_dir(), Path.home() / "Desktop",
+              Path.home() / ".local/share/applications"):
+        if d is None or not d.is_dir() or d in seen:
+            continue
+        seen.add(d)
+        for f in sorted(d.glob("*.desktop")):
+            try:
+                text = f.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            if "mgs-mc-deck-modkit" not in text:
+                continue                     # not ours — leave it alone
+            if re.search(r"(?m)^Icon=%s$" % re.escape(APP_ICON_NAME), text):
+                continue                     # already themed
+            new = re.sub(r"(?m)^Icon=.*$", f"Icon={APP_ICON_NAME}", text)
+            if new == text:
+                continue
+            try:
+                f.write_text(new, encoding="utf-8")
+                changed += 1
+            except OSError:
+                pass
+    if changed:
+        log(f"    ✓ updated {changed} shortcut icon(s)")
+    return changed
+
+
+def apply_branding(log) -> None:
+    """Best-effort: install the icon and retheme our shortcuts. Never raises."""
+    try:
+        if install_app_icon(log):
+            retheme_shortcuts(log)
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
 # Entry mode
 #
 # The shortcut is the user's ONLY entry point, so it must never delete itself:
@@ -2469,6 +2596,10 @@ def main() -> int:
     def log(msg: str) -> None:
         print(msg)
         logs.append(msg)
+
+    # Cosmetic, and done first so the shortcut looks right from now on whatever
+    # the user does next (including quitting straight away).
+    apply_branding(log)
 
     if cli.uninstall:
         return run_uninstall(ui, log)
