@@ -74,7 +74,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.11.0"
+MODKIT_VERSION = "1.11.1"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -2305,10 +2305,14 @@ def save_launch_options_file(ui: UI, found_keys, log,
 # Application icon.
 #
 # The .desktop shortcut is the only file the user downloads, and Icon= can only
-# name a theme icon or an absolute path — it can't carry image data. So the
-# shipped shortcut uses a stock icon (never a broken one), and on first run we
-# install this icon into the user's own icon theme and repoint the shortcut at
-# it. Purely cosmetic: every failure here is ignored.
+# name a theme icon or an absolute path — the Desktop Entry spec has no way to
+# carry image data, so a self-contained custom icon is impossible.
+#
+# The shortcut therefore ships with `package-x-generic`, the stock cardboard-box
+# icon: on-theme for MGS, and guaranteed to render because every icon theme has
+# it. On first run we install the nicer hand-drawn box below into the user's own
+# icon theme and repoint the shortcut at it. Purely cosmetic — every failure
+# here is ignored, and the stock icon is a perfectly good resting state.
 # ---------------------------------------------------------------------------
 APP_ICON_NAME = "mgs-mod-kit"
 APP_ICON_SVG = """\

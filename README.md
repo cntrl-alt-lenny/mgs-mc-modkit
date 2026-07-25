@@ -23,7 +23,7 @@ One double-click · nothing to configure · fully reversible
 <tr><td width="52" align="center"><h3>1</h3></td><td>
 Put <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</code></b></a> on your Desktop, then <b>right-click → Properties → Permissions → tick "Is executable"</b>.
 <br><sub>KDE blocks downloaded shortcuts until you do. 🔒 The shortcut only runs an installer whose SHA-256 matches a pinned GitHub release.</sub>
-<br><sub>🎨 It starts with a stock icon; the first run swaps in the kit's own <img src="assets/icon.svg" width="13" align="absmiddle"> icon.</sub>
+<br><sub>📦 It arrives as a cardboard box — naturally. The first run swaps in the kit's own <img src="assets/icon.svg" width="13" align="absmiddle"> version.</sub>
 </td></tr>
 
 <tr><td align="center"><h3>2</h3></td><td>
@@ -249,7 +249,7 @@ MGSHDFix `3.1.0`, and a future release could rename sections and break launching
 Run the tests: `pip install pytest && python3 -m pytest tests/` (needs `bsdtar`).
 Check the pinned mod versions and hashes: `python3 tools/refresh_checksums.py`.
 
-The shortcut pins release **`v1.11.0`**. To cut a release, push a matching tag —
+The shortcut pins release **`v1.11.1`**. To cut a release, push a matching tag —
 [`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
 shortcut's embedded tag/SHA-256 doesn't match `install.py`**, then publishes.
 After editing `install.py`: update `TAG=`/`SHA=` in the `.desktop`
