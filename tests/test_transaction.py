@@ -295,3 +295,121 @@ def test_incremental_install_merges_manifest(tmp_path):
     assert not (game_dir / "us" / "stage" / "clip0000.sdt").exists()
     assert not (game_dir / "us" / "patch" / "fix.sdt").exists()
     assert not (game_dir / install.MODKIT_DIRNAME).exists()
+
+
+# ---------------------------------------------------------------------------
+# v1.7.0 Group A — data-loss chain regressions
+# ---------------------------------------------------------------------------
+def test_existing_backup_is_never_clobbered(tmp_path, game_dir, patch_download):
+    """The oldest backup is closest to stock; a later run must not overwrite it."""
+    (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
+    steam_root = make_steam_root(tmp_path)
+    install_mgs2_full(game_dir, steam_root)          # backs up TRUE-STOCK
+
+    backup = game_dir / install.MODKIT_DIRNAME / "backups" / "winhttp.dll"
+    assert backup.read_bytes() == b"TRUE-STOCK"
+
+    # Simulate a lost record: delete the manifest but keep backups on disk.
+    (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).unlink()
+
+    # Re-install: winhttp.dll on disk is now MOD content, not stock. Without the
+    # guard this would copy the mod file over the genuine backup.
+    install_mgs2_full(game_dir, steam_root)
+    assert backup.read_bytes() == b"TRUE-STOCK"      # original still recoverable
+
+    _, ok = install.uninstall_game(game_dir, _noop)
+    assert ok
+    assert (game_dir / "winhttp.dll").read_bytes() == b"TRUE-STOCK"
+
+
+def test_corrupt_manifest_halts_and_changes_nothing(tmp_path, game_dir,
+                                                    patch_download):
+    import pytest
+    (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
+    steam_root = make_steam_root(tmp_path)
+    install_mgs2_full(game_dir, steam_root)
+
+    manifest = game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME
+    manifest.write_text("{ this is not json")
+    backup = game_dir / install.MODKIT_DIRNAME / "backups" / "winhttp.dll"
+
+    with pytest.raises(install.CorruptManifestError):
+        install.InstallTxn(game_dir, "mgs2", _noop)
+
+    # Refused to guess; recovery data untouched.
+    assert backup.read_bytes() == b"TRUE-STOCK"
+    assert manifest.is_file()
+
+
+def test_rollback_keeps_preexisting_root_even_without_manifest(tmp_path, game_dir,
+                                                               patch_download):
+    """A failed run must not delete backups that predate it (manifest or not)."""
+    import pytest
+    import tempfile
+    (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
+    steam_root = make_steam_root(tmp_path)
+    install_mgs2_full(game_dir, steam_root)
+    (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).unlink()
+    backup = game_dir / install.MODKIT_DIRNAME / "backups" / "winhttp.dll"
+
+    with tempfile.TemporaryDirectory() as td:
+        tx = install.InstallTxn(game_dir, "mgs2", _noop)
+        assert tx._had_prior is False          # no manifest to load
+        assert tx._root_existed is True        # but our folder DID exist
+        install.install_hdfix(tx, Path(td), _noop)
+        tx.rollback()
+
+    assert backup.read_bytes() == b"TRUE-STOCK"
+    assert (game_dir / install.MODKIT_DIRNAME).exists()
+
+
+def test_failed_fresh_install_still_leaves_no_trace(tmp_path, game_dir,
+                                                    patch_download):
+    """The other side of the gate: a truly fresh failed install cleans up."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        tx = install.InstallTxn(game_dir, "mgs2", _noop)
+        assert tx._root_existed is False
+        install.install_hdfix(tx, Path(td), _noop)
+        tx.rollback()
+    assert not (game_dir / install.MODKIT_DIRNAME).exists()
+    assert not (game_dir / "winhttp.dll").exists()
+
+
+def test_interrupted_run_journal_is_adopted(tmp_path, game_dir, patch_download):
+    """SIGKILL mid-move: the next run must treat moved files as OURS, not stock."""
+    import tempfile
+    (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
+
+    # Simulate a killed run: journal written, files moved, no commit.
+    with tempfile.TemporaryDirectory() as td:
+        tx = install.InstallTxn(game_dir, "mgs2", _noop)
+        install.install_hdfix(tx, Path(td), _noop)
+        assert tx.journal.is_file()            # journal exists mid-flight
+        # (no commit, no rollback — process "dies" here)
+
+    backup = game_dir / install.MODKIT_DIRNAME / "backups" / "winhttp.dll"
+    assert backup.read_bytes() == b"TRUE-STOCK"
+
+    # Next run: adopts the journal, so MOD files are not re-backed-up as stock.
+    with tempfile.TemporaryDirectory() as td:
+        tx2 = install.InstallTxn(game_dir, "mgs2", _noop)
+        assert "winhttp.dll" in tx2._prior_added      # recovered from journal
+        install.install_hdfix(tx2, Path(td), _noop)
+        tx2.commit()
+
+    assert backup.read_bytes() == b"TRUE-STOCK"       # genuine original intact
+    assert not tx2.journal.exists()                   # cleared on commit
+
+    _, ok = install.uninstall_game(game_dir, _noop)
+    assert ok
+    assert (game_dir / "winhttp.dll").read_bytes() == b"TRUE-STOCK"
+
+
+def test_torn_journal_does_not_crash(tmp_path, game_dir, patch_download):
+    root = game_dir / install.MODKIT_DIRNAME
+    root.mkdir(parents=True)
+    (root / install.JOURNAL_NAME).write_text('["partial writ')   # torn
+    tx = install.InstallTxn(game_dir, "mgs2", _noop)             # must not raise
+    assert tx._prior_added == set()
+    assert not (root / install.JOURNAL_NAME).exists()            # cleaned up

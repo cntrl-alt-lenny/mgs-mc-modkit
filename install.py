@@ -72,6 +72,10 @@ MODKIT_VERSION = "1.6.0"
 # them into place. It is the anchor for repair/uninstall — see InstallTxn.
 MODKIT_DIRNAME = "mgs-modkit"
 MANIFEST_NAME = "manifest.json"
+# Written just before files are moved into the game folder and removed on
+# commit/rollback. Its only job is to survive a power loss or SIGKILL so the
+# next run knows those files are OURS, not the game's originals.
+JOURNAL_NAME = "in-progress.json"
 
 # Overwritten originals larger than this are recorded but NOT copied into the
 # backup folder — backing up multi-GB game assets (the Better Audio Mod
@@ -876,6 +880,10 @@ def detect_device(env: dict | None = None,
 # The manifest and backups live in <game>/mgs-modkit/, so repair and uninstall
 # need nothing but the game folder itself.
 # ---------------------------------------------------------------------------
+class CorruptManifestError(RuntimeError):
+    """The mgs-modkit record exists but can't be read — refuse to guess."""
+
+
 class InstallTxn:
     def __init__(self, game_dir: Path, game_key: str, log) -> None:
         self.game_dir = game_dir
@@ -884,6 +892,7 @@ class InstallTxn:
         self.root = game_dir / MODKIT_DIRNAME
         self.backups = self.root / "backups"
         self.staging = self.root / "staging"
+        self.journal = self.root / JOURNAL_NAME
         self.added: list[str] = []
         self.overwritten: list[dict] = []
         self.mods: dict[str, str] = {}
@@ -894,6 +903,12 @@ class InstallTxn:
         # previous install's recovery data (its manifest + backups).
         self._new_added: list[str] = []      # files this run created from scratch
         self._new_backups: list[str] = []    # backup rel-paths this run wrote
+        # Did OUR folder already exist before this transaction? Rollback may
+        # only delete the whole mgs-modkit root when it did NOT — otherwise a
+        # failed run would destroy a previous install's backups. This is
+        # independent of _had_prior, which a corrupt/absent manifest can leave
+        # False even when real backups exist on disk.
+        self._root_existed = self.root.exists()
         # Whether a previous run of this kit is already installed here. Its
         # files are treated as "ours" (reclaimed, not re-backed-up as stock),
         # and on a failed re-install its manifest/backups are left intact.
@@ -905,6 +920,19 @@ class InstallTxn:
         if prev.is_file():
             try:
                 data = json.loads(prev.read_text(encoding="utf-8"))
+            except (ValueError, OSError) as e:
+                # Never guess. Treating an unreadable record as "fresh install"
+                # would let us back up mod files as if they were stock (losing
+                # the real originals) and let rollback delete the backups.
+                raise CorruptManifestError(
+                    f"{game_key.upper()}: this game's mod record "
+                    f"({MODKIT_DIRNAME}/{MANIFEST_NAME}) is damaged and can't "
+                    f"be read ({e.__class__.__name__}).\n\n"
+                    "To protect the backups of your original files, nothing "
+                    "was changed. Run the installer's Uninstall option first, "
+                    f"or delete the '{MODKIT_DIRNAME}' folder inside the game "
+                    "directory and install again.") from e
+            try:
                 self._prior_added_list = list(data.get("added", []))
                 self._prior_added = set(self._prior_added_list)
                 self._prior_mods = dict(data.get("mods", {}))
@@ -916,8 +944,75 @@ class InstallTxn:
                     self.overwritten.append(o)
                     self._backed_up.add(o["path"])
                 self._had_prior = True
-            except (ValueError, OSError, KeyError):
-                pass
+            except (AttributeError, TypeError, KeyError) as e:
+                raise CorruptManifestError(
+                    f"{game_key.upper()}: this game's mod record "
+                    f"({MODKIT_DIRNAME}/{MANIFEST_NAME}) has unexpected "
+                    f"contents ({e.__class__.__name__}).\n\n"
+                    "Nothing was changed. Run the installer's Uninstall "
+                    f"option first, or delete the '{MODKIT_DIRNAME}' folder "
+                    "inside the game directory and install again.") from e
+
+        # An interrupted previous run (power loss / SIGKILL) leaves a journal of
+        # files it had already moved into place. Those are OURS, not stock — so
+        # reclaim them before any backup decision is made.
+        self._adopt_journal()
+        # ...and any backup on disk that no manifest entry points at (killed run,
+        # deleted record) is re-linked, so uninstall RESTORES that file rather
+        # than deleting it as if we had created it.
+        self._adopt_orphan_backups()
+
+    def _adopt_orphan_backups(self) -> None:
+        if not self.backups.is_dir():
+            return
+        found = 0
+        for dirpath, _dirnames, filenames in os.walk(self.backups):
+            for fn in filenames:
+                rel = os.path.relpath(os.path.join(dirpath, fn), self.backups)
+                if rel in self._backed_up:
+                    continue
+                self._backed_up.add(rel)
+                self.overwritten.append(
+                    {"path": rel, "backup": f"backups/{rel}"})
+                found += 1
+        if found:
+            self.log(f"    ⚠ re-linked {found} orphaned backup(s) of your "
+                     "original files")
+
+    def _adopt_journal(self) -> None:
+        if not self.journal.is_file():
+            return
+        try:
+            rels = json.loads(self.journal.read_text(encoding="utf-8"))
+            rels = [r for r in rels if isinstance(r, str)]
+        except (ValueError, OSError):
+            rels = []          # torn write — nothing reliable to adopt
+        if rels:
+            adopted = [r for r in rels if r not in self._prior_added]
+            self._prior_added.update(rels)
+            self._prior_added_list.extend(
+                r for r in rels if r not in self._prior_added_list)
+            self.log(f"    ⚠ recovered {len(adopted)} file(s) from an "
+                     "interrupted previous run")
+        try:
+            self.journal.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+    def _journal_planned(self, rels: list[str]) -> None:
+        """Record files we are ABOUT to move, so a crash can't orphan them."""
+        try:
+            self.root.mkdir(parents=True, exist_ok=True)
+            known = sorted(set(self._prior_added_list) | set(self.added)
+                           | set(rels))
+            tmp = self.journal.with_suffix(".tmp")
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(known, f)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, self.journal)        # atomic
+        except OSError:
+            pass        # journalling is best-effort; never block the install
 
     # -- recording -------------------------------------------------------
     def note_mod(self, name: str, version: str) -> None:
@@ -943,10 +1038,21 @@ class InstallTxn:
                 if size <= BACKUP_MAX_BYTES:
                     bpath = self.backups / rel
                     bpath.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(dest, bpath)
-                    self.overwritten.append(
-                        {"path": rel, "backup": f"backups/{rel}"})
-                    self._new_backups.append(rel)
+                    if bpath.exists():
+                        # A backup already exists from an earlier run whose
+                        # manifest we no longer have (interrupted run, deleted
+                        # record). It is closer to stock than what is on disk
+                        # now, so KEEP it — overwriting would destroy the only
+                        # copy of the user's original file. Adopt it instead.
+                        self.log(f"    ⚠ keeping existing backup of {rel} "
+                                 "(closer to your original file)")
+                        self.overwritten.append(
+                            {"path": rel, "backup": f"backups/{rel}"})
+                    else:
+                        shutil.copy2(dest, bpath)
+                        self.overwritten.append(
+                            {"path": rel, "backup": f"backups/{rel}"})
+                        self._new_backups.append(rel)
                 else:
                     self.overwritten.append({"path": rel, "backup": None})
         else:
@@ -961,6 +1067,10 @@ class InstallTxn:
         stage = Path(tempfile.mkdtemp(prefix="stage_", dir=self.staging))
         try:
             rels = staged_files(archive, stage, on_progress=on_progress)
+            # Journal the intent BEFORE mutating the game folder: if the machine
+            # dies mid-loop, the next run adopts these as ours instead of
+            # mistaking them for stock files and backing them up.
+            self._journal_planned(rels)
             for rel in rels:
                 if _rel_is_unsafe(rel):
                     raise UnsafeArchiveError(
@@ -1012,6 +1122,11 @@ class InstallTxn:
         (self.root / MANIFEST_NAME).write_text(
             json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
             encoding="utf-8")
+        # The record is now durable; the crash journal has done its job.
+        try:
+            self.journal.unlink(missing_ok=True)
+        except OSError:
+            pass
 
     def rollback(self) -> None:
         """Undo ONLY what this run did (best-effort, never raises).
@@ -1042,13 +1157,21 @@ class InstallTxn:
                     pass
         _prune_empty_dirs(self.game_dir, self._new_added)
 
-        if self._had_prior:
-            # Keep the previous install intact: leave its manifest.json (never
-            # rewritten until commit) and its backups. Only clear this run's
-            # transient staging.
+        try:
+            self.journal.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+        if self._root_existed:
+            # Our folder predates this run, so it may hold a previous install's
+            # manifest and — crucially — backups of the user's original files.
+            # Only clear this run's transient staging. Gating on _root_existed
+            # rather than _had_prior matters: an absent/older-format manifest
+            # can leave _had_prior False while real backups sit on disk.
             shutil.rmtree(self.staging, ignore_errors=True)
         else:
-            # Fresh install that failed — nothing of ours should remain.
+            # We created the folder in this run, so nothing in it predates us —
+            # a failed fresh install should leave no trace.
             shutil.rmtree(self.root, ignore_errors=True)
 
 
@@ -2171,16 +2294,22 @@ def main() -> int:
                     raise
                 for f in tmp.glob("*.zip"):
                     f.unlink(missing_ok=True)
+    except CorruptManifestError as e:
+        # Nothing was touched — say so, and don't offer rollback advice.
+        prog.close()
+        ui.error(str(e))
+        return 1
     except (urllib.error.URLError, urllib.error.HTTPError, RuntimeError,
             subprocess.CalledProcessError, OSError) as e:
         ui.error(f"Install failed:\n\n{e}\n\n"
-                 "The affected game was rolled back — files this run added were "
-                 "removed and the fix-mod originals it backed up restored (a "
-                 "failed re-install falls back to your previous working setup). "
-                 "The large Better Audio stock files aren't backed up, so if "
-                 "audio had already been written, run Steam → Properties → "
-                 "Installed Files → Verify integrity to be safe. You can also "
-                 "re-run this kit, or --uninstall.")
+                 "The affected game was put back the way it was — files this "
+                 "run added were removed and the originals it backed up were "
+                 "restored. (A failed repeat install falls back to your "
+                 "previous working setup.)\n\n"
+                 "The large Better Audio files are too big to back up, so if "
+                 "audio had already been written, use Steam → Properties → "
+                 "Installed Files → Verify integrity of game files to restore "
+                 "them. You can also just run this installer again.")
         return 1
     finally:
         prog.close()
