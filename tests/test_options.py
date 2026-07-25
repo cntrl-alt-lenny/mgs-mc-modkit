@@ -133,8 +133,9 @@ def test_options_cancel_keeps_current_values():
     assert opts["hq_movies"] is True and opts["skip_splash"] is True
 
 
-def test_update_check_still_offered():
-    """It stays available (off by default) — removing it wasn't approved."""
+def test_update_check_is_not_offered_and_stays_off():
+    """Removed on purpose: turning it on can stop the games launching, because
+    the pinned mod versions are matched to the settings file this kit writes."""
     from conftest import FakeUI
     opts = {"device": "steam_deck", "button_icons": "Steam Deck",
             "audio_mode": "Stereo (2.0)", "hq_movies": True,
@@ -146,7 +147,20 @@ def test_update_check_still_offered():
             seen["tags"] = [t for t, _, _ in items]
             return None
     install.ask_options(Rec(menu=[None, None]), opts, ["mgs2"], [])
-    assert "update_check" in seen["tags"]
+    assert "update_check" not in seen["tags"]
+    assert opts["update_check"] is False
+
+
+def test_saved_settings_cannot_re_enable_update_check(tmp_path):
+    """An older manifest (or a hand-edit) must not turn it back on."""
+    game = tmp_path / "MGS2"
+    (game / install.MODKIT_DIRNAME).mkdir(parents=True)
+    (game / install.MODKIT_DIRNAME / install.MANIFEST_NAME).write_text(json.dumps({
+        "settings": {"update_check": True, "button_icons": "Xbox One"},
+    }))
+    saved = install.load_saved_opts({"mgs2": (game, tmp_path)})
+    assert "update_check" not in saved
+    assert saved["button_icons"] == "Xbox One"
 
 
 def test_clipboard_uses_klipper_dbus(monkeypatch):

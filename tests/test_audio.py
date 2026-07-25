@@ -280,3 +280,24 @@ def test_one_dialog_per_file_on_the_happy_path(tmp_path):
     audio = install.collect_audio_archives(ui, ["mgs3"])
     assert [c["role"] for c in audio["mgs3"]] == ["base", "update"]
     assert ui._files == []                            # both pickers consumed
+
+
+# -- anchored payload matching ----------------------------------------------
+def test_audio_match_is_anchored_not_substring():
+    """'us/' must not match inside 'bonus/', and '.sdt' not mid-name."""
+    assert install.entries_look_like_audio(["us/stage/a.sdt"])
+    assert install.entries_look_like_audio(["mod/us/stage/a.bin"])
+    assert install.entries_look_like_audio(["whatever/track.sdx"])
+    assert install.entries_look_like_audio(["deep\\path\\clip.xxs"])   # windows sep
+    # These previously passed on a bare-substring check:
+    assert not install.entries_look_like_audio(["bonus/readme.txt"])
+    assert not install.entries_look_like_audio([".sdt_notes/readme.txt"])
+    assert not install.entries_look_like_audio(["docs/about.sdt.txt"])
+    assert not install.entries_look_like_audio([])
+
+
+def test_bonus_folder_archive_is_rejected(tmp_path):
+    """End-to-end: an archive whose only hint is a 'bonus/' folder is not audio."""
+    p = build_zip(tmp_path / "extras-4-1-0-1700000000.zip",
+                  {"bonus/readme.txt": b"hi", "bonus/art.png": b"x"})
+    assert install.validate_audio_for_role(p, "mgs3", "base")[0] == "not_audio"

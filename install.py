@@ -74,7 +74,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
 
-MODKIT_VERSION = "1.8.0"
+MODKIT_VERSION = "1.9.0"
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -1782,15 +1782,34 @@ def audio_modid(path: Path) -> int | None:
     return int(m.group(1)) if m else None
 
 
+AUDIO_EXTS = (".sdt", ".sdx", ".xxs")
+
+
+def entries_look_like_audio(entries) -> bool:
+    """True if these archive members look like an MGS audio payload.
+
+    Matching is ANCHORED on purpose: a bare "us/" substring also matches
+    "bonus/", and a bare ".sdt" matches any name merely containing it, so an
+    unrelated archive could slip into the confirm-to-accept path.
+    """
+    for raw in entries:
+        e = raw.strip().replace("\\", "/").lower()
+        if not e:
+            continue
+        if e.startswith("us/") or "/us/" in e:
+            return True
+        if e.rstrip("/").endswith(AUDIO_EXTS):
+            return True
+    return False
+
+
 def probe_audio_archive(path: Path) -> bool:
     """Cheap sanity check that this really is an MGS audio mod archive."""
     p = subprocess.run(["bsdtar", "-tf", str(path)],
                        capture_output=True, text=True)
     if p.returncode != 0:
         return False
-    names = p.stdout.lower()
-    return ("us/" in names or ".sdt" in names or ".sdx" in names
-            or ".xxs" in names)
+    return entries_look_like_audio(p.stdout.splitlines())
 
 
 def open_url(url: str) -> bool:
@@ -1841,12 +1860,10 @@ def audio_archive_profile(path: Path) -> dict | None:
     if p.returncode != 0:
         return None
     entries = [ln for ln in p.stdout.splitlines() if ln and not ln.endswith("/")]
-    names = "\n".join(entries).lower()
     return {
         "file_count": len(entries),
         "size": path.stat().st_size if path.is_file() else 0,
-        "is_audio": ("us/" in names or ".sdt" in names or ".sdx" in names
-                     or ".xxs" in names),
+        "is_audio": entries_look_like_audio(entries),
         "modid": audio_modid(path),
         "version": audio_version(path),
         "name": path.name.lower(),
@@ -2207,8 +2224,10 @@ def already_modded(found: dict) -> list[str]:
 
 # Only these keys are restored from a previous run — anything else in a manifest
 # is ignored, so a hand-edited or future-version record can't inject values.
+# update_check is deliberately absent: it is no longer user-settable and must
+# stay off, so a manifest written by an older version can never restore it.
 SAVED_OPT_KEYS = ("button_icons", "audio_mode", "hq_movies", "skip_splash",
-                  "skip_launcher", "update_check")
+                  "skip_launcher")
 
 
 def load_saved_opts(found: dict) -> dict:
@@ -2655,15 +2674,14 @@ def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
             ("skip_splash", "Skip the KONAMI intro logos", opts["skip_splash"]),
         ]
     if hdfix_sel or m2fix_sel:
-        extra_items += [
+        extra_items.append(
             ("skip_launcher", "Boot straight into the games",
-             opts["skip_launcher"]),
-            # Left available but off: the mod versions here are pinned to match
-            # the settings file this kit writes, so chasing updates can break
-            # launching. See the pinned-version note at the top of this file.
-            ("update_check", "Let the mods check for their own updates",
-             opts["update_check"]),
-        ]
+             opts["skip_launcher"]))
+    # NOTE: there is deliberately no "check for mod updates" option. The mod
+    # versions here are pinned to match the settings file this kit writes, so a
+    # mod updating itself can rename a settings key and make the game refuse to
+    # start (MGSHDFix hard-aborts on an unknown key). Updates reach users via
+    # new releases of this kit instead. See the pinned-version note up top.
     if extra_items:
         extras = ui.checklist("Extras", "Tick what you want:", extra_items)
         # Cancel keeps the current values rather than reading as "all off".
