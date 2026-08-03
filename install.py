@@ -80,7 +80,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 mgs-mc-modkit"
 
-MODKIT_VERSION = "2.0.0"
+MODKIT_VERSION = "2.0.1"
 
 # One codebase, two platforms. On Windows the mods load natively (no Proton,
 # so no WINEDLLOVERRIDES launch options at all) and the dialogs come from
@@ -1148,7 +1148,9 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
                 raise UnsafeArchiveError(
                     f"Archive '{archive.name}' path escapes staging "
                     f"({fn!r}); refusing to install it.")
-            files.append(os.path.relpath(full, staging))
+            # Always forward slashes: manifests stay identical across
+            # platforms, and pathlib accepts them on Windows natively.
+            files.append(os.path.relpath(full, staging).replace(os.sep, "/"))
     return files
 
 
@@ -1341,7 +1343,8 @@ class InstallTxn:
         found = 0
         for dirpath, _dirnames, filenames in os.walk(self.backups):
             for fn in filenames:
-                rel = os.path.relpath(os.path.join(dirpath, fn), self.backups)
+                rel = os.path.relpath(os.path.join(dirpath, fn),
+                                      self.backups).replace(os.sep, "/")
                 if rel in self._backed_up:
                     continue
                 self._backed_up.add(rel)
@@ -1780,7 +1783,7 @@ def set_launcher_options(tx: InstallTxn, g: dict, steam_root: Path,
                 log(f"    ⚠ couldn't parse {sv.name} ({e}); leaving it alone")
                 continue
             cur.update(wanted)
-            tx.write_bytes(str(sv.relative_to(game_dir)),
+            tx.write_bytes(sv.relative_to(game_dir).as_posix(),
                            _launcher_sv_bytes(list(cur.keys()),
                                               list(cur.values())))
             log(f"    ✓ launcher options patched ({sv.parent.parent.name})")
@@ -1870,7 +1873,7 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
             for dirpath, _dn, filenames in os.walk(backups_dir):
                 for fn in filenames:
                     src = Path(dirpath) / fn
-                    rel = os.path.relpath(src, backups_dir)
+                    rel = os.path.relpath(src, backups_dir).replace(os.sep, "/")
                     try:
                         dst = game_dir / rel
                         dst.parent.mkdir(parents=True, exist_ok=True)
@@ -2497,21 +2500,32 @@ def build_launch_options_text(found_keys) -> str:
     return "\n".join(lines)
 
 
+def _windows_desktop_from_registry() -> Path | None:
+    """The registry knows the true Desktop even when OneDrive has moved it.
+
+    Split out so tests can stub it: on a real Windows box it succeeds, which
+    would otherwise make the fallback branch untestable there.
+    """
+    try:
+        import winreg
+        key = (r"Software\Microsoft\Windows\CurrentVersion"
+               r"\Explorer\User Shell Folders")
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key) as k:
+            raw = winreg.QueryValueEx(k, "Desktop")[0]
+        d = Path(os.path.expandvars(raw))
+        if d.is_dir():
+            return d
+    except (OSError, ImportError):
+        pass
+    return None
+
+
 def resolve_desktop_dir() -> Path | None:
     """The user's real Desktop, honouring a relocated/redirected one."""
     if IS_WINDOWS:
-        # The registry knows the true location even when OneDrive has moved it.
-        try:
-            import winreg
-            key = (r"Software\Microsoft\Windows\CurrentVersion"
-                   r"\Explorer\User Shell Folders")
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key) as k:
-                raw = winreg.QueryValueEx(k, "Desktop")[0]
-            d = Path(os.path.expandvars(raw))
-            if d.is_dir():
-                return d
-        except (OSError, ImportError):
-            pass
+        d = _windows_desktop_from_registry()
+        if d is not None:
+            return d
         d = Path.home() / "Desktop"
         return d if d.is_dir() else None
     if shutil.which("xdg-user-dir"):

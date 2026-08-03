@@ -167,6 +167,7 @@ def test_saved_settings_cannot_re_enable_update_check(tmp_path):
 
 
 def test_clipboard_uses_klipper_dbus(monkeypatch):
+    monkeypatch.setattr(install, "IS_WINDOWS", False)   # the KDE branch
     calls = []
 
     class R:
@@ -182,6 +183,7 @@ def test_clipboard_uses_klipper_dbus(monkeypatch):
 
 
 def test_clipboard_degrades_without_qdbus(monkeypatch):
+    monkeypatch.setattr(install, "IS_WINDOWS", False)   # the KDE branch
     monkeypatch.setattr(install.shutil, "which", lambda n: None)
     assert install.copy_to_clipboard("x") is False
 
@@ -363,11 +365,24 @@ def test_steam_roots_windows_finds_default_dir(monkeypatch, tmp_path):
 
 
 def test_resolve_desktop_dir_windows_fallback(monkeypatch, tmp_path):
-    """No winreg on POSIX -> falls through to ~/Desktop cleanly."""
+    """Registry lookup failing -> falls through to ~/Desktop cleanly.
+
+    The registry helper is stubbed because on a REAL Windows box it succeeds,
+    which would hide the fallback branch from the test entirely.
+    """
     monkeypatch.setattr(install, "IS_WINDOWS", True)
+    monkeypatch.setattr(install, "_windows_desktop_from_registry", lambda: None)
     (tmp_path / "Desktop").mkdir()
     monkeypatch.setattr(install.Path, "home", staticmethod(lambda: tmp_path))
     assert install.resolve_desktop_dir() == tmp_path / "Desktop"
+
+
+def test_resolve_desktop_dir_windows_prefers_registry(monkeypatch, tmp_path):
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    reg = tmp_path / "OneDrive" / "Desktop"
+    reg.mkdir(parents=True)
+    monkeypatch.setattr(install, "_windows_desktop_from_registry", lambda: reg)
+    assert install.resolve_desktop_dir() == reg
 
 
 def test_find_tar_prefers_bsdtar_and_rejects_gnu(monkeypatch):
