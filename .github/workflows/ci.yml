@@ -33,3 +33,24 @@ jobs:
 
       - name: Run the test-suite
         run: python -m pytest tests/ -q
+
+  test-windows:
+    # The Windows port is real, so it gets real CI: dialogs are mocked by the
+    # suite, but discovery, transactions, archive handling (via System32's
+    # tar.exe, which is bsdtar) and the audio classifier all run natively.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Confirm Windows tar is bsdtar
+        run: tar --version
+
+      - name: Run the test-suite
+        run: |
+          python -m pip install --upgrade pip pytest
+          python -m pytest tests/ -q

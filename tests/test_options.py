@@ -13,6 +13,7 @@ ITEMS = [
 
 
 def _term_ui(monkeypatch, answer: str):
+    monkeypatch.setattr(install, "IS_WINDOWS", False)
     ui = install.UI()
     ui.kind = "term"
     monkeypatch.setattr(builtins, "input", lambda *a, **k: answer)
@@ -60,6 +61,7 @@ from pathlib import Path
 
 def test_no_display_falls_back_to_terminal(monkeypatch):
     """SSH into a Deck: dialogs would be invisible and yesno would read 'No'."""
+    monkeypatch.setattr(install, "IS_WINDOWS", False)
     monkeypatch.delenv("DISPLAY", raising=False)
     monkeypatch.delenv("WAYLAND_DISPLAY", raising=False)
     monkeypatch.setattr(install.shutil, "which", lambda n: f"/usr/bin/{n}")
@@ -67,6 +69,7 @@ def test_no_display_falls_back_to_terminal(monkeypatch):
 
 
 def test_display_present_uses_kdialog(monkeypatch):
+    monkeypatch.setattr(install, "IS_WINDOWS", False)
     monkeypatch.setenv("WAYLAND_DISPLAY", "wayland-0")
     monkeypatch.setattr(install.shutil, "which",
                         lambda n: "/usr/bin/kdialog" if n == "kdialog" else None)
@@ -319,3 +322,77 @@ def test_branding_never_raises(monkeypatch, tmp_path):
         raise OSError("read-only file system")
     monkeypatch.setattr(install.Path, "mkdir", boom)
     install.apply_branding(lambda m: None)      # must not raise
+
+
+# ---------------------------------------------------------------------------
+# Windows port — the platform-specific branches, exercised from any OS
+# ---------------------------------------------------------------------------
+def test_clipboard_windows_uses_clip_exe(monkeypatch):
+    calls = {}
+
+    class R:
+        returncode = 0
+
+    def fake_run(args, **kw):
+        calls["args"] = args
+        calls["input"] = kw.get("input")
+        return R()
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    monkeypatch.setattr(install.subprocess, "run", fake_run)
+    assert install.copy_to_clipboard("LINE") is True
+    assert calls["args"] == ["clip"]
+    assert calls["input"] == "LINE"
+
+
+def test_steam_roots_windows_branch_survives_posix(monkeypatch, tmp_path):
+    """The Windows branch must not crash where winreg doesn't exist; with no
+    Steam dirs present it just returns nothing."""
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "nope"))
+    monkeypatch.setenv("ProgramFiles", str(tmp_path / "also-nope"))
+    assert install.steam_roots() == []
+
+
+def test_steam_roots_windows_finds_default_dir(monkeypatch, tmp_path):
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    steam = tmp_path / "pf86" / "Steam"
+    steam.mkdir(parents=True)
+    monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "pf86"))
+    monkeypatch.setenv("ProgramFiles", str(tmp_path / "pf"))
+    assert steam in install.steam_roots()
+
+
+def test_resolve_desktop_dir_windows_fallback(monkeypatch, tmp_path):
+    """No winreg on POSIX -> falls through to ~/Desktop cleanly."""
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    (tmp_path / "Desktop").mkdir()
+    monkeypatch.setattr(install.Path, "home", staticmethod(lambda: tmp_path))
+    assert install.resolve_desktop_dir() == tmp_path / "Desktop"
+
+
+def test_find_tar_prefers_bsdtar_and_rejects_gnu(monkeypatch):
+    monkeypatch.setattr(install.shutil, "which",
+                        lambda n: "/usr/bin/bsdtar" if n == "bsdtar" else None)
+    assert install.find_tar() == "/usr/bin/bsdtar"
+
+    # Only a GNU tar available -> refused (it cannot read .zip).
+    class R:
+        stdout = "tar (GNU tar) 1.35"
+        stderr = ""
+    monkeypatch.setattr(install.shutil, "which",
+                        lambda n: "/usr/bin/tar" if n == "tar" else None)
+    monkeypatch.setattr(install.subprocess, "run", lambda *a, **k: R())
+    assert install.find_tar() is None
+
+    # Windows System32 tar identifies as bsdtar -> accepted.
+    class R2:
+        stdout = "bsdtar 3.7.2 - libarchive 3.7.2"
+        stderr = ""
+    monkeypatch.setattr(install.subprocess, "run", lambda *a, **k: R2())
+    assert install.find_tar() == "/usr/bin/tar"
+
+
+def test_ui_windows_without_tk_falls_back_to_term(monkeypatch):
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    monkeypatch.setattr(install.UI, "_tk_root_ok", lambda self: False)
+    assert install.UI().kind == "term"

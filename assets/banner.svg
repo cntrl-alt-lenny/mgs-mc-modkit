@@ -33,7 +33,7 @@
 
   <!-- kicker -->
   <text x="640" y="86" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace"
-        font-size="17" letter-spacing="7" fill="#6bd6ff" opacity="0.85">STEAM&#160;DECK&#160;&#183;&#160;STEAMOS&#160;&#183;&#160;LINUX</text>
+        font-size="17" letter-spacing="7" fill="#6bd6ff" opacity="0.85">STEAM&#160;DECK&#160;&#183;&#160;LINUX&#160;&#183;&#160;WINDOWS</text>
 
   <!-- title -->
   <text x="640" y="158" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"

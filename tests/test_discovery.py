@@ -47,12 +47,21 @@ def test_find_games_across_libraries(tmp_path, monkeypatch):
     assert found["mgs3"][0].name == "MGS3"
 
 
-def test_detect_device_env():
+def test_detect_device_env(monkeypatch):
     assert install.detect_device(env={"SteamDeck": "1"}) == "steam_deck"
+    monkeypatch.setattr(install, "IS_WINDOWS", False)
     assert install.detect_device(env={}, dmi_bases=()) == "generic_linux"
 
 
-def test_detect_device_dmi(tmp_path):
+def test_detect_device_windows(monkeypatch):
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    assert install.detect_device(env={}, dmi_bases=()) == "windows"
+    # The env override still wins (a Deck is a Deck).
+    assert install.detect_device(env={"SteamDeck": "1"}) == "steam_deck"
+
+
+def test_detect_device_dmi(tmp_path, monkeypatch):
+    monkeypatch.setattr(install, "IS_WINDOWS", False)
     base = tmp_path / "dmi"
     base.mkdir()
     (base / "sys_vendor").write_text("Valve\n")

@@ -206,9 +206,26 @@ def test_collect_all_ordered(tmp_path):
     assert [c["role"] for c in audio["mgs3"]] == ["base", "hq", "update"]
 
 
-def test_collect_cancel_skips_all():
-    ui = FakeUI(checklist=[None])
+def test_collect_cancel_asks_once_then_skips():
+    """A mis-tap must not silently discard the recommended audio packs."""
+    ui = FakeUI(checklist=[None], yesno=[True])          # cancel -> confirm skip
     assert install.collect_audio_archives(ui, ["mgs2", "mgs3"]) == {}
+    assert ui._yesno == []                               # the confirm was shown
+
+
+def test_collect_cancel_can_go_back(tmp_path):
+    base = build_mgs3_base_zip(tmp_path / MGS3_BASE_NAME)
+    # cancel -> "No, go back" -> checklist again -> pick base -> file
+    ui = FakeUI(checklist=[None, ["mgs3:base"]], yesno=[False],
+                files=[str(base)])
+    audio = install.collect_audio_archives(ui, ["mgs3"])
+    assert [c["role"] for c in audio["mgs3"]] == ["base"]
+
+
+def test_collect_deliberate_empty_needs_no_confirm():
+    ui = FakeUI(checklist=[[]])                          # unticked everything
+    assert install.collect_audio_archives(ui, ["mgs2", "mgs3"]) == {}
+    # no yesno scripted: a deliberate empty selection is respected silently
 
 
 def test_recommendation_note_base_without_update(tmp_path):

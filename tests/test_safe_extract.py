@@ -3,9 +3,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import sys
+
 import pytest
 
 import install
+
+needs_symlinks = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="creating symlinks on Windows needs privileges bsdtar won't have")
 from conftest import build_tar, build_zip
 
 
@@ -35,6 +41,7 @@ def test_traversal_member_rejected(tmp_path: Path):
     assert not (tmp_path / "escape.txt").exists()
 
 
+@needs_symlinks
 def test_symlink_member_rejected(tmp_path: Path):
     arc = build_tar(tmp_path / "link.tar",
                     regular={"readme.txt": b"hi"},
@@ -43,6 +50,7 @@ def test_symlink_member_rejected(tmp_path: Path):
         install.staged_files(arc, tmp_path / "stage")
 
 
+@needs_symlinks
 def test_symlinked_dir_rejected(tmp_path: Path):
     arc = build_tar(tmp_path / "linkdir.tar",
                     regular={"safe/inner.txt": b"hi"},

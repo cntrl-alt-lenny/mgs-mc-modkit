@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 """
-Metal Gear Solid 1, 2 & 3 (Master Collection) — Steam Deck & SteamOS Mod Kit
-============================================================================
+Metal Gear Solid 1, 2 & 3 (Master Collection) — Mod Kit
+=======================================================
 A guided, dependency-free installer for the "essential" vanilla-faithful mod
-stack on the Steam Deck, Steam Machine, and any SteamOS / Linux Steam install.
+stack on the Steam Deck, any SteamOS / Linux Steam install, and Windows 10/11.
+
+One codebase, both platforms: dialogs come from kdialog/zenity on Linux and
+tkinter on Windows; archives are unpacked by bsdtar, which Windows ships in
+System32 as tar.exe. On Windows the mods load natively, so the Proton
+launch-options step below does not exist there at all.
 
 It will:
   1. Auto-detect your MGS1 / MGS2 / MGS3 Master Collection installs
@@ -46,15 +51,16 @@ Run it again any time: if a previous install is found you are asked whether to
 install/repair or remove the mods, so the shortcut stays useful and is never
 deleted.
 
-It deliberately does NOT set Steam launch options: Steam rewrites its config
-from memory and will silently revert edits made while it is running. The one
-line you must paste is shown at the end and saved to a file on your Desktop.
+On Linux it deliberately does NOT set Steam launch options: Steam rewrites its
+config from memory and will silently revert edits made while it is running.
+The one line you must paste is shown at the end and saved to a file on your
+Desktop. (Windows needs no launch options — the mods load natively.)
 
-Requirements (all preinstalled on SteamOS): python3, bsdtar, and kdialog OR
-zenity. No pip packages, no sudo.
+Requirements: python3 and bsdtar — both preinstalled on SteamOS; on Windows,
+tar.exe is built in and Python is a free install. No pip packages, no admin.
 
-Run it from the Desktop (Konsole):  python3 install.py
-Skip straight to removal:           python3 install.py --uninstall
+Run it:                    python3 install.py
+Skip straight to removal:  python3 install.py --uninstall
 """
 
 from __future__ import annotations
@@ -72,9 +78,49 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-UA = "Mozilla/5.0 (X11; Linux x86_64) mgs-mc-deck-modkit"
+UA = "Mozilla/5.0 mgs-mc-modkit"
 
-MODKIT_VERSION = "1.11.1"
+MODKIT_VERSION = "2.0.0"
+
+# One codebase, two platforms. On Windows the mods load natively (no Proton,
+# so no WINEDLLOVERRIDES launch options at all) and the dialogs come from
+# tkinter, which ships with every python.org / Microsoft Store Python.
+# Read at call time (not captured) so tests can monkeypatch it.
+IS_WINDOWS = os.name == "nt"
+
+
+def find_tar() -> str | None:
+    """The archive tool. Must be bsdtar — GNU tar cannot read .zip files.
+
+    Linux/SteamOS ship it as `bsdtar`; Windows 10+ ships it in System32 as
+    `tar.exe`, which IS bsdtar (libarchive). A plain `tar` that is GNU tar is
+    rejected rather than half-working.
+    """
+    p = shutil.which("bsdtar")
+    if p:
+        return p
+    p = shutil.which("tar")
+    if p:
+        try:
+            r = subprocess.run([p, "--version"], capture_output=True,
+                               text=True, timeout=15)
+            if "bsdtar" in (r.stdout + r.stderr).lower():
+                return p
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return None
+
+
+# Resolved once at startup by main(); tests and library callers get the same
+# lazy default the first time an archive helper runs.
+TAR: str | None = None
+
+
+def tar_cmd() -> str:
+    global TAR
+    if TAR is None:
+        TAR = find_tar() or "bsdtar"
+    return TAR
 
 # Directory (inside each game folder) where this kit records what it installed,
 # keeps backups of any files it overwrote, and stages archives before copying
@@ -411,17 +457,23 @@ class UI:
     _degraded = False
 
     def __init__(self) -> None:
-        # Without a display, every kdialog/zenity call exits non-zero: info()
-        # and error() vanish and yesno() reads as "No", so the run would abort
-        # with no visible reason (a real problem when SSH'd into a Deck). Fall
-        # back to the terminal, which works end to end.
-        has_display = bool(os.environ.get("DISPLAY")
-                           or os.environ.get("WAYLAND_DISPLAY"))
-        self.kind = (
-            "kdialog" if has_display and shutil.which("kdialog")
-            else "zenity" if has_display and shutil.which("zenity")
-            else "term"
-        )
+        if IS_WINDOWS:
+            # tkinter ships with python.org and Microsoft Store Pythons. If it
+            # is missing (a stripped custom build), the terminal UI still works
+            # end to end in the console window the .cmd opens.
+            self.kind = "tk" if self._tk_root_ok() else "term"
+        else:
+            # Without a display, every kdialog/zenity call exits non-zero:
+            # info() and error() vanish and yesno() reads as "No", so the run
+            # would abort with no visible reason (a real problem when SSH'd
+            # into a Deck). Fall back to the terminal, which works end to end.
+            has_display = bool(os.environ.get("DISPLAY")
+                               or os.environ.get("WAYLAND_DISPLAY"))
+            self.kind = (
+                "kdialog" if has_display and shutil.which("kdialog")
+                else "zenity" if has_display and shutil.which("zenity")
+                else "term"
+            )
         # The folder the file picker opens in — starts at Downloads, then
         # follows wherever the user last picked a file, so choosing several
         # archives in a row (e.g. MGS3 base + Update 2.0) stays quick even if
@@ -459,14 +511,111 @@ class UI:
 
     def _retryable(self, fn, *a, **k):
         """Run a dialog; if the tool broke, run it again in terminal mode."""
-        out = fn(*a, **k)
+        try:
+            out = fn(*a, **k)
+        except Exception as e:
+            if self.kind == "term":
+                raise                       # terminal prompts must not be eaten
+            self._degrade(f"dialog failed: {e.__class__.__name__}")
+            out = fn(*a, **k)
+            self._degraded = False
+            return out
         if self._degraded:
             self._degraded = False
             out = fn(*a, **k)
         return out
 
-    def _info_impl(self, text: str, title: str = "MGS Deck Mod Kit") -> None:
-        if self.kind == "kdialog":
+    # -- tkinter backend (Windows) ---------------------------------------
+    _tk_root = None
+
+    def _tk_root_ok(self) -> bool:
+        """Create (once) the hidden tk root window; False if tk is unusable."""
+        if self._tk_root is not None:
+            return True
+        try:
+            import tkinter as tk
+            root = tk.Tk()
+            root.withdraw()
+            self._tk_root = root
+            return True
+        except Exception:
+            return False
+
+    def _tk_modal(self, title: str, build):
+        """Show a small modal window; `build(top, done)` fills it in.
+
+        `done(value)` closes the window and makes _tk_modal return value.
+        Closing the window any other way returns None (a cancel).
+        """
+        import tkinter as tk
+        result = [None]
+        top = tk.Toplevel(self._tk_root)
+        top.title(title)
+        top.attributes("-topmost", True)     # not behind the console window
+        top.resizable(False, False)
+
+        def done(value):
+            result[0] = value
+            top.destroy()
+
+        build(top, done)
+        top.update_idletasks()
+        # Centre on screen.
+        w, h = top.winfo_reqwidth(), top.winfo_reqheight()
+        x = (top.winfo_screenwidth() - w) // 2
+        y = (top.winfo_screenheight() - h) // 3
+        top.geometry(f"+{max(x, 0)}+{max(y, 0)}")
+        top.grab_set()
+        top.wait_window()
+        return result[0]
+
+    def _tk_choices(self, title: str, text: str, items, multi: bool):
+        """Shared body for menu (single-choice) and checklist (multi)."""
+        import tkinter as tk
+
+        def build(top, done):
+            tk.Label(top, text=text, justify="left", wraplength=460,
+                     padx=14, pady=10, anchor="w").pack(fill="x")
+            body = tk.Frame(top, padx=14)
+            body.pack(fill="both", expand=True)
+            if multi:
+                vars_ = []
+                for tag, label, checked in items:
+                    v = tk.BooleanVar(value=checked)
+                    tk.Checkbutton(body, text=label, variable=v,
+                                   anchor="w").pack(fill="x")
+                    vars_.append((tag, v))
+
+                def ok():
+                    done([t for t, v in vars_ if v.get()])
+            else:
+                lb = tk.Listbox(body, height=min(len(items), 8),
+                                exportselection=False, activestyle="dotbox")
+                for _tag, label in items:
+                    lb.insert("end", label)
+                lb.selection_set(0)
+                lb.pack(fill="both", expand=True)
+                lb.bind("<Double-Button-1>", lambda _e: ok())
+
+                def ok():
+                    sel = lb.curselection()
+                    done(items[sel[0]][0] if sel else None)
+            btns = tk.Frame(top, pady=10)
+            btns.pack()
+            tk.Button(btns, text="OK", width=10, command=ok,
+                      default="active").pack(side="left", padx=6)
+            tk.Button(btns, text="Cancel", width=10,
+                      command=lambda: done(None)).pack(side="left", padx=6)
+            top.bind("<Return>", lambda _e: ok())
+            top.bind("<Escape>", lambda _e: done(None))
+
+        return self._tk_modal(title, build)
+
+    def _info_impl(self, text: str, title: str = "MGS Mod Kit") -> None:
+        if self.kind == "tk":
+            from tkinter import messagebox
+            messagebox.showinfo(title, text, parent=self._tk_root)
+        elif self.kind == "kdialog":
             self._run(["kdialog", "--title", title, "--msgbox", text])
         elif self.kind == "zenity":
             self._run(["zenity", "--info", "--title", title,
@@ -474,14 +623,18 @@ class UI:
         else:
             print(f"\n=== {title} ===\n{text}\n")
 
-    def _error_impl(self, text: str, title: str = "MGS Deck Mod Kit — Error",
+    def _error_impl(self, text: str, title: str = "MGS Mod Kit — Error",
               details: str | None = None) -> None:
         """Show an error. `details` goes in an expandable pane where supported.
 
         Keeps the headline readable on an 800p screen instead of dumping hashes
         and recovery paragraphs into one box.
         """
-        if self.kind == "kdialog":
+        if self.kind == "tk":
+            from tkinter import messagebox
+            body = text if not details else f"{text}\n\n{details}"
+            messagebox.showerror(title, body, parent=self._tk_root)
+        elif self.kind == "kdialog":
             if details:
                 self._run(["kdialog", "--title", title, "--detailederror",
                            text, details])
@@ -496,7 +649,10 @@ class UI:
             if details:
                 print(f"{details}\n", file=sys.stderr)
 
-    def _yesno_impl(self, text: str, title: str = "MGS Deck Mod Kit") -> bool:
+    def _yesno_impl(self, text: str, title: str = "MGS Mod Kit") -> bool:
+        if self.kind == "tk":
+            from tkinter import messagebox
+            return bool(messagebox.askyesno(title, text, parent=self._tk_root))
         if self.kind == "kdialog":
             return self._run(["kdialog", "--title", title, "--yesno", text])[0] == 0
         if self.kind == "zenity":
@@ -506,6 +662,11 @@ class UI:
 
     def _pick_dir_impl(self, text: str) -> str | None:
         start = str(Path.home())
+        if self.kind == "tk":
+            from tkinter import filedialog
+            out = filedialog.askdirectory(title=text, initialdir=start,
+                                          parent=self._tk_root)
+            return out or None
         if self.kind == "kdialog":
             rc, out = self._run(["kdialog", "--title", text,
                                  "--getexistingdirectory", start])
@@ -519,6 +680,13 @@ class UI:
 
     def _pick_file_impl(self, text: str, start: Path | None = None) -> str | None:
         start_s = str(start or (Path.home() / "Downloads"))
+        if self.kind == "tk":
+            from tkinter import filedialog
+            out = filedialog.askopenfilename(
+                title=text, initialdir=start_s, parent=self._tk_root,
+                filetypes=[("Mod archives", "*.zip *.7z *.rar"),
+                           ("All files", "*.*")])
+            return out or None
         if self.kind == "kdialog":
             # The filter MUST be the described "Name (globs)" form: KF5-era
             # kdialog silently ignored a bare glob and showed every file
@@ -555,6 +723,8 @@ class UI:
         backed out" — the caller keeps its defaults instead of silently
         treating a cancel as "turn every option off".
         """
+        if self.kind == "tk":
+            return self._tk_choices(title, text, items, multi=True)
         if self.kind == "kdialog":
             args = ["kdialog", "--title", title, "--separate-output",
                     "--checklist", text]
@@ -591,6 +761,8 @@ class UI:
 
     def _menu_impl(self, title: str, text: str,
              items: list[tuple[str, str]]) -> str | None:
+        if self.kind == "tk":
+            return self._tk_choices(title, text, items, multi=False)
         if self.kind == "kdialog":
             args = ["kdialog", "--title", title, "--menu", text]
             for tag, label in items:
@@ -611,13 +783,13 @@ class UI:
         return input("Choice: ").strip() or None
 
     # -- public API: every dialog retries in the terminal if the tool breaks --
-    def info(self, text, title="MGS Deck Mod Kit"):
+    def info(self, text, title="MGS Mod Kit"):
         return self._retryable(self._info_impl, text, title)
 
-    def error(self, text, title="MGS Deck Mod Kit — Error", details=None):
+    def error(self, text, title="MGS Mod Kit — Error", details=None):
         return self._retryable(self._error_impl, text, title, details)
 
-    def yesno(self, text, title="MGS Deck Mod Kit"):
+    def yesno(self, text, title="MGS Mod Kit"):
         return self._retryable(self._yesno_impl, text, title)
 
     def pick_dir(self, text):
@@ -633,7 +805,7 @@ class UI:
         return self._retryable(self._menu_impl, title, text, items)
 
     def progress(self, title: str, log) -> "Progress":
-        return Progress(self.kind, title, log)
+        return Progress(self.kind, title, log, tk_root=self._tk_root)
 
 
 # ---------------------------------------------------------------------------
@@ -647,14 +819,34 @@ class UI:
 # down (with a kill fallback) so nothing is left hanging.
 # ---------------------------------------------------------------------------
 class Progress:
-    def __init__(self, kind: str, title: str, log) -> None:
+    def __init__(self, kind: str, title: str, log, tk_root=None) -> None:
         self.title = title
         self.log = log
         self._proc = None
         self._backend = "term"
         self._dbus = None           # (service, path) for kdialog
         self._qdbus = None
-        if kind == "zenity" and shutil.which("zenity"):
+        self._tk = None             # (window, bar, label) for tkinter
+        if kind == "tk" and tk_root is not None:
+            try:
+                import tkinter as tk
+                from tkinter import ttk
+                top = tk.Toplevel(tk_root)
+                top.title(title)
+                top.attributes("-topmost", True)
+                top.resizable(False, False)
+                top.protocol("WM_DELETE_WINDOW", lambda: None)  # not closable
+                lbl = tk.Label(top, text="Preparing…", anchor="w",
+                               padx=14, pady=8, width=52)
+                lbl.pack(fill="x")
+                bar = ttk.Progressbar(top, length=420, maximum=100)
+                bar.pack(padx=14, pady=(0, 12))
+                top.update()
+                self._tk = (top, bar, lbl)
+                self._backend = "tk"
+            except Exception:
+                self._tk = None
+        elif kind == "zenity" and shutil.which("zenity"):
             try:
                 self._proc = subprocess.Popen(
                     ["zenity", "--progress", "--title", title, "--width", "460",
@@ -700,8 +892,23 @@ class Progress:
             self._qdbus_call("org.freedesktop.DBus.Properties.Set",
                              "org.kde.kdialog.ProgressDialog", "value", str(pct))
             self._qdbus_call("setLabelText", label)
+        elif self._backend == "tk" and self._tk:
+            try:
+                top, bar, lbl = self._tk
+                bar["value"] = pct
+                lbl.config(text=label)
+                top.update()             # pump events without a mainloop
+            except Exception:
+                self._backend = "term"
+                self._tk = None
 
     def close(self) -> None:
+        if self._tk:
+            try:
+                self._tk[0].destroy()
+            except Exception:
+                pass
+            self._tk = None
         if self._backend == "kdialog":
             self._qdbus_call("close")
         if self._proc:
@@ -724,11 +931,26 @@ class Progress:
 # Steam / game discovery
 # ---------------------------------------------------------------------------
 def steam_roots() -> list[Path]:
-    candidates = [
-        Path.home() / ".local/share/Steam",
-        Path.home() / ".steam/steam",
-        Path.home() / ".var/app/com.valvesoftware.Steam/.local/share/Steam",
-    ]
+    if IS_WINDOWS:
+        candidates = []
+        # Steam records its install path in the registry; the defaults below
+        # are the fallback for the rare setup where it doesn't.
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                                r"Software\Valve\Steam") as k:
+                candidates.append(Path(winreg.QueryValueEx(k, "SteamPath")[0]))
+        except (OSError, ImportError):
+            pass
+        pf86 = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
+        pf = os.environ.get("ProgramFiles", r"C:\Program Files")
+        candidates += [Path(pf86) / "Steam", Path(pf) / "Steam"]
+    else:
+        candidates = [
+            Path.home() / ".local/share/Steam",
+            Path.home() / ".steam/steam",
+            Path.home() / ".var/app/com.valvesoftware.Steam/.local/share/Steam",
+        ]
     out, seen = [], set()
     for c in candidates:
         if c.is_dir():
@@ -864,7 +1086,7 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
     are extracted (genuine per-file progress for multi-GB audio archives).
     """
     # 1. Pre-flight the listing — reject obviously hostile members up front.
-    listing = subprocess.run(["bsdtar", "-tf", str(archive)],
+    listing = subprocess.run([tar_cmd(), "-tf", str(archive)],
                              capture_output=True, text=True, check=True)
     total = 0
     for ln in listing.stdout.splitlines():
@@ -883,7 +1105,7 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
         # -v prints one line per extracted entry to stderr; count them for a
         # real progress fraction.
         proc = subprocess.Popen(
-            ["bsdtar", "-xvf", str(archive), "-C", str(staging)],
+            [tar_cmd(), "-xvf", str(archive), "-C", str(staging)],
             stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
         done = 0
         for line in proc.stderr:               # type: ignore[union-attr]
@@ -896,7 +1118,7 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
             raise subprocess.CalledProcessError(proc.returncode, "bsdtar")
         on_progress(1.0)
     else:
-        subprocess.run(["bsdtar", "-xf", str(archive), "-C", str(staging)],
+        subprocess.run([tar_cmd(), "-xf", str(archive), "-C", str(staging)],
                        check=True)
 
     # 3. Walk what landed. Any symlink (dir or file) is a traversal risk once
@@ -930,14 +1152,13 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
     return files
 
 
+# shutil.disk_usage works on every platform; os.statvfs is Unix-only.
 def free_gb(path: Path) -> float:
-    st = os.statvfs(path)
-    return st.f_bavail * st.f_frsize / (1024 ** 3)
+    return shutil.disk_usage(path).free / (1024 ** 3)
 
 
 def free_bytes(path: Path) -> int:
-    st = os.statvfs(path)
-    return st.f_bavail * st.f_frsize
+    return shutil.disk_usage(path).free
 
 
 # Extraction is staged inside the game folder before files are moved into
@@ -953,7 +1174,7 @@ def archive_payload_bytes(archive: Path) -> int:
     rather than treated as an error.
     """
     try:
-        p = subprocess.run(["bsdtar", "-tvf", str(archive)],
+        p = subprocess.run([tar_cmd(), "-tvf", str(archive)],
                            capture_output=True, text=True, timeout=600)
     except (OSError, subprocess.SubprocessError):
         return 0
@@ -1002,6 +1223,8 @@ def detect_device(env: dict | None = None,
     env = os.environ if env is None else env
     if env.get("SteamDeck"):
         return "steam_deck"
+    if IS_WINDOWS:
+        return "windows"
     for base in dmi_bases or ("/sys/class/dmi/id",
                               "/sys/devices/virtual/dmi/id"):
         try:
@@ -1877,7 +2100,7 @@ def entries_look_like_audio(entries) -> bool:
 
 def probe_audio_archive(path: Path) -> bool:
     """Cheap sanity check that this really is an MGS audio mod archive."""
-    p = subprocess.run(["bsdtar", "-tf", str(path)],
+    p = subprocess.run([tar_cmd(), "-tf", str(path)],
                        capture_output=True, text=True)
     if p.returncode != 0:
         return False
@@ -1885,6 +2108,12 @@ def probe_audio_archive(path: Path) -> bool:
 
 
 def open_url(url: str) -> bool:
+    if IS_WINDOWS:
+        try:
+            os.startfile(url)          # noqa: S606 — opens the default browser
+            return True
+        except OSError:
+            return False
     if not shutil.which("xdg-open"):
         return False
     try:
@@ -1905,12 +2134,18 @@ def find_qdbus() -> str | None:
 
 
 def copy_to_clipboard(text: str) -> bool:
-    """Put `text` on the KDE clipboard via klipper's D-Bus interface.
+    """Put `text` on the clipboard: clip.exe on Windows, klipper D-Bus on KDE.
 
     Lets the user paste the launch options straight into Steam instead of
-    transcribing them. Best-effort: returns False if klipper isn't reachable
-    (no display, non-KDE session, widget disabled), and nothing else changes.
+    transcribing them. Best-effort: returns False when no clipboard is
+    reachable, and nothing else changes.
     """
+    if IS_WINDOWS:
+        try:
+            r = subprocess.run(["clip"], input=text, text=True, timeout=10)
+            return r.returncode == 0
+        except (OSError, subprocess.SubprocessError):
+            return False
     qdbus = find_qdbus()
     if not qdbus:
         return False
@@ -1927,7 +2162,7 @@ def copy_to_clipboard(text: str) -> bool:
 # -- role identification (unit-tested) --------------------------------------
 def audio_archive_profile(path: Path) -> dict | None:
     """Structural profile of an archive, or None if unreadable/not an archive."""
-    p = subprocess.run(["bsdtar", "-tf", str(path)],
+    p = subprocess.run([tar_cmd(), "-tf", str(path)],
                        capture_output=True, text=True)
     if p.returncode != 0:
         return None
@@ -2203,7 +2438,18 @@ def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
         return {}
     picked = ui.checklist("Better Audio (optional)", AUDIO_CHECKLIST_TEXT,
                           items)
-    if not picked:            # cancelled or nothing ticked
+    if picked is None:
+        # Cancel is ambiguous on this screen: it might mean "skip the audio"
+        # or just a mis-tap that would silently discard the recommended packs.
+        # One confirm — and deliberately no Nexus nagging in it.
+        if not ui.yesno("Skip the Better Audio packs entirely?\n\n"
+                        "They're recommended (the MGS2 one also fixes a "
+                        "cutscene crash), and you can add them later by "
+                        "running this again.\n\n"
+                        "Yes = skip audio    No = go back"):
+            picked = ui.checklist("Better Audio (optional)",
+                                  AUDIO_CHECKLIST_TEXT, items)
+    if not picked:            # skipped, or nothing ticked on purpose
         return {}
     picked = set(picked)
     chosen: dict[str, tuple] = {}
@@ -2252,7 +2498,22 @@ def build_launch_options_text(found_keys) -> str:
 
 
 def resolve_desktop_dir() -> Path | None:
-    """The user's real Desktop, honouring an XDG-relocated/renamed one."""
+    """The user's real Desktop, honouring a relocated/redirected one."""
+    if IS_WINDOWS:
+        # The registry knows the true location even when OneDrive has moved it.
+        try:
+            import winreg
+            key = (r"Software\Microsoft\Windows\CurrentVersion"
+                   r"\Explorer\User Shell Folders")
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key) as k:
+                raw = winreg.QueryValueEx(k, "Desktop")[0]
+            d = Path(os.path.expandvars(raw))
+            if d.is_dir():
+                return d
+        except (OSError, ImportError):
+            pass
+        d = Path.home() / "Desktop"
+        return d if d.is_dir() else None
     if shutil.which("xdg-user-dir"):
         try:
             r = subprocess.run(["xdg-user-dir", "DESKTOP"],
@@ -2406,7 +2667,8 @@ def retheme_shortcuts(log) -> int:
                 text = f.read_text(encoding="utf-8")
             except OSError:
                 continue
-            if "mgs-mc-deck-modkit" not in text:
+            if not any(m in text for m in ("mgs-mc-modkit",
+                                           "mgs-mc-deck-modkit")):
                 continue                     # not ours — leave it alone
             if re.search(r"(?m)^Icon=%s$" % re.escape(APP_ICON_NAME), text):
                 continue                     # already themed
@@ -2424,7 +2686,13 @@ def retheme_shortcuts(log) -> int:
 
 
 def apply_branding(log) -> None:
-    """Best-effort: install the icon and retheme our shortcuts. Never raises."""
+    """Best-effort: install the icon and retheme our shortcuts. Never raises.
+
+    Linux-only — Windows has no icon themes or .desktop files; its .cmd
+    shortcut has no icon of its own to fix up.
+    """
+    if IS_WINDOWS:
+        return
     try:
         if install_app_icon(log):
             retheme_shortcuts(log)
@@ -2608,11 +2876,17 @@ def main() -> int:
     if cli.uninstall:
         return run_uninstall(ui, log)
 
-    if not shutil.which("bsdtar"):
-        ui.error("Your system is missing a tool this installer needs "
-                 "(bsdtar).\n\nOn a Steam Deck it's included as standard, so "
-                 "this is unexpected — on other Linux systems, install the "
-                 "'libarchive' package and run this again.")
+    global TAR
+    TAR = find_tar()
+    if TAR is None:
+        ui.error("Your system is missing the archive tool this installer "
+                 "needs (bsdtar).\n\n"
+                 + ("It ships with Windows 10 and newer as tar.exe, so this "
+                    "is unexpected — updating Windows should restore it."
+                    if IS_WINDOWS else
+                    "On a Steam Deck it's included as standard, so this is "
+                    "unexpected — on other Linux systems, install the "
+                    "'libarchive' package and run this again."))
         return 1
 
     # 1. Find the games -----------------------------------------------------
@@ -2827,15 +3101,6 @@ def main() -> int:
 
     # 8. Final manual steps -------------------------------------------------
     names = ", ".join(GAMES[k]["short"] for k in found)
-    lo_lines = [f"   {GAMES[key]['short']}:  {launch_option_for(key)}"
-                for key in ("mgs1", "mgs2", "mgs3") if key in found]
-
-    # Always write the reference file — it's tiny, it's the one step we can't
-    # do for the user, and the old "save it? (recommended: yes)" prompt was a
-    # question whose answer was never in doubt.
-    saved_path = save_launch_options_file(ui, list(found.keys()), log)
-    saved_note = (f"They're also saved in “{saved_path.name}” on your Desktop.\n"
-                  if saved_path else "")
 
     tips = []
     if hdfix_sel:
@@ -2845,11 +3110,34 @@ def main() -> int:
         else:
             tips.append("• The Konami launcher still appears — its settings are "
                         "already done, just press Play.")
-        tips.append("• Playing on a TV and it looks soft? In Steam set "
-                    "Properties → Game Resolution to Native.")
+        if not IS_WINDOWS:
+            tips.append("• Playing on a TV and it looks soft? In Steam set "
+                        "Properties → Game Resolution to Native.")
     if any(GAMES[k].get("kind") == "m2fix" for k in found):
         tips.append("• MGS1 asks which version to play the first time: choose "
                     "METAL GEAR SOLID (US), Max resolution, 4:3.")
+    keep_note = ("\n\nKeep the shortcut — run it again any time to repair the "
+                 "mods, add the audio packs, or remove everything.")
+
+    if IS_WINDOWS:
+        # On Windows the mods load natively — there is genuinely nothing left
+        # to do. No launch options, no reference file, no clipboard step.
+        ui.info(
+            f"✅ All done — {names} is modded and checked.\n\n"
+            "Nothing else to set up: just launch the games from Steam.\n\n"
+            + "\n".join(tips) + keep_note)
+        return 0
+
+    # Linux/Steam Deck: Proton needs per-game launch options, and Steam
+    # reverts config edits made while it runs — so this one step stays manual.
+    lo_lines = [f"   {GAMES[key]['short']}:  {launch_option_for(key)}"
+                for key in ("mgs1", "mgs2", "mgs3") if key in found]
+    # Always write the reference file — it's tiny, it's the one step we can't
+    # do for the user, and the old "save it? (recommended: yes)" prompt was a
+    # question whose answer was never in doubt.
+    saved_path = save_launch_options_file(ui, list(found.keys()), log)
+    saved_note = (f"They're also saved in “{saved_path.name}” on your Desktop.\n"
+                  if saved_path else "")
 
     ui.info(
         f"✅ All done — {names} is modded and checked.\n\n"
@@ -2858,9 +3146,7 @@ def main() -> int:
         "line.\n\n"
         + "\n".join(lo_lines) + "\n\n"
         + saved_note
-        + "\n".join(tips)
-        + "\n\nKeep the desktop shortcut — run it again any time to repair the "
-          "mods, add the audio packs, or remove everything."
+        + "\n".join(tips) + keep_note
     )
     offer_clipboard_copy(ui, list(found.keys()))
     return 0

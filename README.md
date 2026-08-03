@@ -4,14 +4,15 @@
 
 <br><br>
 
-[![Latest release](https://img.shields.io/github/v/release/cntrl-alt-lenny/mgs-mc-deck-modkit?style=for-the-badge&color=4ade80&label=release)](https://github.com/cntrl-alt-lenny/mgs-mc-deck-modkit/releases/latest)
-[![CI](https://img.shields.io/github/actions/workflow/status/cntrl-alt-lenny/mgs-mc-deck-modkit/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/cntrl-alt-lenny/mgs-mc-deck-modkit/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/cntrl-alt-lenny/mgs-mc-modkit?style=for-the-badge&color=4ade80&label=release)](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/releases/latest)
+[![CI](https://img.shields.io/github/actions/workflow/status/cntrl-alt-lenny/mgs-mc-modkit/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/workflows/ci.yml)
 ![Steam Deck](https://img.shields.io/badge/Steam_Deck-verified-1A9FFF?style=for-the-badge&logo=steamdeck&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D4?style=for-the-badge&logoColor=white)
 ![Python](https://img.shields.io/badge/python3-no_deps-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Licence](https://img.shields.io/badge/licence-MIT-green?style=for-the-badge)
 
 **The essential MGS 1 / 2 / 3 fixes, installed for you.**
-One double-click · nothing to configure · fully reversible
+Steam Deck · Linux · Windows — one double-click, nothing to configure, fully reversible
 
 </div>
 
@@ -21,9 +22,11 @@ One double-click · nothing to configure · fully reversible
 
 <table>
 <tr><td width="52" align="center"><h3>1</h3></td><td>
-Put <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</code></b></a> on your Desktop, then <b>right-click → Properties → Permissions → tick "Is executable"</b>.
-<br><sub>KDE blocks downloaded shortcuts until you do. 🔒 The shortcut only runs an installer whose SHA-256 matches a pinned GitHub release.</sub>
-<br><sub>📦 It arrives as a cardboard box — naturally. The first run swaps in the kit's own <img src="assets/icon.svg" width="13" align="absmiddle"> version.</sub>
+<b>Steam Deck / Linux:</b> put <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</code></b></a> on your Desktop, then <b>right-click → Properties → Permissions → tick "Is executable"</b>.
+<br><sub>KDE blocks downloaded shortcuts until you do. 📦 It arrives as a cardboard box — naturally; the first run swaps in the kit's own <img src="assets/icon.svg" width="13" align="absmiddle"> version.</sub>
+<br><br><b>Windows:</b> put <a href="Install-MGS-Mods.cmd"><b><code>Install-MGS-Mods.cmd</code></b></a> anywhere and double-click it. Needs <a href="https://www.python.org/downloads/">Python</a> (free — tick <i>"Add python.exe to PATH"</i>); the shortcut opens that page for you if it's missing.
+<br><sub>If Windows shows a blue "protected your PC" note: <i>More info → Run anyway</i> — it appears for any downloaded script.</sub>
+<br><br><sub>🔒 Either shortcut only runs an installer whose SHA-256 matches a pinned GitHub release.</sub>
 </td></tr>
 
 <tr><td align="center"><h3>2</h3></td><td>
@@ -38,16 +41,18 @@ Put <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</code><
 </td></tr>
 
 <tr><td align="center"><h3>4</h3></td><td>
-In Steam, right-click <b>each</b> game → <i>Properties → Launch Options</i> and paste its line:
+<b>Steam Deck / Linux only:</b> in Steam, right-click <b>each</b> game → <i>Properties → Launch Options</i> and paste its line:
 <br><br>
 <b>MGS2 &amp; MGS3</b> &nbsp;<code>WINEDLLOVERRIDES="wininet,winhttp=n,b" %command%</code><br>
 <b>MGS1</b> &nbsp;<code>WINEDLLOVERRIDES="dinput8=n,b;d3d11=n,b" %command%</code>
 <br><br><sub>The installer offers a <b>Copy to clipboard</b> button for each line and saves them to <code>MGS Steam Launch Options.txt</code> on your Desktop. <b>Without this the mods don't load.</b></sub>
+<br><br><b>Windows:</b> nothing to do — the mods load by themselves. Just play. 🎉
 </td></tr>
 </table>
 
-> **Step 4 is the only manual bit.** Steam overwrites config changes made while
-> it's running, so no script can do it reliably.
+> **Step 4 is the only manual bit, and only on Steam Deck / Linux** (Proton
+> needs launch options, and Steam overwrites config changes made while it's
+> running, so no script can set them reliably).
 
 ---
 
@@ -76,7 +81,7 @@ releases — **nothing is rehosted here**.
 | **Crash-safe** | Backups are never overwritten, and a power cut mid-install can't make the next run mistake mod files for your originals |
 | **Won't fill your drive** | Free space is checked against each file's real unpacked size first |
 | **Repair & remove built in** | Run the shortcut again: *install/repair* or *remove the mods*. It remembers your settings |
-| **Tested** | [125 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
+| **Tested** | [134 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
 
 <sub>One honest caveat: Better Audio replaces some multi-GB game files that are
 too large to back up. Those specific files come back via Steam's <i>Verify
@@ -249,11 +254,12 @@ MGSHDFix `3.1.0`, and a future release could rename sections and break launching
 Run the tests: `pip install pytest && python3 -m pytest tests/` (needs `bsdtar`).
 Check the pinned mod versions and hashes: `python3 tools/refresh_checksums.py`.
 
-The shortcut pins release **`v1.11.1`**. To cut a release, push a matching tag —
-[`release.yml`](.github/workflows/release.yml) runs the tests, **fails if the
-shortcut's embedded tag/SHA-256 doesn't match `install.py`**, then publishes.
-After editing `install.py`: update `TAG=`/`SHA=` in the `.desktop`
-(`sha256sum install.py`), bump `MODKIT_VERSION`, then tag.
+Both shortcuts (`.desktop` for Linux, `.cmd` for Windows) pin release
+**`v2.0.0`**. To cut a release, push a matching tag —
+[`release.yml`](.github/workflows/release.yml) runs the tests (Linux **and**
+Windows), **fails if either shortcut's embedded tag/SHA-256 doesn't match
+`install.py`**, then publishes. After editing `install.py`: update `TAG=`/`SHA=`
+in BOTH shortcuts (`sha256sum install.py`), bump `MODKIT_VERSION`, then tag.
 
 **Deliberately excluded:** AI-upscaled texture addons (upstream's own README
 calls them AI upscales), MGS3 Crouch Walk (adds a mechanic), MGSHDFix nightlies
@@ -276,6 +282,6 @@ and **knight_killer**.
 
 <br>
 
-**MIT** · [LICENSE](LICENSE) · Needs only `python3`, `bsdtar` and `kdialog`/`zenity` — all stock on SteamOS
+**MIT** · [LICENSE](LICENSE) · Runs on stock SteamOS (`python3`, `bsdtar`, `kdialog`) and stock Windows 10/11 (+ free [Python](https://www.python.org/downloads/))
 
 </div>
