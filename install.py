@@ -80,7 +80,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 mgs-mc-modkit"
 
-MODKIT_VERSION = "2.0.1"
+MODKIT_VERSION = "2.1.0"
 
 # One codebase, two platforms. On Windows the mods load natively (no Proton,
 # so no WINEDLLOVERRIDES launch options at all) and the dialogs come from
@@ -2563,6 +2563,16 @@ def save_launch_options_file(ui: UI, found_keys, log,
 
     path = dest_dir / "MGS Steam Launch Options.txt"
     if path.exists():
+        # Our own file from a previous run. If what we'd write is identical
+        # (the common case: a repair with the same games), keep it silently —
+        # asking "overwrite?" on every re-run is pure nagging. Only genuinely
+        # different content is worth a question.
+        try:
+            if path.read_text(encoding="utf-8") == text:
+                log(f"  ✓ launch options already saved → {path}")
+                return path
+        except OSError:
+            pass
         if not ui.yesno(f"'{path.name}' already exists in:\n{dest_dir}\n\n"
                         "Overwrite it?  (No = save with a timestamp instead)"):
             ts = timestamp or datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -2851,13 +2861,13 @@ def run_uninstall(ui: UI, log) -> int:
 
     ui.info(
         f"✅ Mods removed from {names}.\n\n"
-        "Two things to tidy up in Steam yourself:\n\n"
-        "1) Right-click each game → Properties → Launch Options and clear "
-        "the line you pasted in.\n\n"
-        "2) The mods leave behind a 'logs' folder and steam_appid.txt. "
-        "Delete those if you want the folder spotless.\n\n"
-        "(Steam's Verify integrity restores original game files, but it will "
-        "not delete leftover mod files.)")
+        + ("" if IS_WINDOWS else
+           "One thing to tidy up in Steam yourself: right-click each game → "
+           "Properties → Launch Options and clear the line you pasted in.\n\n")
+        + "The mods leave behind a 'logs' folder and steam_appid.txt — delete "
+          "those if you want the folder spotless.\n\n"
+          "(Steam's Verify integrity restores original game files, but it "
+          "will not delete leftover mod files.)")
     return 0
 
 

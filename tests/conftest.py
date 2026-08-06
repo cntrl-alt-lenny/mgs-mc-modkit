@@ -240,3 +240,7 @@ class FakeUI:
 
     def error(self, *a, **k):
         self.errors.append(a)
+
+    def progress(self, title, log):
+        # A real (terminal-mode) Progress, so main() can be driven end to end.
+        return install.Progress("term", title, log)

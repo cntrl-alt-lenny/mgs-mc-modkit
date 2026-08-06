@@ -98,3 +98,21 @@ def test_progress_clamps_percent():
     p.update("b", 250)
     assert any("(0%)" in m for m in logs)
     assert any("(100%)" in m for m in logs)
+
+
+def test_identical_existing_file_is_kept_without_asking(tmp_path, monkeypatch):
+    """Repair re-runs must not nag 'overwrite?' about our own unchanged file
+    (found by the user-journey test on its first execution)."""
+    desk = tmp_path / "Desktop"
+    desk.mkdir()
+    monkeypatch.setattr(install, "resolve_desktop_dir", lambda: desk)
+    ui = FakeUI()                                  # NO yesno scripted
+    p1 = install.save_launch_options_file(ui, ["mgs1", "mgs2"], lambda m: None)
+    p2 = install.save_launch_options_file(ui, ["mgs1", "mgs2"], lambda m: None)
+    assert p1 == p2 and p1.is_file()               # same file, zero dialogs
+
+    # Different games -> different content -> the question IS still asked.
+    ui2 = FakeUI(yesno=[True])
+    p3 = install.save_launch_options_file(ui2, ["mgs2"], lambda m: None)
+    assert p3 == p1
+    assert ui2._yesno == []                        # consumed the overwrite ask

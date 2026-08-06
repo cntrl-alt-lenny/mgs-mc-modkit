@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="MGS Master Collection Mod Kit — one-click vanilla-faithful fixes for Steam Deck / SteamOS" width="100%">
+<img src="assets/banner.svg" alt="MGS Master Collection Mod Kit — vanilla-faithful fixes for Steam Deck, Linux and Windows" width="100%">
 
 <br><br>
 
@@ -81,7 +81,7 @@ releases — **nothing is rehosted here**.
 | **Crash-safe** | Backups are never overwritten, and a power cut mid-install can't make the next run mistake mod files for your originals |
 | **Won't fill your drive** | Free space is checked against each file's real unpacked size first |
 | **Repair & remove built in** | Run the shortcut again: *install/repair* or *remove the mods*. It remembers your settings |
-| **Tested** | [135 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
+| **Tested** | [139 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
 
 <sub>One honest caveat: Better Audio replaces some multi-GB game files that are
 too large to back up. Those specific files come back via Steam's <i>Verify
@@ -255,7 +255,7 @@ Run the tests: `pip install pytest && python3 -m pytest tests/` (needs `bsdtar`)
 Check the pinned mod versions and hashes: `python3 tools/refresh_checksums.py`.
 
 Both shortcuts (`.desktop` for Linux, `.cmd` for Windows) pin release
-**`v2.0.1`**. To cut a release, push a matching tag —
+**`v2.1.0`**. To cut a release, push a matching tag —
 [`release.yml`](.github/workflows/release.yml) runs the tests (Linux **and**
 Windows), **fails if either shortcut's embedded tag/SHA-256 doesn't match
 `install.py`**, then publishes. After editing `install.py`: update `TAG=`/`SHA=`

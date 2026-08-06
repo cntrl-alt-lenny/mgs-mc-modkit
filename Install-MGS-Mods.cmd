@@ -1,8 +1,8 @@
 @echo off
 setlocal
 title MGS Master Collection Mod Kit
-set "TAG=v2.0.1"
-set "SHA=4a308fcc88cb968cc9ba48ae829e3eb089971135df27b09c4ac53603ff76719c"
+set "TAG=v2.1.0"
+set "SHA=096b35317e042a4e323b0eef52ab41c8bfc3cdbc13a9267ecd167704fe949479"
 set "URL=https://github.com/cntrl-alt-lenny/mgs-mc-modkit/releases/download/%TAG%/install.py"
 set "F=%TEMP%\mgs_install_%RANDOM%%RANDOM%.py"
 echo Fetching the MGS Mod Kit installer (%TAG%)...

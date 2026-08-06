@@ -1,68 +1,130 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" role="img" aria-label="MGS Master Collection Mod Kit — one-click vanilla-faithful fixes for Steam Deck and SteamOS">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" role="img" aria-label="MGS Master Collection Mod Kit — vanilla-faithful fixes for Steam Deck, Linux and Windows">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0a0f14"/>
-      <stop offset="0.55" stop-color="#0c141b"/>
-      <stop offset="1" stop-color="#0a1017"/>
+      <stop offset="0" stop-color="#0b1219"/>
+      <stop offset="0.5" stop-color="#0d1620"/>
+      <stop offset="1" stop-color="#090d12"/>
     </linearGradient>
+    <radialGradient id="gloL" cx="0.12" cy="0.2" r="0.55">
+      <stop offset="0" stop-color="#4ade80" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#4ade80" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gloR" cx="0.88" cy="0.85" r="0.6">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#4ade80"/>
       <stop offset="1" stop-color="#38bdf8"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.32" r="0.7">
-      <stop offset="0" stop-color="#1b3a4b" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#0a0f14" stop-opacity="0"/>
-    </radialGradient>
-    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
-      <path d="M34 0H0V34" fill="none" stroke="#1a2732" stroke-width="1" opacity="0.5"/>
+    <linearGradient id="titleSheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#e8f4f0"/>
+      <stop offset="1" stop-color="#9fb8c6"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#1c2a36" stroke-width="1" opacity="0.6"/>
     </pattern>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1.2" y="0" fill="#000000" opacity="0.16"/>
+    </pattern>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.1" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
   <!-- backdrop -->
-  <rect width="1280" height="360" fill="url(#bg)"/>
-  <rect width="1280" height="360" fill="url(#grid)"/>
-  <rect width="1280" height="360" fill="url(#glow)"/>
+  <rect width="1280" height="400" fill="url(#bg)"/>
+  <rect width="1280" height="400" fill="url(#grid)"/>
+  <rect width="1280" height="400" fill="url(#gloL)"/>
+  <rect width="1280" height="400" fill="url(#gloR)"/>
 
-  <!-- frame corner brackets (codec vibe) -->
+  <!-- sweeping diagonal light -->
+  <path d="M-100 420 L520 -40 L640 -40 L20 420 Z" fill="#8ee7ff" opacity="0.03"/>
+  <path d="M660 420 L1280 -40 L1330 -40 L710 420 Z" fill="#8ee7ff" opacity="0.02"/>
+
+  <!-- waveform strip behind the title (codec vibe) -->
+  <g stroke="url(#accent)" stroke-width="1.6" fill="none" opacity="0.28">
+    <path d="M60 200 h90 l8 -14 8 28 8 -34 8 40 8 -34 8 22 8 -12 8 4 h60"/>
+    <path d="M964 200 h60 l8 -6 8 14 8 -26 8 36 8 -30 8 16 8 -8 8 4 h90"/>
+  </g>
+
+  <!-- corner brackets, doubled -->
   <g stroke="url(#accent)" stroke-width="2.5" fill="none" opacity="0.9">
-    <path d="M28 28 h46 M28 28 v46"/>
-    <path d="M1252 28 h-46 M1252 28 v46"/>
-    <path d="M28 332 h46 M28 332 v-46"/>
-    <path d="M1252 332 h-46 M1252 332 v-46"/>
+    <path d="M30 30 h50 M30 30 v50"/>
+    <path d="M1250 30 h-50 M1250 30 v50"/>
+    <path d="M30 370 h50 M30 370 v-50"/>
+    <path d="M1250 370 h-50 M1250 370 v-50"/>
+  </g>
+  <g stroke="#274253" stroke-width="1.5" fill="none">
+    <path d="M42 42 h30 M42 42 v30"/>
+    <path d="M1238 42 h-30 M1238 42 v30"/>
+    <path d="M42 358 h30 M42 358 v-30"/>
+    <path d="M1238 358 h-30 M1238 358 v-30"/>
+  </g>
+
+  <!-- codec frequency, the deep cut -->
+  <g font-family="ui-monospace,Menlo,Consolas,monospace" fill="#5f8ba0">
+    <text x="76" y="52" font-size="13" letter-spacing="2">140.85</text>
+    <text x="1204" y="52" font-size="13" letter-spacing="2" text-anchor="end">PCM 48kHz</text>
+  </g>
+  <!-- signal bars, top right -->
+  <g fill="url(#accent)" opacity="0.9">
+    <rect x="1080" y="46" width="4" height="6" rx="1"/>
+    <rect x="1087" y="42" width="4" height="10" rx="1"/>
+    <rect x="1094" y="38" width="4" height="14" rx="1"/>
+    <rect x="1101" y="34" width="4" height="18" rx="1"/>
   </g>
 
   <!-- kicker -->
-  <text x="640" y="86" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace"
-        font-size="17" letter-spacing="7" fill="#6bd6ff" opacity="0.85">STEAM&#160;DECK&#160;&#183;&#160;LINUX&#160;&#183;&#160;WINDOWS</text>
+  <text x="640" y="96" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace"
+        font-size="16" letter-spacing="8" fill="#6bd6ff" opacity="0.9">STEAM&#160;DECK&#160;&#183;&#160;LINUX&#160;&#183;&#160;WINDOWS</text>
+  <rect x="500" y="108" width="280" height="1.5" fill="url(#accent)" opacity="0.45"/>
 
   <!-- title -->
-  <text x="640" y="158" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"
-        font-size="62" font-weight="800" letter-spacing="1.5" fill="#eef6f4">MGS&#160;MASTER&#160;COLLECTION</text>
-  <text x="640" y="214" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"
-        font-size="46" font-weight="800" letter-spacing="10" fill="url(#accent)">MOD&#160;KIT</text>
+  <text x="640" y="172" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"
+        font-size="64" font-weight="800" letter-spacing="2" fill="url(#titleSheen)"
+        filter="url(#soft)">MGS&#160;MASTER&#160;COLLECTION</text>
+  <text x="640" y="234" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"
+        font-size="50" font-weight="800" letter-spacing="14" fill="url(#accent)"
+        filter="url(#glow)">MOD&#160;KIT</text>
 
   <!-- subtitle -->
-  <text x="640" y="252" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"
-        font-size="20" fill="#9fb4c2">One-click, vanilla-faithful fixes for MGS&#160;1, 2 &amp; 3</text>
+  <text x="640" y="272" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif"
+        font-size="19" fill="#a9bfcc">The essential vanilla-faithful fixes for MGS&#160;1, 2 &amp; 3 — installed in one click</text>
 
   <!-- divider -->
-  <rect x="360" y="278" width="560" height="2" rx="1" fill="url(#accent)" opacity="0.5"/>
+  <g opacity="0.6">
+    <rect x="330" y="296" width="620" height="1.5" rx="1" fill="url(#accent)" opacity="0.5"/>
+    <circle cx="322" cy="296.7" r="3" fill="#4ade80"/>
+    <circle cx="958" cy="296.7" r="3" fill="#38bdf8"/>
+  </g>
 
   <!-- three game panels -->
   <g font-family="ui-monospace,Menlo,Consolas,monospace">
-    <!-- MGS1 -->
-    <text x="213" y="316" text-anchor="middle" font-size="22" font-weight="700" fill="#eef6f4">MGS&#160;1</text>
-    <text x="213" y="338" text-anchor="middle" font-size="12.5" fill="#7f96a5">MGSM2Fix</text>
-    <!-- MGS2 -->
-    <text x="640" y="316" text-anchor="middle" font-size="22" font-weight="700" fill="#eef6f4">MGS&#160;2</text>
-    <text x="640" y="338" text-anchor="middle" font-size="12.5" fill="#7f96a5">HDFix + Bugfix + Audio</text>
-    <!-- MGS3 -->
-    <text x="1067" y="316" text-anchor="middle" font-size="22" font-weight="700" fill="#eef6f4">MGS&#160;3</text>
-    <text x="1067" y="338" text-anchor="middle" font-size="12.5" fill="#7f96a5">HDFix + Bugfix + Audio</text>
+    <g text-anchor="middle">
+      <text x="240" y="334" font-size="21" font-weight="700" fill="#eef6f4">MGS&#160;1</text>
+      <text x="240" y="356" font-size="12.5" fill="#7f96a5">MGSM2Fix &#183; deadzone &#183; uncensored</text>
+    </g>
+    <g text-anchor="middle">
+      <text x="640" y="334" font-size="21" font-weight="700" fill="#eef6f4">MGS&#160;2</text>
+      <text x="640" y="356" font-size="12.5" fill="#7f96a5">HDFix &#183; Bugfix &#183; Better Audio</text>
+    </g>
+    <g text-anchor="middle">
+      <text x="1040" y="334" font-size="21" font-weight="700" fill="#eef6f4">MGS&#160;3</text>
+      <text x="1040" y="356" font-size="12.5" fill="#7f96a5">HDFix &#183; Bugfix &#183; Better Audio</text>
+    </g>
   </g>
-  <!-- panel dividers -->
   <g stroke="#24333f" stroke-width="1.5">
-    <line x1="427" y1="300" x2="427" y2="342"/>
-    <line x1="853" y1="300" x2="853" y2="342"/>
+    <line x1="440" y1="318" x2="440" y2="360"/>
+    <line x1="840" y1="318" x2="840" y2="360"/>
   </g>
+
+  <!-- scanlines on top of everything, very subtle -->
+  <rect width="1280" height="400" fill="url(#scan)"/>
 </svg>
