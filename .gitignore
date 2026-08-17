@@ -9,3 +9,6 @@ __pycache__/
 *.zip
 *.exe
 /tmp/
+
+# macOS
+.DS_Store

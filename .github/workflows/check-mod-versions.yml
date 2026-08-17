@@ -1,0 +1,83 @@
+name: Check mod versions
+
+# Watches the four upstream mods for new releases and opens (or updates) a
+# single tracking issue when one appears.
+#
+# ALERT ONLY — it never edits install.py. The pinned versions are a tested,
+# internally-consistent SET: upstream has removed fixes on the assumption that
+# a newer MGSHDFix provides them, so a half-updated stack silently loses
+# fixes. Upgrading is a deliberate job — see docs/UPGRADING.md.
+on:
+  schedule:
+    - cron: "0 9 * * 1"        # Mondays, 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Compare pinned versions against upstream
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          python3 tools/check_pins.py | tee report.txt
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Mod version check"
+            echo '```'
+            cat report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail loudly if the check itself broke
+        if: steps.check.outputs.status == '2'
+        run: |
+          echo "::error::Could not reach the GitHub releases API — check skipped, not clean."
+          exit 1
+
+      - name: Open or update the tracking issue
+        if: steps.check.outputs.status == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TITLE="Mod updates available upstream"
+          BODY=$(
+            echo "One or more pinned mods have a newer upstream release."
+            echo
+            echo '```'
+            cat report.txt
+            echo '```'
+            echo
+            echo "**Do not bump these individually.** The pinned versions are a"
+            echo "tested set — newer Bugfix Compilations remove fixes that only a"
+            echo "newer MGSHDFix provides, so a partial update silently loses them."
+            echo "MGSHDFix major releases also change the settings schema, which"
+            echo "means regenerating \`MGSHDFix.settings\` with its Config Tool."
+            echo
+            echo "See [docs/UPGRADING.md](../blob/main/docs/UPGRADING.md)."
+            echo
+            echo "_Raised automatically by \`check-mod-versions\`; updated in place."
+            echo "Close it once the stack has been upgraded._"
+          )
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" \
+                       --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --body "$BODY"
+            echo "Updated existing issue #$EXISTING"
+          else
+            gh issue create --title "$TITLE" --body "$BODY"
+          fi

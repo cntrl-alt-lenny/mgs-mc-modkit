@@ -81,7 +81,7 @@ releases — **nothing is rehosted here**.
 | **Crash-safe** | Backups are never overwritten, and a power cut mid-install can't make the next run mistake mod files for your originals |
 | **Won't fill your drive** | Free space is checked against each file's real unpacked size first |
 | **Repair & remove built in** | Run the shortcut again: *install/repair* or *remove the mods*. It remembers your settings |
-| **Tested** | [139 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
+| **Tested** | [145 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
 
 <sub>One honest caveat: Better Audio replaces some multi-GB game files that are
 too large to back up. Those specific files come back via Steam's <i>Verify
@@ -252,7 +252,13 @@ MGSHDFix `3.1.0`, and a future release could rename sections and break launching
 <br>
 
 Run the tests: `pip install pytest && python3 -m pytest tests/` (needs `bsdtar`).
-Check the pinned mod versions and hashes: `python3 tools/refresh_checksums.py`.
+Verify the pinned hashes: `python3 tools/refresh_checksums.py`.
+See if newer mods exist: `python3 tools/check_pins.py` (a weekly workflow does
+this too, and opens a tracking issue — it never bumps anything by itself).
+
+**Upgrading a mod is not a version-number bump** — the four pinned versions are
+a tested set, and MGSHDFix major releases change the settings schema. Read
+[`docs/UPGRADING.md`](docs/UPGRADING.md) first.
 
 Both shortcuts (`.desktop` for Linux, `.cmd` for Windows) pin release
 **`v2.1.0`**. To cut a release, push a matching tag —
