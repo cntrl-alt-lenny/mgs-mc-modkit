@@ -348,8 +348,15 @@ def test_clipboard_windows_uses_clip_exe(monkeypatch):
 
 def test_steam_roots_windows_branch_survives_posix(monkeypatch, tmp_path):
     """The Windows branch must not crash where winreg doesn't exist; with no
-    Steam dirs present it just returns nothing."""
+    Steam dirs present it just returns nothing.
+
+    The registry helper is stubbed because on a REAL Windows box with Steam
+    installed it succeeds and returns the user's actual library, which would
+    fail this assertion. CI's Windows runner has no Steam, so without the stub
+    this passes there and fails for every real user.
+    """
     monkeypatch.setattr(install, "IS_WINDOWS", True)
+    monkeypatch.setattr(install, "_windows_steam_from_registry", lambda: None)
     monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "nope"))
     monkeypatch.setenv("ProgramFiles", str(tmp_path / "also-nope"))
     assert install.steam_roots() == []
@@ -357,11 +364,39 @@ def test_steam_roots_windows_branch_survives_posix(monkeypatch, tmp_path):
 
 def test_steam_roots_windows_finds_default_dir(monkeypatch, tmp_path):
     monkeypatch.setattr(install, "IS_WINDOWS", True)
+    monkeypatch.setattr(install, "_windows_steam_from_registry", lambda: None)
     steam = tmp_path / "pf86" / "Steam"
     steam.mkdir(parents=True)
     monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "pf86"))
     monkeypatch.setenv("ProgramFiles", str(tmp_path / "pf"))
     assert steam in install.steam_roots()
+
+
+def test_steam_roots_windows_uses_the_registry_path(monkeypatch, tmp_path):
+    """The registry is the primary source, and it comes first."""
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
+    steam = tmp_path / "D_drive" / "Steam"
+    steam.mkdir(parents=True)
+    monkeypatch.setattr(install, "_windows_steam_from_registry", lambda: steam)
+    monkeypatch.setenv("ProgramFiles(x86)", str(tmp_path / "nope"))
+    monkeypatch.setenv("ProgramFiles", str(tmp_path / "also-nope"))
+    assert install.steam_roots() == [steam]
+
+
+def test_library_paths_dedupes_case_insensitively(tmp_path):
+    """Windows' two sources disagree on case for the SAME library.
+
+    The registry stores 'c:\\program files (x86)\\steam' while
+    libraryfolders.vdf stores 'C:\\Program Files (x86)\\Steam'. A
+    case-sensitive de-dupe scans that one library twice.
+    """
+    root = tmp_path / "Steam"
+    (root / "steamapps").mkdir(parents=True)
+    (root / "steamapps" / "libraryfolders.vdf").write_text(
+        '"libraryfolders"\n{\n  "0"\n  {\n'
+        f'    "path"    "{str(root).upper()}"\n'
+        '  }\n}\n')
+    assert install.library_paths(root) == [root]
 
 
 def test_resolve_desktop_dir_windows_fallback(monkeypatch, tmp_path):

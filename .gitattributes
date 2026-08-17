@@ -1,2 +1,6 @@
 *.cmd -text
 *.desktop text eol=lf
+# The release workflow computes install.py's SHA-256 on Linux and both
+# shortcuts pin that value, so the working copy must be LF on every platform —
+# otherwise `sha256sum install.py` on Windows disagrees with CI.
+*.py text eol=lf
