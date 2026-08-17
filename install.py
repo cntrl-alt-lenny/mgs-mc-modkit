@@ -149,7 +149,7 @@ BACKUP_MAX_BYTES = 64 * 1024 * 1024
 # To move to a newer MGSHDFix, bump HDFIX_VERSION and regenerate the settings
 # file with the Config Tool (see README).
 # ---------------------------------------------------------------------------
-HDFIX_VERSION = "3.1.0"
+HDFIX_VERSION = "4.0.2"
 HDFIX_URL = (
     "https://github.com/ShizCalev/MGSHDFix/releases/download/"
     f"{HDFIX_VERSION}/MGSHDFix_{HDFIX_VERSION}.zip"
@@ -157,7 +157,7 @@ HDFIX_URL = (
 # SHA-256 of the release asset above, so a tampered/truncated download is
 # caught before it touches the game folder. Regenerate with `sha256sum` after
 # bumping a version (see tools/refresh_checksums.py).
-HDFIX_SHA256 = "ec42a40a26d80425496cf20a52c13d91f1523d74472c77183dda0aaf0d46db33"
+HDFIX_SHA256 = "a2a2584a7d53b00177a810cfbf5a94caa871715e3c4ef9607d3953b951bdb15c"
 
 # MGS1 (M2 emulator) fix — nuggslet's MGSM2Fix. Ships its own MGSM2Fix.ini
 # whose defaults are already vanilla-faithful (censored-texture restorations
@@ -180,14 +180,14 @@ GAMES = {
         "exe": "METAL GEAR SOLID2.exe",
         # Region value the Config Tool writes for this title's option list.
         "region": "eu",
-        "bugfix_version": "2.2.0",
+        "bugfix_version": "3.0.0",
         "bugfix_url": (
             "https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/"
-            "releases/download/2.2.0/"
-            "MGS2-Community-Bugfix-Compilation_Base_v2.2.0.zip"
+            "releases/download/3.0.0/"
+            "MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip"
         ),
         "bugfix_sha256":
-            "c09d2c51128d389af1e90a4356dbfbca1e0cd63beb8f5e1ae76200b00b42c131",
+            "a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003",
         "bugfix_asi": "MGS2-Community-Bugfix-Compilation.asi",
         "audio_page": "https://www.nexusmods.com/metalgearsolid2mc/mods/3",
     },
@@ -199,14 +199,14 @@ GAMES = {
         "dirname": "MGS3",
         "exe": "METAL GEAR SOLID3.exe",
         "region": "us",
-        "bugfix_version": "1.1.0",
+        "bugfix_version": "2.0.1",
         "bugfix_url": (
             "https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/"
-            "releases/download/1.1.0/"
-            "MGS3-Community-Bugfix-Compilation_Base_v1.1.0.zip"
+            "releases/download/2.0.1/"
+            "MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip"
         ),
         "bugfix_sha256":
-            "1bc091847726560e31f019e9a327303623bf646bbb6bd0adc1d9a18cabb754f9",
+            "a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769",
         "bugfix_asi": "MGS3-Community-Bugfix-Compilation.asi",
         "audio_page": "https://www.nexusmods.com/metalgearsolid3mc/mods/4",
     },
@@ -401,6 +401,12 @@ Window Height=0
 Window Width=0
 
 """
+
+# The MGSHDFix release whose Config Tool produced SETTINGS_TEMPLATE above.
+# MGSHDFix hard-aborts on a missing key and its schema changes between major
+# releases, so this MUST equal HDFIX_VERSION. A test enforces that — which is
+# what stops a version bump shipping a settings file the mod can't read.
+SETTINGS_CAPTURED_FROM = "3.1.0"
 
 SETTINGS_EXPECTED_SECTIONS = 27
 SETTINGS_EXPECTED_KEYS = 96

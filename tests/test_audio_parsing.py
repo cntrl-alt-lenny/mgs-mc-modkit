@@ -44,3 +44,21 @@ def test_write_settings_produces_crlf_and_region(tmp_path):
     assert b"\r\n" in raw
     assert b'Game Region="us"' in raw
     assert b"@" not in raw          # every placeholder substituted
+
+
+# ---------------------------------------------------------------------------
+# The settings template is COUPLED to a specific MGSHDFix release.
+# ---------------------------------------------------------------------------
+def test_settings_template_matches_the_pinned_mgshdfix():
+    """MGSHDFix hard-aborts on a missing key, and its schema changes between
+    major releases (4.0.2 renamed 9 sections and added 10). So the template
+    must have been captured from the Config Tool of the version we pin.
+
+    If this fails after a version bump, the settings file needs regenerating —
+    see docs/UPGRADING.md. Do NOT just edit the constant.
+    """
+    assert install.SETTINGS_CAPTURED_FROM == install.HDFIX_VERSION, (
+        f"SETTINGS_TEMPLATE was captured from MGSHDFix "
+        f"{install.SETTINGS_CAPTURED_FROM}, but this kit now installs "
+        f"{install.HDFIX_VERSION}. Regenerate it with "
+        f"{install.HDFIX_VERSION}'s Config Tool before releasing.")
