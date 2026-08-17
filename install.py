@@ -930,18 +930,32 @@ class Progress:
 # ---------------------------------------------------------------------------
 # Steam / game discovery
 # ---------------------------------------------------------------------------
+def _windows_steam_from_registry() -> Path | None:
+    """Steam's install path as the registry records it, or None.
+
+    Split out so tests can stub it — exactly like
+    _windows_desktop_from_registry. On a real Windows box with Steam installed
+    this SUCCEEDS, which would otherwise make the "no Steam anywhere" branch
+    untestable there (and CI's Windows runner, which has no Steam, would never
+    notice).
+    """
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
+                            r"Software\Valve\Steam") as k:
+            return Path(winreg.QueryValueEx(k, "SteamPath")[0])
+    except (OSError, ImportError):
+        return None
+
+
 def steam_roots() -> list[Path]:
     if IS_WINDOWS:
         candidates = []
         # Steam records its install path in the registry; the defaults below
         # are the fallback for the rare setup where it doesn't.
-        try:
-            import winreg
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                                r"Software\Valve\Steam") as k:
-                candidates.append(Path(winreg.QueryValueEx(k, "SteamPath")[0]))
-        except (OSError, ImportError):
-            pass
+        reg = _windows_steam_from_registry()
+        if reg is not None:
+            candidates.append(reg)
         pf86 = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
         pf = os.environ.get("ProgramFiles", r"C:\Program Files")
         candidates += [Path(pf86) / "Steam", Path(pf) / "Steam"]
@@ -971,8 +985,13 @@ def library_paths(steam_root: Path) -> list[Path]:
             paths.append(Path(m.group(1)))
     seen, out = set(), []
     for p in paths:
-        if str(p) not in seen:
-            seen.add(str(p))
+        # Windows paths are case-insensitive, and the two sources genuinely
+        # disagree on case: the registry stores "c:\program files (x86)\steam"
+        # while libraryfolders.vdf stores "C:\Program Files (x86)\Steam". A
+        # case-sensitive key sees those as two libraries and scans both.
+        key = os.path.normcase(str(p))
+        if key not in seen:
+            seen.add(key)
             out.append(p)
     return out
 
@@ -1070,6 +1089,13 @@ class UnsafeArchiveError(RuntimeError):
 
 def _rel_is_unsafe(rel: str) -> bool:
     if not rel or rel.startswith("/") or rel.startswith("\\"):
+        return True
+    # Windows has a second spelling of "absolute": a drive letter, with or
+    # without a slash after it ("C:\x", "C:/x", "C:x" — the last is relative to
+    # that drive's working directory, not ours). bsdtar strips these itself,
+    # but this pre-flight is meant to reject them BEFORE extraction, and only
+    # the user-supplied Nexus archives reach it without a pinned SHA-256.
+    if re.match(r"^[A-Za-z]:", rel):
         return True
     parts = re.split(r"[\\/]+", rel)
     return any(p in ("..",) for p in parts)

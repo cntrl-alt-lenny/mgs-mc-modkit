@@ -21,6 +21,12 @@ def test_rel_is_unsafe():
     assert install._rel_is_unsafe("a/../../evil")
     assert install._rel_is_unsafe("\\windows\\system32")
     assert install._rel_is_unsafe("")
+    # Windows' other spelling of "absolute" — a drive letter. "C:x" has no
+    # separator at all but still escapes, being relative to that drive's own
+    # working directory rather than ours.
+    assert install._rel_is_unsafe("C:\\Windows\\System32\\evil.dll")
+    assert install._rel_is_unsafe("C:/Windows/System32/evil.dll")
+    assert install._rel_is_unsafe("c:evil.dll")
     assert not install._rel_is_unsafe("plugins/MGSHDFix.asi")
     assert not install._rel_is_unsafe("a/b/c.dll")
 
