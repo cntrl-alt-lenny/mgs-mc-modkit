@@ -32,9 +32,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Deliberately NOT a pipeline: `cmd | tee` reports tee's exit status,
+          # which is always 0, so the conditional steps below would never fire.
           set +e
-          python3 tools/check_pins.py | tee report.txt
-          echo "status=$?" >> "$GITHUB_OUTPUT"
+          python3 tools/check_pins.py > report.txt 2>&1
+          STATUS=$?
+          set -e
+          cat report.txt
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           {
             echo "## Mod version check"
             echo '```'
