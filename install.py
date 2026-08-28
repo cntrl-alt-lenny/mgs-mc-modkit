@@ -80,7 +80,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 mgs-mc-modkit"
 
-MODKIT_VERSION = "2.1.0"
+MODKIT_VERSION = "2.2.0"
 
 # One codebase, two platforms. On Windows the mods load natively (no Proton,
 # so no WINEDLLOVERRIDES launch options at all) and the dialogs come from
