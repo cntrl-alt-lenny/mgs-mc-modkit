@@ -27,7 +27,9 @@ jobs:
           sudo apt-get install -y libarchive-tools desktop-file-utils
           bsdtar --version
           desktop-file-validate Install-MGS-Mods.desktop
-          python -m pip install --upgrade pip pytest ruff
+          # Keep CI deterministic: newer Ruff releases can add new default
+          # rules and turn an otherwise green release into a lint failure.
+          python -m pip install --upgrade pip pytest ruff==0.15.13
 
       - name: Byte-compile the installer
         run: python -m py_compile install.py

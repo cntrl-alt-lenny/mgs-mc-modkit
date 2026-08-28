@@ -397,13 +397,14 @@ def test_steam_roots_windows_uses_the_registry_path(monkeypatch, tmp_path):
     assert install.steam_roots() == [steam]
 
 
-def test_library_paths_dedupes_case_insensitively(tmp_path):
+def test_library_paths_dedupes_case_insensitively(monkeypatch, tmp_path):
     """Windows' two sources disagree on case for the SAME library.
 
     The registry stores 'c:\\program files (x86)\\steam' while
     libraryfolders.vdf stores 'C:\\Program Files (x86)\\Steam'. A
     case-sensitive de-dupe scans that one library twice.
     """
+    monkeypatch.setattr(install, "IS_WINDOWS", True)
     root = tmp_path / "Steam"
     (root / "steamapps").mkdir(parents=True)
     (root / "steamapps" / "libraryfolders.vdf").write_text(

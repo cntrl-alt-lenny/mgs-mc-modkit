@@ -1027,6 +1027,8 @@ def library_paths(steam_root: Path) -> list[Path]:
         # while libraryfolders.vdf stores "C:\Program Files (x86)\Steam". A
         # case-sensitive key sees those as two libraries and scans both.
         key = os.path.normcase(str(p))
+        if IS_WINDOWS:
+            key = key.casefold()
         if key not in seen:
             seen.add(key)
             out.append(p)
