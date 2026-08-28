@@ -12,283 +12,107 @@
 ![Licence](https://img.shields.io/badge/licence-MIT-green?style=for-the-badge)
 
 **The essential MGS 1 / 2 / 3 fixes, installed for you.**
+
 Steam Deck · Linux · Windows — one double-click, nothing to configure, fully reversible
 
 </div>
 
 ---
 
-## ⚡ Quick start
+## Install
 
-<table>
-<tr><td width="52" align="center"><h3>1</h3></td><td>
-<b>Steam Deck / Linux:</b> put <a href="Install-MGS-Mods.desktop"><b><code>Install-MGS-Mods.desktop</code></b></a> on your Desktop, then <b>right-click → Properties → Permissions → tick "Is executable"</b>.
-<br><sub>KDE blocks downloaded shortcuts until you do. 📦 It arrives as a cardboard box — naturally; the first run swaps in the kit's own <img src="assets/icon.svg" width="13" align="absmiddle"> version.</sub>
-<br><br><b>Windows:</b> put <a href="Install-MGS-Mods.cmd"><b><code>Install-MGS-Mods.cmd</code></b></a> anywhere and double-click it. Needs <a href="https://www.python.org/downloads/">Python</a> (free — tick <i>"Add python.exe to PATH"</i>); the shortcut opens that page for you if it's missing.
-<br><sub>If Windows shows a blue "protected your PC" note: <i>More info → Run anyway</i> — it appears for any downloaded script.</sub>
-<br><br><sub>🔒 Either shortcut only runs an installer whose SHA-256 matches a pinned GitHub release.</sub>
-</td></tr>
+1. Install MGS1, MGS2 and/or MGS3 through Steam.
 
-<tr><td align="center"><h3>2</h3></td><td>
-<i>Optional but recommended:</i> grab the <b>Better Audio</b> files from NexusMods (free login). Keep them anywhere — you'll point at them in step 3, and renaming is fine.
-<br><br>
-🔊 <a href="https://www.nexusmods.com/metalgearsolid2mc/mods/3"><b>MGS2</b></a> — <i>2.0 Full Version</i> or the smaller <i>2.0 Lite Version</i> &nbsp;·&nbsp; 🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3</b></a> — <i>main file</i> + <i>Update 2.0</i> <sub>(+ optional <i>HQ Ending Cutscenes</i>)</sub>
-</td></tr>
+2. Download the matching shortcut:
+   - **Windows:** [`Install-MGS-Mods.cmd`](Install-MGS-Mods.cmd). Double-click it. You need free [Python](https://www.python.org/downloads/) 3.
+   - **Steam Deck/Linux:** [`Install-MGS-Mods.desktop`](Install-MGS-Mods.desktop). Put it on your Desktop, then right-click → **Properties → Permissions → Is executable**.
 
-<tr><td align="center"><h3>3</h3></td><td>
-<b>Double-click the shortcut.</b> Tick which audio files you want, pick them, press <b>Install now</b>. That's it.
-<br><sub>Everything else is preset. <i>Change settings…</i> is there if you want different button prompts, 5.1 sound, or the KONAMI logos back.</sub>
-</td></tr>
+3. Run the shortcut. Choose your games, optionally select Better Audio files, and press **Install now**.
 
-<tr><td align="center"><h3>4</h3></td><td>
-<b>Steam Deck / Linux only:</b> in Steam, right-click <b>each</b> game → <i>Properties → Launch Options</i> and paste its line:
-<br><br>
-<b>MGS2 &amp; MGS3</b> &nbsp;<code>WINEDLLOVERRIDES="wininet,winhttp=n,b" %command%</code><br>
-<b>MGS1</b> &nbsp;<code>WINEDLLOVERRIDES="dinput8=n,b;d3d11=n,b" %command%</code>
-<br><br><sub>The installer offers a <b>Copy to clipboard</b> button for each line and saves them to <code>MGS Steam Launch Options.txt</code> on your Desktop. <b>Without this the mods don't load.</b></sub>
-<br><br><b>Windows:</b> nothing to do — the mods load by themselves. Just play. 🎉
-</td></tr>
-</table>
+4. **Steam Deck/Linux only:** paste the launch options shown by the installer into Steam → each game → **Properties → Launch Options**:
 
-> **Step 4 is the only manual bit, and only on Steam Deck / Linux** (Proton
-> needs launch options, and Steam overwrites config changes made while it's
-> running, so no script can set them reliably).
+   ```text
+   MGS2 & MGS3: WINEDLLOVERRIDES="wininet,winhttp=n,b" %command%
+   MGS1:        WINEDLLOVERRIDES="dinput8=n,b;d3d11=n,b" %command%
+   ```
 
----
+   The installer offers **Copy to clipboard** and saves the same lines to `MGS Steam Launch Options.txt` on your Desktop. Without them, Linux/Proton will not load the mods.
 
-## 📦 What you get
+Windows needs no launch options. Just play.
 
-| Game | Mods installed | Result |
+## What you get
+
+| Game | Included fixes | Result |
 |:--|:--|:--|
-| **MGS1** | [MGSM2Fix](https://github.com/nuggslet/MGSM2Fix) `3.6.0` | Analog deadzone gone, uncensored Western textures restored, startup notices skipped, high internal resolution |
-| **MGS2** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `4.1.0` + [Bugfix Compilation](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) `3.0.0` + *audio* | True 16:10, correct FOV, lower CPU, PS2 textures & models back, launcher skipped, HQ cutscenes, uncompressed audio — plus a fix for a late-game cutscene crash |
-| **MGS3** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `4.1.0` + [Bugfix Compilation](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) `2.0.1` + *audio* | As MGS2: true 16:10, correct FOV, lower CPU, restored assets, launcher skipped, uncompressed audio |
+| **MGS1** | [MGSM2Fix](https://github.com/nuggslet/MGSM2Fix) `3.6.0` | High internal resolution, restored Western textures, no analog deadzone, skipped startup notices |
+| **MGS2** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `4.1.0` + [Community Bugfix Compilation](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) `3.0.0` | Correct aspect ratio/FOV, lower CPU use, restored assets, high-quality cutscenes, launcher skip, and bug fixes |
+| **MGS3** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `4.1.0` + [Community Bugfix Compilation](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) `2.0.1` | Correct aspect ratio/FOV, lower CPU use, restored assets, high-quality cutscenes, launcher skip, and bug fixes |
 
-Mods install in the order their authors require, straight from their official
-releases — **nothing is rehosted here**.
+Everything is installed from the authors’ official releases. Nothing is rehosted here.
 
-> 🌿 **Vanilla-faithful only.** Every mod is a *fix* or a *restoration*.
-> AI-upscaled texture packs are deliberately excluded.
+> **Vanilla-faithful:** the kit installs fixes and restorations only. AI-upscaled textures and gameplay-changing mods are deliberately excluded.
 
----
+## Better Audio (optional)
 
-## 🔒 Safe by design
+The audio files are hosted on Nexus Mods, which requires a free account. Their author does not permit redistribution, so you download them yourself and point the installer at the files.
 
-|  |  |
+| Game | Download |
 |:--|:--|
-| **Verified downloads** | Every auto-downloaded file must match a pinned SHA-256 before it's used |
-| **Nothing half-done** | Files are unpacked and path-checked in a staging area first; a failure puts the game back as it was |
-| **Crash-safe** | Backups are never overwritten, and a power cut mid-install can't make the next run mistake mod files for your originals |
-| **Won't fill your drive** | Free space is checked against each file's real unpacked size first |
-| **Repair & remove built in** | Run the shortcut again: *install/repair* or *remove the mods*. It remembers your settings |
-| **Tested** | [149 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
+| MGS2 | **2.0 Full Version** for the complete restoration, or the smaller **2.0 Lite Version** |
+| MGS3 | **Main file** (v1.0) **and** **Update 2.0** |
+| MGS3 ending | **HQ Ending Cutscenes** is optional and off by default; those scenes may pause at the end and need a button press |
 
-<sub>One honest caveat: Better Audio replaces some multi-GB game files that are
-too large to back up. Those specific files come back via Steam's <i>Verify
-integrity</i>; everything else the kit does is fully reversible.</sub>
+[MGS2 Better Audio](https://www.nexusmods.com/metalgearsolid2mc/mods/3) · [MGS3 Better Audio](https://www.nexusmods.com/metalgearsolid3mc/mods/4)
 
----
+Files can live anywhere and be renamed. The installer checks their contents and refuses files belonging to the wrong game. Better Audio replaces some multi-GB originals that cannot be backed up; Steam → **Verify integrity** restores those originals if needed.
 
-<details>
-<summary><b>🔊 The audio files, and why you fetch them yourself</b></summary>
+## Defaults
 
-<br>
-
-Better Audio restores the higher-quality sound this port re-compressed. For MGS2
-it **also replaces a corrupted file that can crash a late-game cutscene**, which
-is why it's strongly recommended.
-
-It lives on NexusMods, which needs a free login, and **its author does not permit
-it being hosted anywhere else** — so this kit will never mirror it or download it
-for you. (The files are also 2–3 GB, over GitHub's release size limit.)
-
-**What to download**
-
-| Component | Nexus file | Notes |
-|:--|:--|:--|
-| MGS2 audio | *2.0 Full Version* or *2.0 Lite Version* | Full restores the complete pack; Lite is the smaller, more limited restoration |
-| MGS3 audio | the *main file* (v1.0) | v1.0 **is** current |
-| MGS3 audio update | *Update 2.0* (~25 MB) | Recommended, but optional |
-| MGS3 HQ ending | *HQ Ending Cutscenes* | Optional, **off** by default |
-
-Each is a separate tickbox and installs independently — so you can add the update
-later, or install just it if you already have the main file. When several are
-chosen the order is enforced (main → ending → update).
-
-**Files can live anywhere and be renamed.** The installer identifies each one by
-what's *inside* it where possible, checked against the real archives: MGS2's full
-payload contains folders MGS3's never does, and a full pack is thousands of files
-where the patches are two or three. Smaller packs also carry the Nexus page id in
-their filename. If a file can't be identified it asks rather than guessing, and
-it refuses one belonging to the other game.
-
-> ⚠️ *HQ Ending Cutscenes* has one quirk from its author: the final two
-> cutscenes **pause at the end and need a button press** to continue. Hence off
-> by default.
-
-</details>
-
-<details>
-<summary><b>🎚️ Settings and their defaults</b></summary>
-
-<br>
-
-These aren't asked one at a time — the review screen shows them and you press
-**Install now**. Everything is behind *Change settings…* if you want otherwise,
-and your choices are remembered next time.
+The installer is preset for a simple, console-like experience:
 
 | Setting | Default |
 |:--|:--|
-| Button prompts | Auto-detected — `Steam Deck` on a Deck, `Xbox` elsewhere. PS5, PS2 and keyboard also offered |
-| Sound | `Stereo` — correct for handheld, headphones and TV. Pick 5.1 only with real surround speakers |
-| High-quality cutscenes | on |
-| Skip KONAMI intro logos | on |
-| Boot straight into the games | on |
+| Button prompts | Steam Deck on Deck; Xbox elsewhere; PS5, PS2 and keyboard options available |
+| Sound | Stereo |
+| High-quality cutscenes | On |
+| KONAMI intro logos | Skipped |
+| Launcher | Skipped; games boot directly |
 
-There is deliberately **no** "check for mod updates" option: the mod versions
-here are matched to the settings file the kit writes, so a mod updating itself
-can stop the games launching. Updates reach you through new releases of this kit.
+Use **Change settings…** if you want different prompts, 5.1 sound, or the logos back. Your choices are remembered.
 
-> 🚫 **No MGS3 high-res texture option.** Konami's official texture pack can be
-> installed on a Steam Deck but **cannot be used in-game** there, so the kit
-> keeps its flag off. (The Bugfix Compilation's restored textures are unrelated
-> and always installed.)
->
-> 🖥️ **On a TV and it looks soft?** SteamOS may default to 720p — set
-> *Properties → Game Resolution* to **Native**.
->
-> 🌍 **Another language?** The kit writes English defaults. Run
-> `MGSHDFix Config Tool.exe` in the game's `plugins/` folder once to change it.
+## Repair or remove
+
+Run the same shortcut again:
+
+- **Install or repair mods** re-applies the selected setup and is also how you add audio later.
+- **Remove the mods** restores backed-up originals and removes files installed by the kit.
+
+Your saves are never touched. If a large Better Audio file was replaced, use Steam’s **Verify integrity** after removal. The shortcut is also the repair and uninstall button—keep it.
+
+<details>
+<summary><b>MGS1 first-boot recommendation</b></summary>
+
+Choose **METAL GEAR SOLID (US)**, **Max** resolution, **Original / 4:3** screen size, and **Smoothing Off**. The version menu appears once; you can change versions later from the pause menu.
 
 </details>
 
 <details>
-<summary><b>🕹️ MGS1: what to pick on first boot</b></summary>
+<summary><b>Quick troubleshooting</b></summary>
 
-<br>
+- **Mods do not load on Steam Deck/Linux:** check the launch options in step 4.
+- **“Failed to read config key…”:** run `plugins/MGSHDFix Config Tool.exe` once and choose **Save and Exit**.
+- **Want the KONAMI launcher back:** set `Skip Launcher=0` in `plugins/MGSHDFix.settings`.
 
-MGS1's version-select menu appears **once**, then it boots straight in (change
-versions later from the in-game pause menu).
-
-| Setting | Pick | Why |
-|:--|:--|:--|
-| Version | **METAL GEAR SOLID (US)** | Full-speed 60 Hz English. The EU disc is 50 Hz PAL — genuinely ~17% slower, with borders |
-| Resolution | **Max** | M2's official internal upscale: sharp and era-authentic |
-| Screen size | Original / 4:3 | Correct framing. Never the stretch option |
-| Smoothing | Off | PS1 hardware had no texture filtering — off is authentic. Taste, though |
-
-MGSM2Fix's own defaults (which the kit keeps) already revert the Master
-Collection's censored textures, remove the analog deadzone, and skip the startup
-notices.
+Terminal uninstall: `python3 install.py --uninstall`.
 
 </details>
 
-<details>
-<summary><b>🧹 Repair, remove & troubleshooting</b></summary>
+## For maintainers
 
-<br>
+Pinned versions are checked weekly. Read [`docs/UPGRADING.md`](docs/UPGRADING.md) before changing a mod version; MGSHDFix updates require a matching settings template and full test run.
 
-**Just double-click the shortcut again.** It notices the games are already set up
-and asks what you want:
+## Credits
 
-- **Install or repair mods** — re-applies everything; also how you add audio later
-- **Remove the mods** — full uninstall
-- **Quit**
+The fixes come from **[ShizCalev](https://github.com/ShizCalev)**, **[Lyall](https://github.com/Lyall)**, **[nuggslet](https://github.com/nuggslet)** and **knight_killer**. This kit only automates installing their work—please endorse and star their projects.
 
-> 🔑 **Keep the shortcut** — it's your repair and uninstall button, not just an
-> installer.
-
-Uninstall reverses what the kit recorded: removes the files it added, restores
-the originals it backed up, and clears the obsolete legacy `MGSM2Fix.asi` that
-upstream warns can clash with current releases. **Your saves are never touched.**
-If something can't be reverted, the backups are *kept* so you can retry.
-
-<sub>Terminal alternative: <code>python3 install.py --uninstall</code></sub>
-
-**Removing it by hand instead:** Steam → *Properties → Installed Files → Verify
-integrity*, then delete — MGS2/3: `winhttp.dll`, `wininet.dll`, `plugins/`,
-`mgs-modkit/`, `logs/`, `steam_appid.txt` · MGS1: `d3d11.dll`, `dinput8.dll`,
-`MGSM2Fix*.asi`, `MGSM2Fix.ini`, `mgs-modkit/`.
-*Verify integrity restores original files but does **not** delete added ones.*
-
-| Problem | Fix |
-|:--|:--|
-| Mods don't load at all | The launch options aren't set — see step 4 |
-| *"Failed to read config key…"* | Run `MGSHDFix Config Tool.exe` in `plugins/` → *Save and Exit* |
-| Want the Konami launcher back | `plugins/MGSHDFix.settings` → `Skip Launcher=0` |
-| `No display-attached GPUs were detected` | Harmless on Deck/Proton, appears every run |
-
-</details>
-
-<details>
-<summary><b>🔍 Why this kit exists</b></summary>
-
-<br>
-
-**MGSHDFix has no built-in defaults.** Without a complete `MGSHDFix.settings` it
-refuses to launch, and it aborts on any *single* missing key:
-
-```
-[MGSHDFix Config Helper] Failed to read config key 'Debug Logging'
-in section 'Internal Settings': Section not found
-```
-
-That file can normally only be produced by the mod's **Windows-only Config
-Tool**, and its section names aren't the tab labels that tool shows you — so
-hand-writing one doesn't work either. This kit ships a canonical settings file
-matched to the pinned release's Config Tool schema.
-
-**The launcher is the other trap.** It's the only place to enable *high quality
-cinematics*, so skipping it normally locks you out of that setting. The kit
-writes the launcher's own save directly, so you get both.
-
-**Versions are pinned deliberately** — the bundled settings file is matched to
-MGSHDFix `4.1.0`, and a future release could rename sections and break launching.
-
-</details>
-
-<details>
-<summary><b>🛠️ For maintainers</b></summary>
-
-<br>
-
-Run the tests: `pip install pytest && python3 -m pytest tests/` (needs `bsdtar`).
-Verify the pinned hashes: `python3 tools/refresh_checksums.py`.
-See if newer mods exist: `python3 tools/check_pins.py` (a weekly workflow does
-this too, and opens a tracking issue — it never bumps anything by itself).
-
-**Upgrading a mod is not a version-number bump** — the four pinned versions are
-a tested set, and MGSHDFix major releases change the settings schema. Read
-[`docs/UPGRADING.md`](docs/UPGRADING.md) first.
-
-Both shortcuts (`.desktop` for Linux, `.cmd` for Windows) pin release
-**`v2.1.0`**. To cut a release, push a matching tag —
-[`release.yml`](.github/workflows/release.yml) runs the tests (Linux **and**
-Windows), **fails if either shortcut's embedded tag/SHA-256 doesn't match
-`install.py`**, then publishes. After editing `install.py`: update `TAG=`/`SHA=`
-in BOTH shortcuts (`sha256sum install.py`), bump `MODKIT_VERSION`, then tag.
-
-**Deliberately excluded:** AI-upscaled texture addons (upstream's own README
-calls them AI upscales), MGS3 Crouch Walk (adds a mechanic), MGSHDFix nightlies
-(unpinnable, and settings-schema drift is exactly what breaks launching),
-Konami's HD texture pack (unusable in-game on Deck), and the MGS3 4K assets
-addon (pointless at 800p).
-
-</details>
-
----
-
-<div align="center">
-
-### 🙏 Credits
-
-The real work belongs to **[ShizCalev](https://github.com/ShizCalev)**,
-**[Lyall](https://github.com/Lyall)**, **[nuggslet](https://github.com/nuggslet)**
-and **knight_killer**.
-<br>This kit only automates installing it — please endorse and star their work.
-
-<br>
-
-**MIT** · [LICENSE](LICENSE) · Runs on stock SteamOS (`python3`, `bsdtar`, `kdialog`) and stock Windows 10/11 (+ free [Python](https://www.python.org/downloads/))
-
-</div>
+**MIT** · [LICENSE](LICENSE)
