@@ -1,8 +1,6 @@
 """Better Audio: independent components, role validation, selection flow."""
 from __future__ import annotations
 
-from pathlib import Path
-
 import install
 from conftest import (FakeUI, build_audio_zip, build_base_audio_zip,
                       build_mgs2_base_zip, build_mgs3_base_zip,
@@ -35,6 +33,8 @@ def test_checklist_defaults_and_disclaimer():
     # The HQ pause disclaimer moved into the dialog header (rows don't wrap).
     assert "pause" in install.AUDIO_CHECKLIST_TEXT.lower()
     assert "button press" in install.AUDIO_CHECKLIST_TEXT.lower()
+    assert "full version" in install.AUDIO_SPECS["mgs2"]["roles"]["base"]["nexus"].lower()
+    assert "lite version" in install.AUDIO_SPECS["mgs2"]["roles"]["base"]["nexus"].lower()
 
 
 def test_checklist_rows_fit_the_deck_screen():
@@ -116,6 +116,9 @@ def test_mgs2_identified_by_name_or_by_contents(tmp_path):
     # By Nexus id in the name...
     good = build_audio_zip(tmp_path / MGS2_BASE_NAME)
     assert install.validate_audio_for_role(good, "mgs2", "base")[0] == "ok"
+    lite = build_audio_zip(
+        tmp_path / "MGS2MC Better Audio Mod 2.0 - Lite Version-3-2-0-1739564749.zip")
+    assert install.validate_audio_for_role(lite, "mgs2", "base")[0] == "ok"
     # ...or by its MGS2-only folders when renamed.
     assert install.validate_audio_for_role(
         build_mgs2_base_zip(tmp_path / "renamed.zip"), "mgs2", "base")[0] == "ok"
@@ -337,7 +340,7 @@ def test_bonus_folder_archive_is_rejected(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# Signatures taken from the REAL NexusMods archives (inspected July 2026).
+# Signatures taken from the REAL NexusMods archives (inspected August 2026).
 # These lock in the exact shapes so a refactor can't silently break detection.
 #   MGS2 Full Version      3821 files  us/demo us/demo2 us/movie us/movievr us/vox
 #   MGS3 main file         6053 files  us/demo us/movie us/vox

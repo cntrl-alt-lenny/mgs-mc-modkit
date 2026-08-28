@@ -1,8 +1,6 @@
 """Launch-options reference text + file saving."""
 from __future__ import annotations
 
-from pathlib import Path
-
 import install
 from conftest import FakeUI
 

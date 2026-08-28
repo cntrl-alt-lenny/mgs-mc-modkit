@@ -8,11 +8,11 @@ import sys
 import pytest
 
 import install
+from conftest import build_tar, build_zip
 
 needs_symlinks = pytest.mark.skipif(
     sys.platform == "win32",
     reason="creating symlinks on Windows needs privileges bsdtar won't have")
-from conftest import build_tar, build_zip
 
 
 def test_rel_is_unsafe():

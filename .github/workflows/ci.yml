@@ -21,15 +21,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install bsdtar (libarchive-tools) + pytest
+      - name: Install bsdtar, desktop validator + test tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y libarchive-tools
+          sudo apt-get install -y libarchive-tools desktop-file-utils
           bsdtar --version
-          python -m pip install --upgrade pip pytest
+          desktop-file-validate Install-MGS-Mods.desktop
+          python -m pip install --upgrade pip pytest ruff
 
       - name: Byte-compile the installer
         run: python -m py_compile install.py
+
+      - name: Run lint
+        run: ruff check .
 
       - name: Run the test-suite
         run: python -m pytest tests/ -q

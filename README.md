@@ -32,7 +32,7 @@ Steam Deck · Linux · Windows — one double-click, nothing to configure, fully
 <tr><td align="center"><h3>2</h3></td><td>
 <i>Optional but recommended:</i> grab the <b>Better Audio</b> files from NexusMods (free login). Keep them anywhere — you'll point at them in step 3, and renaming is fine.
 <br><br>
-🔊 <a href="https://www.nexusmods.com/metalgearsolid2mc/mods/3"><b>MGS2</b></a> — <i>Full Version</i> &nbsp;·&nbsp; 🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3</b></a> — <i>main file</i> + <i>Update 2.0</i> <sub>(+ optional <i>HQ Ending Cutscenes</i>)</sub>
+🔊 <a href="https://www.nexusmods.com/metalgearsolid2mc/mods/3"><b>MGS2</b></a> — <i>2.0 Full Version</i> or the smaller <i>2.0 Lite Version</i> &nbsp;·&nbsp; 🔊 <a href="https://www.nexusmods.com/metalgearsolid3mc/mods/4"><b>MGS3</b></a> — <i>main file</i> + <i>Update 2.0</i> <sub>(+ optional <i>HQ Ending Cutscenes</i>)</sub>
 </td></tr>
 
 <tr><td align="center"><h3>3</h3></td><td>
@@ -61,8 +61,8 @@ Steam Deck · Linux · Windows — one double-click, nothing to configure, fully
 | Game | Mods installed | Result |
 |:--|:--|:--|
 | **MGS1** | [MGSM2Fix](https://github.com/nuggslet/MGSM2Fix) `3.6.0` | Analog deadzone gone, uncensored Western textures restored, startup notices skipped, high internal resolution |
-| **MGS2** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `3.1.0` + [Bugfix Compilation](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) `2.2.0` + *audio* | True 16:10, correct FOV, lower CPU, PS2 textures & models back, launcher skipped, HQ cutscenes, uncompressed audio — plus a fix for a late-game cutscene crash |
-| **MGS3** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `3.1.0` + [Bugfix Compilation](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) `1.1.0` + *audio* | As MGS2: true 16:10, correct FOV, lower CPU, restored assets, launcher skipped, uncompressed audio |
+| **MGS2** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `4.1.0` + [Bugfix Compilation](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) `3.0.0` + *audio* | True 16:10, correct FOV, lower CPU, PS2 textures & models back, launcher skipped, HQ cutscenes, uncompressed audio — plus a fix for a late-game cutscene crash |
+| **MGS3** | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) `4.1.0` + [Bugfix Compilation](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) `2.0.1` + *audio* | As MGS2: true 16:10, correct FOV, lower CPU, restored assets, launcher skipped, uncompressed audio |
 
 Mods install in the order their authors require, straight from their official
 releases — **nothing is rehosted here**.
@@ -81,7 +81,7 @@ releases — **nothing is rehosted here**.
 | **Crash-safe** | Backups are never overwritten, and a power cut mid-install can't make the next run mistake mod files for your originals |
 | **Won't fill your drive** | Free space is checked against each file's real unpacked size first |
 | **Repair & remove built in** | Run the shortcut again: *install/repair* or *remove the mods*. It remembers your settings |
-| **Tested** | [145 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
+| **Tested** | [149 automated tests](tests/) in [CI](.github/workflows/ci.yml) — bad archives, interrupted installs, partial re-installs, uninstall |
 
 <sub>One honest caveat: Better Audio replaces some multi-GB game files that are
 too large to back up. Those specific files come back via Steam's <i>Verify
@@ -106,7 +106,7 @@ for you. (The files are also 2–3 GB, over GitHub's release size limit.)
 
 | Component | Nexus file | Notes |
 |:--|:--|:--|
-| MGS2 audio | *Full Version* | The only MGS2 file |
+| MGS2 audio | *2.0 Full Version* or *2.0 Lite Version* | Full restores the complete pack; Lite is the smaller, more limited restoration |
 | MGS3 audio | the *main file* (v1.0) | v1.0 **is** current |
 | MGS3 audio update | *Update 2.0* (~25 MB) | Recommended, but optional |
 | MGS3 HQ ending | *HQ Ending Cutscenes* | Optional, **off** by default |
@@ -116,10 +116,11 @@ later, or install just it if you already have the main file. When several are
 chosen the order is enforced (main → ending → update).
 
 **Files can live anywhere and be renamed.** The installer identifies each one by
-what's *inside* it, checked against the real archives: MGS2's payload contains
-folders MGS3's never does, and a full pack is thousands of files where the
-patches are two or three. If a file can't be identified it asks rather than
-guessing, and it refuses one belonging to the other game.
+what's *inside* it where possible, checked against the real archives: MGS2's full
+payload contains folders MGS3's never does, and a full pack is thousands of files
+where the patches are two or three. Smaller packs also carry the Nexus page id in
+their filename. If a file can't be identified it asks rather than guessing, and
+it refuses one belonging to the other game.
 
 > ⚠️ *HQ Ending Cutscenes* has one quirk from its author: the final two
 > cutscenes **pause at the end and need a button press** to continue. Hence off
@@ -235,14 +236,14 @@ in section 'Internal Settings': Section not found
 That file can normally only be produced by the mod's **Windows-only Config
 Tool**, and its section names aren't the tab labels that tool shows you — so
 hand-writing one doesn't work either. This kit ships a canonical settings file
-captured from the real tool.
+matched to the pinned release's Config Tool schema.
 
 **The launcher is the other trap.** It's the only place to enable *high quality
 cinematics*, so skipping it normally locks you out of that setting. The kit
 writes the launcher's own save directly, so you get both.
 
 **Versions are pinned deliberately** — the bundled settings file is matched to
-MGSHDFix `3.1.0`, and a future release could rename sections and break launching.
+MGSHDFix `4.1.0`, and a future release could rename sections and break launching.
 
 </details>
 

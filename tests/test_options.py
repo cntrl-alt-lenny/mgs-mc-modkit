@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import builtins
+import json
+from pathlib import Path
 
 import install
 
@@ -55,8 +57,6 @@ def test_cancel_preserves_opts_defaults(monkeypatch):
 # ---------------------------------------------------------------------------
 # Tier 2 — settings persistence, no-display fallback, clipboard, filters
 # ---------------------------------------------------------------------------
-import json
-from pathlib import Path
 
 
 def test_no_display_falls_back_to_terminal(monkeypatch):
@@ -100,6 +100,20 @@ def test_saved_settings_ignores_unknown_and_bad_values(tmp_path):
     }))
     saved = install.load_saved_opts({"mgs2": (game, tmp_path)})
     assert saved == {"button_icons": "Xbox One"}     # unknown/non-scalar dropped
+
+
+def test_saved_settings_rejects_wrong_scalar_types(tmp_path):
+    game = tmp_path / "MGS2"
+    (game / install.MODKIT_DIRNAME).mkdir(parents=True)
+    (game / install.MODKIT_DIRNAME / install.MANIFEST_NAME).write_text(
+        json.dumps({"settings": {
+            "button_icons": True,
+            "audio_mode": False,
+            "hq_movies": "yes",
+            "skip_splash": 1,
+            "skip_launcher": None,
+        }}))
+    assert install.load_saved_opts({"mgs2": (game, tmp_path)}) == {}
 
 
 def test_saved_settings_absent_or_corrupt_is_empty(tmp_path):

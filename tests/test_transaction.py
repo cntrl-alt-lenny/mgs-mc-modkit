@@ -341,10 +341,43 @@ def test_corrupt_manifest_halts_and_changes_nothing(tmp_path, game_dir,
     assert manifest.is_file()
 
 
+def test_uninstall_rejects_manifest_path_escape(tmp_path):
+    game_dir = tmp_path / "MGS2"
+    game_dir.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_bytes(b"do not delete")
+    root = game_dir / install.MODKIT_DIRNAME
+    root.mkdir()
+    (root / install.MANIFEST_NAME).write_text(json.dumps({
+        "added": ["../outside.txt"],
+        "overwritten": [],
+    }))
+
+    notes, ok = install.uninstall_game(game_dir, _noop)
+
+    assert not ok
+    assert outside.read_bytes() == b"do not delete"
+    assert (root / install.MANIFEST_NAME).is_file()
+    assert any("unsafe" in note for note in notes)
+
+
+def test_authored_file_is_in_recovery_journal(tmp_path):
+    game_dir = tmp_path / "MGS2"
+    game_dir.mkdir()
+    tx = install.InstallTxn(game_dir, "mgs2", _noop)
+
+    tx.write_bytes("plugins/MGSHDFix.settings", b"settings")
+
+    journal = json.loads(
+        (game_dir / install.MODKIT_DIRNAME / install.JOURNAL_NAME)
+        .read_text())
+    assert journal == ["plugins/MGSHDFix.settings"]
+    tx.rollback()
+
+
 def test_rollback_keeps_preexisting_root_even_without_manifest(tmp_path, game_dir,
                                                                patch_download):
     """A failed run must not delete backups that predate it (manifest or not)."""
-    import pytest
     import tempfile
     (game_dir / "winhttp.dll").write_bytes(b"TRUE-STOCK")
     steam_root = make_steam_root(tmp_path)

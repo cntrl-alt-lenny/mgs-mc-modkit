@@ -4,7 +4,7 @@
 
 The four pinned mod versions are **a set, not four independent choices**. They
 are pinned together because they depend on each other, and because MGSHDFix has
-no runtime defaults — the kit ships a `MGSHDFix.settings` file captured from one
+no runtime defaults — the kit ships a `MGSHDFix.settings` file matched to one
 specific version of its Config Tool, and the game **hard-aborts on a single
 missing key**.
 
@@ -27,8 +27,8 @@ fixes: the Bugfix pack no longer ships them and the old MGSHDFix never provided
 them. Nothing errors. The game just quietly has bugs back.
 
 **2. MGSHDFix major releases change the settings schema.**
-`SETTINGS_TEMPLATE` in `install.py` is a byte-exact capture from the Config Tool
-of the pinned MGSHDFix. A major release adds and renames sections, and the mod
+`SETTINGS_TEMPLATE` in `install.py` is a schema-matched template for the pinned
+MGSHDFix Config Tool. A major release adds and renames sections, and the mod
 aborts on anything it can't find:
 
 ```
@@ -36,9 +36,8 @@ aborts on anything it can't find:
 in section 'Internal Settings': Section not found
 ```
 
-That template can only be produced by the real **Windows** Config Tool. It
-cannot be hand-written — the ini section names are not the tab labels shown in
-the tool's UI.
+For a future major release, regenerate the template with the real **Windows**
+Config Tool. The ini section names are not the tab labels shown in its UI.
 
 ---
 
@@ -109,17 +108,15 @@ to publish if either shortcut's pin disagrees with `install.py`.
 
 ---
 
-## Known pending upgrade (as of August 2026)
+## Current pinned set (August 2026)
 
-| Mod | Pinned | Upstream | Notes |
-|:--|:--|:--|:--|
-| MGSHDFix | `3.1.0` | `4.0.2` | Major. Restores depth of field, MGS3 film grain, timer fix, SMAA, retranslation. **Settings schema changed** — 7 of our 27 sections no longer appear in its binaries. |
-| MGS2 Bugfix | `2.2.0` | `3.0.0` | Removed fixes now handled by MGSHDFix 4.x. **Requires 4.x.** |
-| MGS3 Bugfix | `1.1.0` | `2.0.1` | Same coupling. |
-| MGSM2Fix | `v3.6` | `v3.6` | Current — MGS1 is unaffected, upgrade it independently or not at all. |
+| Mod | Pinned | Notes |
+|:--|:--|:--|
+| MGSHDFix | `4.1.0` | Includes the matching 4.x settings schema and the QoL fixes used by this kit. |
+| MGS2 Bugfix | `3.0.0` | Paired with MGSHDFix 4.x. |
+| MGS3 Bugfix | `2.0.1` | Paired with MGSHDFix 4.x. |
+| MGSM2Fix | `v3.6` | Independent MGS1 component. |
 
-The current pinned set is **internally consistent and working** — it is simply a
-version behind. There is no urgency and nothing is broken; the upgrade buys the
-4.x restorations.
-
-MGSM2Fix being independent means **MGS1 support needs no work** in this upgrade.
+This set is the known-good baseline. Any future version change must update the
+whole coupled set, regenerate the settings template, and pass a real install →
+launch → repair → uninstall check.

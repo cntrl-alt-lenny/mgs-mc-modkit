@@ -6,8 +6,6 @@ construction and defensive fallback are unit-testable by faking `which` and
 """
 from __future__ import annotations
 
-import subprocess
-
 import install
 
 

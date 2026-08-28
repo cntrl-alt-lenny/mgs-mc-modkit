@@ -136,7 +136,7 @@ def make_steam_root(tmp_path: Path, account_id: str = "12345678") -> Path:
 # ---------------------------------------------------------------------------
 # Better Audio archive fixtures + a scripted fake UI
 # ---------------------------------------------------------------------------
-# These shapes mirror the REAL NexusMods archives, inspected July 2026:
+# These shapes mirror the REAL NexusMods archives, inspected August 2026:
 #   MGS2 Full Version      3821 files  us/demo us/demo2 us/movie us/movievr us/vox
 #   MGS3 main file         6053 files  us/demo us/movie us/vox
 #   MGS3 Update 2.0           3 files  us/demo/_bp/ + us/vox/_bp/

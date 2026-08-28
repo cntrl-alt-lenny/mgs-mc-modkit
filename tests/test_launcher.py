@@ -1,8 +1,6 @@
 """Konami launcher_sv handling: fresh synth, in-place patch, edge cases."""
 from __future__ import annotations
 
-from pathlib import Path
-
 import install
 from conftest import make_steam_root
 
@@ -72,10 +70,10 @@ def test_mismatched_array_lengths_do_not_crash(tmp_path):
         ["languageLauncher", "HiresoMovie", "orphanKey"], ["3", "0"]))
 
     tx = _tx(game_dir)
-    install.set_launcher_options(tx, install.GAMES["mgs2"],
-                                 make_steam_root(tmp_path), OPTS, _noop)
-    data = install._read_launcher_sv(sv)
-    assert data["HiresoMovie"] == "1"          # overlapping keys still applied
+    before = sv.read_bytes()
+    assert not install.set_launcher_options(
+        tx, install.GAMES["mgs2"], make_steam_root(tmp_path), OPTS, _noop)
+    assert sv.read_bytes() == before       # malformed save was not rewritten
 
 
 def test_unparseable_save_left_alone(tmp_path):
@@ -85,8 +83,8 @@ def test_unparseable_save_left_alone(tmp_path):
     sv.write_bytes(b"\xef\xbb\xbfnot json at all")
 
     tx = _tx(game_dir)
-    install.set_launcher_options(tx, install.GAMES["mgs2"],
-                                 make_steam_root(tmp_path), OPTS, _noop)
+    assert not install.set_launcher_options(
+        tx, install.GAMES["mgs2"], make_steam_root(tmp_path), OPTS, _noop)
     # Untouched — still the garbage we wrote, nothing tracked.
     assert sv.read_bytes() == b"\xef\xbb\xbfnot json at all"
     assert tx.added == []
