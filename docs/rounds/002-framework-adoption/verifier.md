@@ -2,10 +2,10 @@
 round: 002-framework-adoption
 role: verifier
 branch: verifier/002-framework-adoption
-head: 4e53178feb8bd93592b21a9d0de6ec6f8a594daf
+head: cbcad124ef5134ca7af9232b1035da3c366a4398
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T18:10:16Z
+written: 2026-10-03T18:10:57Z
 -->
 # Verifier report: 002-framework-adoption
 
@@ -143,6 +143,33 @@ removed prior sentences. Its first-adoption prompt caveat agrees with the note.
 The fresh-clone test it explicitly left unverified has now been performed.
 No contradictory claim found. Historical Worker adoption commands are recorded
 in its report; this Verifier proves the resulting copies, not that past process.
+
+### Report publication evidence
+
+`python3 tools/fw.py report --role verifier --round 002-framework-adoption --push`
+exited 0 after the first version of this report was written:
+
+```text
+report committed: docs/rounds/002-framework-adoption/verifier.md at cbcad124ef51; it describes 4e53178feb8b on verifier/002-framework-adoption
+pushed verifier/002-framework-adoption to origin
+end your final reply with: mgs-mc-modkit · ROUND 002 · VERIFIER · DONE — report pushed at cbcad124ef51
+```
+
+`python3 tools/fw.py delivery --round 002-framework-adoption` exited 0:
+
+```text
+origin/verifier/002-framework-adoption (cbcad124ef51): delivered
+  verifier: report describes 4e53178feb8b (written 2026-10-03T18:10:16Z on macOS 27.0)
+  worker: report describes 13c30c031d4a (written 2026-10-03T16:53:37Z on macOS 27.0)
+```
+
+`python3 tools/fw.py status` exited 0 and ended:
+`next: ask Brain to judge round 002-framework-adoption: every seat has reported`.
+`git diff --name-only 4e53178feb8bd93592b21a9d0de6ec6f8a594daf HEAD`
+exited 0 and listed only this Verifier report. Remote branch tip matched the
+first report commit. These recorded results are followed by one final report
+restamp/push, whose actual commit is returned in the final seat reply; reviewed
+Worker delivery remains the literal commit stated at the top.
 
 ## Not verified
 
