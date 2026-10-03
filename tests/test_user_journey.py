@@ -9,6 +9,12 @@ uninstall back to stock.
 from __future__ import annotations
 
 import sys
+import json
+import threading
+
+import pytest
+
+from test_progress import BrokenZenity
 
 import install
 from conftest import FakeUI, make_steam_root
@@ -134,3 +140,116 @@ def test_journey_windows_needs_no_manual_step(tmp_path, monkeypatch,
     assert "Launch Options" not in done            # never mentioned on Windows
     # ...and no launch-options file is dropped on the Desktop either
     assert not (desk / "MGS Steam Launch Options.txt").exists()
+
+
+@pytest.mark.parametrize("change_before_reset", [False, True])
+def test_reset_then_choices_match_review_manifest_and_files(
+        tmp_path, monkeypatch, patch_download, change_before_reset):
+    g1, g2, _ = _fake_world(tmp_path, monkeypatch, patch_download)
+    g3 = g2.parent / "MGS3"
+    g3.mkdir()
+    (g3 / "METAL GEAR SOLID3.exe").write_bytes(b"exe")
+    root = tmp_path / "steam"
+    found = {"mgs1": (g1, root), "mgs2": (g2, root), "mgs3": (g3, root)}
+    monkeypatch.setattr(install, "find_games", lambda: dict(found))
+
+    class ReviewUI(FakeUI):
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.reviews = []
+
+        def menu(self, title, body, items):
+            if title == "Ready to install":
+                self.reviews.append(body)
+            return super().menu(title, body, items)
+
+    # Start with an actual installation so reset must discard custom values.
+    ui = ReviewUI(checklist=[list(found), [], []],
+                  menu=["opts", "Xbox One", "Stereo (2.0)", "go"])
+    monkeypatch.setattr(install, "UI", lambda: ui)
+    assert install.main() == 0
+    for game_dir in (g2, g3):
+        path = game_dir / "plugins/MGSHDFix.settings"
+        path.write_text(path.read_text().replace('Game Language="en"', 'Game Language="fr"'))
+        assert 'Game Language="fr"' in path.read_text()
+    ini = g1 / "MGSM2Fix.ini"
+    ini.write_text(ini.read_text().replace("SkipIntro = true", "SkipIntro = false"))
+
+    # Also exercise Change -> Reset -> Change: only post-reset choices win.
+    menus = ["install"]
+    checklists = [list(found), []]
+    if change_before_reset:
+        menus += ["opts", "PlayStation 5", "Stereo (2.0)"]
+        checklists += [["hq_movies", "skip_splash", "skip_launcher"]]
+    menus += ["reset", "opts", "PlayStation 2", "Surround Sound (5.1)", "go"]
+    checklists += [[]]  # explicitly turn off HQ movies, logos skip and auto-boot
+    ui = ReviewUI(checklist=checklists, menu=menus)
+    monkeypatch.setattr(install, "UI", lambda: ui)
+    assert install.main() == 0
+    assert not ui.errors and not ui._menu and not ui._checklist
+    review = ui.reviews[-1]
+    for key, game_dir in (("mgs1", g1), ("mgs2", g2), ("mgs3", g3)):
+        saved = json.loads((game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).read_text())["settings"]
+        assert saved["skip_launcher"] is False
+        assert f"{install.GAMES[key]['short']}: Boot straight in: no" in review
+        if key == "mgs1":
+            parser = install.parse_ini(ini.read_text())
+            assert parser["Main"]["StartGame"] == "false"
+            assert parser["Main"]["SkipIntro"] == "true"  # shipped reset default
+        else:
+            assert saved["button_icons"] == "PlayStation 2"
+            assert saved["audio_mode"] == "Surround Sound (5.1)"
+            assert saved["hq_movies"] is False and saved["skip_splash"] is False
+            parser = install.validate_settings((game_dir / "plugins/MGSHDFix.settings").read_text())
+            assert parser["Controller Settings"]["Button Icons"] == '"PlayStation 2"'
+            assert parser["System Specific Fixes"]["Audio Output Mode"] == '"Surround Sound (5.1)"'
+            assert parser["Launcher and Splashscreens"]["Skip Launcher"] == "0"
+            assert parser["Launcher and Splashscreens"]["Skip In-Game Splashscreens"] == "0"
+            assert parser["Launcher and Splashscreens"]["Skip Launcher Splashscreens"] == "0"
+            assert parser["Language Settings"]["Game Language"] == '"en"'
+            saves = list(game_dir.glob("*_savedata_win/*/launcher/launcher_sv"))
+            assert len(saves) == 1
+            assert install._read_launcher_sv(saves[0])["HiresoMovie"] == "0"
+    assert review.count("Buttons: PlayStation 2 · Sound: Surround Sound (5.1) · HQ movies: off · Skip logos: no") == 2
+
+
+def test_zenity_queued_cancel_restores_install_and_reports_cancellation(
+        tmp_path, monkeypatch, patch_download):
+    _, game_dir, _ = _fake_world(tmp_path, monkeypatch, patch_download)
+    root = tmp_path / "steam"
+    monkeypatch.setattr(install, "find_games", lambda: {"mgs2": (game_dir, root)})
+    before = {p.relative_to(game_dir): p.read_bytes() for p in game_dir.rglob("*") if p.is_file()}
+    ready = threading.Event()
+    real_install_hdfix = install.install_hdfix
+
+    def install_then_wait(tx, tmp, log):
+        real_install_hdfix(tx, tmp, log)
+        assert (game_dir / "winhttp.dll").read_bytes() != before[install.Path("winhttp.dll")]
+        ready.set()
+        assert install.CANCEL_EVENT.wait(5), "UI pump did not detect Zenity cancellation"
+        install.check_cancelled()
+
+    monkeypatch.setattr(install, "install_hdfix", install_then_wait)
+
+    class CancelUI(FakeUI):
+        def progress(self, title, log):
+            class CancelProgress(install.Progress):
+                def pump(self):
+                    if not ready.is_set():
+                        return
+                    if not getattr(self, "cancel_injected", False):
+                        self.cancel_injected = True
+                        self._backend = "zenity"
+                        self._proc = BrokenZenity(1)
+                        assert not self._pending.empty()
+                    super().pump()
+            return CancelProgress("term", title, log)
+
+    ui = CancelUI(checklist=[["mgs2"], []], menu=["go"])
+    monkeypatch.setattr(install, "UI", lambda: ui)
+    assert install.main() == 1
+    assert "Installation cancelled" in str(ui.errors)
+    assert "previous setup restored" in str(ui.errors)
+    assert not ui.infos
+    after = {p.relative_to(game_dir): p.read_bytes() for p in game_dir.rglob("*") if p.is_file()}
+    assert after == before

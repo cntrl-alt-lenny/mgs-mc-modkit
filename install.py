@@ -1120,7 +1120,8 @@ class Progress:
                 self._tk[0].update()
             except Exception:
                 self.cancel_event.set()
-        if self._backend == "zenity" and self._proc and self._proc.poll() is not None:
+        # Keep polling after a broken pipe: the exit status may arrive later.
+        if self._proc and self._proc.poll() is not None:
             if self._proc.returncode == 1:
                 self.cancel_event.set()
         if (self._backend == "kdialog" and self._qdbus and self._dbus
@@ -1157,7 +1158,7 @@ class Progress:
                 self._proc.stdin.flush()
             except (OSError, ValueError):
                 self._backend = "term"
-                self._proc = None
+                # Retain the process for cancellation polling and close() cleanup.
         elif self._backend == "kdialog":
             self._qdbus_call("org.freedesktop.DBus.Properties.Set",
                              "org.kde.kdialog.ProgressDialog", "value", str(pct))
@@ -3910,11 +3911,11 @@ def _main(log, log_path=None) -> int:
                         tx = InstallTxn(game_dir, key, log)
                         # Refresh inside the lock, after any interrupted run is recovered.
                         fresh = options_for_game(key, found[key], defaults, log)
-                        for option in game_opts.get("_changed", set()):
-                            fresh[option] = game_opts[option]
                         if game_opts.get("_reset"):
                             fresh.update(defaults)
                             fresh["_reset"] = True
+                        for option in game_opts.get("_changed", set()):
+                            fresh[option] = game_opts[option]
                         fresh["_changed"] = game_opts.get("_changed", set())
                         game_opts = per_game[key] = fresh
                         tx.settings = {k: game_opts[k] for k in SAVED_OPT_KEYS if k in game_opts}
