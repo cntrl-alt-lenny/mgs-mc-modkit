@@ -66,6 +66,14 @@ Skip straight to removal:  python3 install.py --uninstall
 from __future__ import annotations
 
 import hashlib
+import configparser
+import math
+import traceback
+import threading
+import time
+import uuid
+import io
+import queue
 import json
 import os
 import re
@@ -80,7 +88,7 @@ from pathlib import Path
 
 UA = "Mozilla/5.0 mgs-mc-modkit"
 
-MODKIT_VERSION = "2.2.0"
+MODKIT_VERSION = "2.3.0"
 
 # One codebase, two platforms. On Windows the mods load natively (no Proton,
 # so no WINEDLLOVERRIDES launch options at all) and the dialogs come from
@@ -373,7 +381,7 @@ Fix In-Game Timer Loading Pause=1
 Force RTC Hostage Type="Normal"
 Gameplay Stats Overlay="Disabled"
 Restore SoL Elevator Glitch=0
-Show Pressure Level Overlay="Disabled"
+Show Pressure Level Overlay=0
 
 [System Specific Fixes]
 Audio Output Mode="@AUDIO_MODE@"
@@ -441,6 +449,185 @@ SETTINGS_CAPTURED_FROM = "4.1.0"
 
 SETTINGS_EXPECTED_SECTIONS = 27
 SETTINGS_EXPECTED_KEYS = 128
+
+# Derived independently from the pinned upstream Config Tool field definitions.
+SETTINGS_SCHEMA = {'Bugfixes': {'Boost Reverb Volume': 'Bool',
+              'Depth of Field Blur Strength': 'Float',
+              'Fix  High  CPU  Usage': 'Choice',
+              'Fix Achievement Stat Tracking': 'Bool',
+              'Fix Aiming After Equip': 'Bool',
+              'Fix Aiming On Full Tilt': 'Bool',
+              'Fix Alt-Tab Loading Bugs': 'Bool',
+              'Fix Broken PS2 Visual Effects': 'Bool',
+              'Fix Depth of Field': 'Bool',
+              'Fix Film Grain': 'Bool',
+              'Fix M92 Laser Origin in FPV': 'Bool',
+              'Fix Motion Trails': 'Choice',
+              'Fix Mouse Cursor Showing': 'Bool',
+              'Reverb Volume Multiplier': 'Float'},
+ 'CAUTION - THIS WILL RESET ALL ACHIEVEMENTS': {'Reset All Achievements': 'Bool'},
+ 'Camera Positioning': {'Disable HD Collection Camera Positioning': 'Bool',
+                        'HD Collection Camera Toggle': 'Hotkey'},
+ 'Caption Settings': {'Caption Opacity (%)': 'Int',
+                      'Caption Outline Opacity (%)': 'Int',
+                      'Caption Size (%)': 'Int'},
+ 'Controller Settings': {'Button Icons': 'Choice',
+                         'DualShock Rumble Strength (%)': 'Int',
+                         'Dualshock 2 && 3 Controller Support': 'Bool',
+                         'Restore PS2 Pressure Sensitive Binds': 'Bool',
+                         'Set Menu OK && Cancel Button': 'Choice'},
+ 'DISABLE STEAM ACHIEVEMENTS': {'Disable Unlocking Steam Achievements': 'Bool'},
+ 'Damaged Steam Cloud Save Data Fix': {'Enable Console Notification When Fixed': 'Bool',
+                                       'Fix Mode': 'Choice'},
+ 'Debugging': {'Debug Logging': 'Bool', 'Start Game in Developer Menu': 'Bool'},
+ 'Difficulty Restoration': {'Enable Grenade Cooking': 'Bool',
+                            'Restore PS2 Solidus Choking Difficulty': 'Choice',
+                            'Toggle Grenade Cooking': 'Hotkey'},
+ 'Enable Game Warnings': {'Warn When FSR Upscaling is Enabled': 'Bool',
+                          'Warn When Game is Muted': 'Bool',
+                          'Warn When Missing Major Bugfix Mods': 'Bool',
+                          'Warn When Save Files Are Read-Only': 'Bool',
+                          'Warn When Save Folders Not Writable': 'Bool',
+                          'Warn When Windows Slideshow Enabled': 'Bool'},
+ 'Enhancements and Tweaks': {'Anisotropic Filtering Level': 'Int',
+                             'Correct Gamma Levels': 'Bool',
+                             'Enable SMAA Anti-Aliasing': 'Bool',
+                             'Nearest Neighbor Texture Filtering': 'Bool',
+                             'Reduce Photosensitive Effects': 'Bool'},
+ 'First Person Shooter Mode': {'Enable First Person Shooter Mode': 'Bool',
+                               'First Person Shooter - Movement Enabled By Default': 'Bool',
+                               'Keep First Person View Across Rooms': 'Bool',
+                               'Tap to Keep First Person View Active': 'Bool',
+                               'Toggle First Person Shooter Mode': 'Hotkey',
+                               'Toggle First Person Shooter Movement': 'Hotkey',
+                               'Toggle Tap for First Person View': 'Hotkey'},
+ 'Hotkeys': {'Capture Hotkeys While Alt Tabbed': 'Bool',
+             'Cycle Wireframe Mode': 'Hotkey',
+             'Return to Developer Menu': 'Hotkey',
+             'Toggle Vector Line Fixes': 'Hotkey'},
+ 'Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)': {'Render Height': 'Int',
+                                                                                                 'Render Width': 'Int'},
+ 'Keep Aiming After Firing': {'Always Keep Aiming': 'Bool',
+                              'While Holding Lock On': 'Bool',
+                              'While in FPS Mode': 'Bool',
+                              'While in First Person': 'Bool'},
+ 'Language Settings': {'Game Language': 'Choice', 'Game Region': 'Choice'},
+ 'Launcher and Splashscreens': {'Skip In-Game Splashscreens': 'Bool',
+                                'Skip Launcher': 'Bool',
+                                'Skip Launcher Splashscreens': 'Bool'},
+ 'MGS2 Community Bugfix Compilation Integration': {'Restore Title Screen 2 Color Swapping': 'Bool',
+                                                   'Retro MSX Colonel Sprite': 'Choice'},
+ 'Model Quality && Level of Detail Enhancements': {'Always Show Grass': 'Bool',
+                                                   'Always Show Weapon Shell Casings': 'Bool',
+                                                   'Custom Grass Distance Multiplier': 'Float',
+                                                   'Force High Quality Characters': 'Bool',
+                                                   'Increase Shadow Resolution': 'Bool',
+                                                   "Make Snake's Bandana Heavier": 'Bool',
+                                                   'Show Soft Particles': 'Bool',
+                                                   'Toggle Always Show Grass': 'Hotkey'},
+ 'Mouse Sensitivity': {'Override Mouse Sensitivity': 'Bool',
+                       'X Multiplier': 'Int',
+                       'Y Multiplier': 'Int'},
+ 'Speedrunner Settings': {'Fix In-Game Timer Loading Pause': 'Bool',
+                          'Force RTC Hostage Type': 'Choice',
+                          'Gameplay Stats Overlay': 'Choice',
+                          'Restore SoL Elevator Glitch': 'Bool',
+                          'Show Pressure Level Overlay': 'Bool'},
+ 'System Specific Fixes': {'Audio Output Mode': 'Choice',
+                           'Disable Windows Fullscreen Optimization': 'Bool',
+                           'Force Dedicated GPU': 'Bool',
+                           'Limit Game to 2 CPU Cores': 'Bool'},
+ 'Third Person Freecam': {'Camera - Zoom In Hotkey': 'Hotkey',
+                          'Camera - Zoom Out Hotkey': 'Hotkey',
+                          'Camera - Zoom Reset Hotkey': 'Hotkey',
+                          'Camera - Zoom Speed': 'Int',
+                          'Camera - Zoom Step Amount': 'Int',
+                          'Enable Third Person Freecam': 'Bool',
+                          'Horizontal Camera Sensitivity': 'Float',
+                          'Inherit Camera Rotation': 'Bool',
+                          'Inherit Camera Rotation Toggle': 'Hotkey',
+                          'Max Camera Distance': 'Int',
+                          'Third Person View Toggle': 'Hotkey',
+                          'Vertical Camera Sensitivity': 'Float'},
+ 'Ultra-Wide / 16:10+': {'Fix Aspect Ratio': 'Bool',
+                         'Fix FOV': 'Bool',
+                         'Fix Framebuffer': 'Bool',
+                         'Lock HUD && Movies to 16:9': 'Bool'},
+ 'Update Notifications': {'Check For MGSHDFix Updates': 'Bool', 'In-Game Update Notifications': 'Bool'},
+ 'Various': {'Camera Triggers Steam Screenshot': 'Bool',
+             'Custom Lifebar Name': 'Str',
+             'Enable Radar in Snake Tales': 'Bool',
+             'Fix Vamp Punch Damage Type': 'Bool',
+             'Force Sunglasses': 'Choice',
+             'High Frequency Blade Anywhere': 'Bool',
+             'Pause On Focus Loss': 'Bool',
+             'Restore Japanese Phone Ringtone': 'Bool',
+             'Restore Main Menu Voiceovers': 'Bool',
+             'Restore Node DoB && Bloodtype Entry': 'Bool',
+             'Restore Original Dogtag Names': 'Bool',
+             'Restore PS2 Memory Card Strings': 'Bool',
+             'Restore SoL Radar Rotation': 'Bool',
+             'T.Goggle Color Cycle Hotkey': 'Hotkey',
+             'Thermal Goggle Default Palette': 'Choice',
+             'Thermal Goggle Palette Swapping': 'Bool',
+             'Use Character Names for Lifebar': 'Bool',
+             'Use Custom Lifebar Name': 'Bool'},
+ 'Window Settings': {'Enable Resolution Overrides': 'Bool',
+                     'Fullscreen, Borderless, and Windowed': 'Choice',
+                     'Window Height': 'Int',
+                     'Window Width': 'Int'}}
+SETTINGS_CONSTRAINTS = {'Bugfixes': {'Fix  High  CPU  Usage': {'choices': ['Full', 'Half', 'Disabled']},
+              'Fix Motion Trails': {'choices': ['Full (Gameplay + Cutscenes)',
+                                                'Cutscenes Only',
+                                                'Disabled']}},
+ 'System Specific Fixes': {'Audio Output Mode': {'choices': ['Stereo (2.0)', 'Surround Sound (5.1)']}},
+ 'Damaged Steam Cloud Save Data Fix': {'Fix Mode': {'choices': ['Move Outdated Save Data to Backup '
+                                                                'Folder',
+                                                                'Delete Outdated Save Data',
+                                                                'Disable Damaged Save Data Fix']}},
+ 'Controller Settings': {'Set Menu OK && Cancel Button': {'choices': ['Default',
+                                                                      'East for OK',
+                                                                      'South for OK']},
+                         'DualShock Rumble Strength (%)': {'range': [0, 200]}},
+ 'Window Settings': {'Window Width': {'range': [0, 16384]},
+                     'Fullscreen, Borderless, and Windowed': {'choices': ['Exclusive Fullscreen',
+                                                                          'Borderless Fullscreen',
+                                                                          'Borderless Windowed',
+                                                                          'Windowed (with borders)']},
+                     'Window Height': {'range': [0, 16384]}},
+ 'Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)': {'Render Width': {'range': [0,
+                                                                                                                            16384]},
+                                                                                                 'Render Height': {'range': [0,
+                                                                                                                             16384]}},
+ 'Enhancements and Tweaks': {'Anisotropic Filtering Level': {'range': [0, 16]}},
+ 'Various': {'Force Sunglasses': {'choices': ['Normal', 'Always', 'Never']},
+             'Thermal Goggle Default Palette': {'choices': ['Substance',
+                                                            'Sons of Liberty',
+                                                            'Splinter Cell',
+                                                            'White Hot',
+                                                            'Black Hot']}},
+ 'Caption Settings': {'Caption Size (%)': {'range': [1, 100]},
+                      'Caption Opacity (%)': {'range': [0, 100]},
+                      'Caption Outline Opacity (%)': {'range': [0, 100]}},
+ 'Speedrunner Settings': {'Gameplay Stats Overlay': {'choices': ['Disabled',
+                                                                 'Top Left',
+                                                                 'Top Right',
+                                                                 'Bottom Left',
+                                                                 'Bottom Right']},
+                          'Force RTC Hostage Type': {'choices': ['Normal',
+                                                                 'Kato-chan',
+                                                                 'Old Beauties',
+                                                                 'Jennifer']}},
+ 'MGS2 Community Bugfix Compilation Integration': {'Retro MSX Colonel Sprite': {'choices': ['Disabled',
+                                                                                            'MSX2',
+                                                                                            'Subsistence']}},
+ 'Difficulty Restoration': {'Restore PS2 Solidus Choking Difficulty': {'choices': ['Disabled',
+                                                                                   'Duration Increase '
+                                                                                   'Only',
+                                                                                   'Life Reduction Only',
+                                                                                   'Full Restoration']}},
+ 'Third Person Freecam': {'Camera - Zoom Speed': {'range': [1, 500]}},
+ 'Mouse Sensitivity': {'X Multiplier': {'range': [1, 100]}, 'Y Multiplier': {'range': [1, 100]}}}
 
 # ---------------------------------------------------------------------------
 # The Konami launcher's own settings.
@@ -859,10 +1046,14 @@ class Progress:
     def __init__(self, kind: str, title: str, log, tk_root=None) -> None:
         self.title = title
         self.log = log
+        self.cancel_event = threading.Event()
+        self._owner_thread = threading.get_ident()
+        self._pending = queue.Queue(maxsize=1)
         self._proc = None
         self._backend = "term"
         self._dbus = None           # (service, path) for kdialog
         self._qdbus = None
+        self._last_cancel_poll = 0
         self._tk = None             # (window, bar, label) for tkinter
         if kind == "tk" and tk_root is not None:
             try:
@@ -872,12 +1063,13 @@ class Progress:
                 top.title(title)
                 top.attributes("-topmost", True)
                 top.resizable(False, False)
-                top.protocol("WM_DELETE_WINDOW", lambda: None)  # not closable
+                top.protocol("WM_DELETE_WINDOW", self.cancel_event.set)
                 lbl = tk.Label(top, text="Preparing…", anchor="w",
                                padx=14, pady=8, width=52)
                 lbl.pack(fill="x")
                 bar = ttk.Progressbar(top, length=420, maximum=100)
                 bar.pack(padx=14, pady=(0, 12))
+                tk.Button(top, text="Cancel", command=self.cancel_event.set).pack(pady=(0, 12))
                 top.update()
                 self._tk = (top, bar, lbl)
                 self._backend = "tk"
@@ -887,7 +1079,7 @@ class Progress:
             try:
                 self._proc = subprocess.Popen(
                     ["zenity", "--progress", "--title", title, "--width", "460",
-                     "--auto-close", "--no-cancel", "--percentage", "0"],
+                     "--auto-close", "--percentage", "0"],
                     stdin=subprocess.PIPE, text=True)
                 self._backend = "zenity"
             except OSError:
@@ -903,6 +1095,7 @@ class Progress:
                     if r.returncode == 0 and len(parts) == 2:
                         self._dbus = (parts[0], parts[1])
                         self._backend = "kdialog"
+                        self._qdbus_call("showCancelButton", "true")
                 except (OSError, subprocess.SubprocessError):
                     self._dbus = None
 
@@ -915,7 +1108,48 @@ class Progress:
         except (OSError, subprocess.SubprocessError):
             self._backend = "term"      # stop trying if D-Bus misbehaves
 
+    def pump(self) -> None:
+        while True:
+            try:
+                label, pct = self._pending.get_nowait()
+            except queue.Empty:
+                break
+            self.update(label, pct)
+        if self._tk:
+            try:
+                self._tk[0].update()
+            except Exception:
+                self.cancel_event.set()
+        # Keep polling after a broken pipe: the exit status may arrive later.
+        if self._proc and self._proc.poll() is not None:
+            if self._proc.returncode == 1:
+                self.cancel_event.set()
+        if (self._backend == "kdialog" and self._qdbus and self._dbus
+                and time.monotonic() - self._last_cancel_poll >= 0.5):
+            self._last_cancel_poll = time.monotonic()
+            try:
+                result = subprocess.run([self._qdbus, *self._dbus, "wasCancelled"],
+                                        capture_output=True, text=True, timeout=1)
+                if result.returncode == 0 and result.stdout.strip().lower() == "true":
+                    self.cancel_event.set()
+            except (OSError, subprocess.SubprocessError):
+                pass
+
     def update(self, label: str, pct: float) -> None:
+        if threading.get_ident() != self._owner_thread:
+            # Coalesce rapid byte/file events so the UI cannot fall behind.
+            try:
+                self._pending.put_nowait((label, pct))
+            except queue.Full:
+                try:
+                    self._pending.get_nowait()
+                except queue.Empty:
+                    pass
+                try:
+                    self._pending.put_nowait((label, pct))
+                except queue.Full:
+                    pass
+            return
         pct = max(0, min(100, int(pct)))
         self.log(f"  … {label}  ({pct}%)")
         if self._backend == "zenity" and self._proc and self._proc.stdin:
@@ -924,7 +1158,7 @@ class Progress:
                 self._proc.stdin.flush()
             except (OSError, ValueError):
                 self._backend = "term"
-                self._proc = None
+                # Retain the process for cancellation polling and close() cleanup.
         elif self._backend == "kdialog":
             self._qdbus_call("org.freedesktop.DBus.Properties.Set",
                              "org.kde.kdialog.ProgressDialog", "value", str(pct))
@@ -1052,49 +1286,125 @@ def find_games() -> dict[str, tuple[Path, Path]]:
 # ---------------------------------------------------------------------------
 # Download / extract helpers
 # ---------------------------------------------------------------------------
-def download(url: str, dest: Path, log, sha256: str | None = None) -> None:
-    """Stream `url` to `dest`, verifying its SHA-256 if one is pinned.
+class CancelledInstall(RuntimeError):
+    pass
 
-    The hash is computed on the fly (no second read), and a mismatch deletes
-    the partial file and aborts — a corrupted or tampered archive never
-    reaches the extractor. Passing sha256=None (user-supplied Nexus archives,
-    whose bytes we can't know ahead of time) skips only the hash check; the
-    non-empty and content checks still apply.
-    """
-    log(f"  ↓ {url.rsplit('/', 1)[-1]}")
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    h = hashlib.sha256()
-    with urllib.request.urlopen(req, timeout=300) as r, open(dest, "wb") as f:
-        while True:
-            chunk = r.read(1024 * 256)
-            if not chunk:
-                break
-            h.update(chunk)
-            f.write(chunk)
+
+CANCEL_EVENT = None
+TRANSFER_PROGRESS = None
+
+
+def check_cancelled() -> None:
+    if CANCEL_EVENT is not None and CANCEL_EVENT.is_set():
+        raise CancelledInstall("Installation cancelled. Recovery is finishing before the window closes.")
+
+
+def download(url: str, dest: Path, log, sha256: str | None = None) -> None:
+    """Bounded retries, interruptible chunks, pinned verification before use."""
     name = url.rsplit("/", 1)[-1]
-    if dest.stat().st_size == 0:
-        dest.unlink(missing_ok=True)
-        raise RuntimeError(
-            f"The download of {name} arrived empty. Check your internet "
-            "connection and run the installer again. Nothing was changed.")
-    if sha256 is not None:
-        got = h.hexdigest()
-        if got.lower() != sha256.lower():
+    log(f"  ↓ {name}")
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    for attempt in range(3):
+        check_cancelled()
+        h, count = hashlib.sha256(), 0
+        try:
+            with urllib.request.urlopen(req, timeout=15) as r, open(dest, "wb") as f:
+                headers = getattr(r, "headers", {})
+                length = headers.get("Content-Length", "0")
+                total = int(length) if str(length).isdigit() else 0
+                while True:
+                    check_cancelled()
+                    chunk = r.read(1024 * 256)
+                    if not chunk:
+                        break
+                    h.update(chunk)
+                    f.write(chunk)
+                    count += len(chunk)
+                    if TRANSFER_PROGRESS:
+                        TRANSFER_PROGRESS(name, count, total)
+            if not count:
+                raise RuntimeError(f"The download of {name} arrived empty. Check your internet connection and run the installer again.")
+            if sha256 is not None and h.hexdigest().lower() != sha256.lower():
+                log(f"    ✗ {name}: expected {sha256}, got {h.hexdigest()}")
+                raise RuntimeError(f"The download of {name} didn't arrive intact, so it was not installed. Please run the installer again.")
+            if sha256:
+                log("    ✓ download verified")
+            return
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             dest.unlink(missing_ok=True)
-            # Keep the digests out of the message the user reads — they're in
-            # the log for bug reports.
-            log(f"    ✗ {name}: expected {sha256}, got {got}")
-            raise RuntimeError(
-                f"The download of {name} didn't arrive intact, so it was not "
-                "installed.\n\nThis is usually a dropped connection — run the "
-                "installer again. Nothing was changed in your game folder.")
-        log("    ✓ download verified")
+            retryable = not isinstance(e, urllib.error.HTTPError) or e.code == 429 or e.code >= 500
+            if attempt == 2 or not retryable:
+                raise
+            log(f"    Connection interrupted; retrying ({attempt + 2}/3)…")
+            if CANCEL_EVENT is not None:
+                CANCEL_EVENT.wait(2 ** attempt)
+            else:
+                time.sleep(2 ** attempt)
+        except BaseException:
+            dest.unlink(missing_ok=True)
+            raise
+
+
+def archive_command(args, on_progress=None, total=0, timeout=600):
+    """Keep extraction cancellable even during a long, silent file write."""
+    check_cancelled()
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    started = time.monotonic()
+    reported = 0
+    stdout, stderr, failures = [], [], []
+
+    def read_pipe(pipe, output):
+        try:
+            for line in pipe:
+                output.append(line)
+        except (OSError, UnicodeError) as e:
+            failures.append(e)
+        finally:
+            pipe.close()
+
+    readers = [threading.Thread(target=read_pipe, args=(pipe, output), daemon=True)
+               for pipe, output in ((proc.stdout, stdout), (proc.stderr, stderr))]
+    for reader in readers:
+        reader.start()
+    try:
+        # Windows communicate(timeout) does not expose partial output. Read
+        # lines continuously on both platforms instead of waiting for EOF.
+        while proc.poll() is None:
+            check_cancelled()
+            if time.monotonic() - started > timeout:
+                raise RuntimeError("The archive tool took too long. Check the archive and try again.")
+            if on_progress and total and len(stderr) > reported:
+                reported = len(stderr)
+                on_progress(min(0.99, reported / total))
+            try:
+                proc.wait(timeout=0.1)
+            except subprocess.TimeoutExpired:
+                pass
+        for reader in readers:
+            reader.join(timeout=1)
+        if failures or any(reader.is_alive() for reader in readers):
+            raise RuntimeError("The archive tool's output could not be read safely.")
+        out, err = "".join(stdout), "".join(stderr)
+        if proc.returncode:
+            raise subprocess.CalledProcessError(proc.returncode, args, out, err)
+        if on_progress:
+            on_progress(1.0)
+        return subprocess.CompletedProcess(args, proc.returncode, out, err)
+    except BaseException:
+        if proc.poll() is None:
+            proc.kill()
+        proc.wait(timeout=5)
+        for reader in readers:
+            reader.join(timeout=1)
+        raise
+
 
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(1024 * 256), b""):
+            check_cancelled()
             h.update(chunk)
     return h.hexdigest()
 
@@ -1137,7 +1447,10 @@ def _rel_is_unsafe(rel: str) -> bool:
     if re.match(r"^[A-Za-z]:", rel):
         return True
     parts = re.split(r"[\\/]+", rel)
-    return any(p in ("..",) for p in parts)
+    return any(p in ("..",) or ":" in p or "\x00" in p
+               or p.endswith((" ", "."))
+               or re.fullmatch(r"(?i)(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?", p)
+               for p in parts)
 
 
 def _path_is_within(base: Path, candidate: Path) -> bool:
@@ -1171,8 +1484,7 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
     are extracted (genuine per-file progress for multi-GB audio archives).
     """
     # 1. Pre-flight the listing — reject obviously hostile members up front.
-    listing = subprocess.run([tar_cmd(), "-tf", str(archive)],
-                             capture_output=True, text=True, check=True)
+    listing = archive_command([tar_cmd(), "-tf", str(archive)], timeout=60)
     total = 0
     for ln in listing.stdout.splitlines():
         name = ln.rstrip("\r")
@@ -1186,25 +1498,8 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
 
     # 2. Extract into the isolated staging dir.
     staging.mkdir(parents=True, exist_ok=True)
-    if on_progress and total:
-        # -v prints one line per extracted entry to stderr; count them for a
-        # real progress fraction.
-        proc = subprocess.Popen(
-            [tar_cmd(), "-xvf", str(archive), "-C", str(staging)],
-            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-        done = 0
-        for line in proc.stderr:               # type: ignore[union-attr]
-            if line.strip():
-                done += 1
-                if done % 40 == 0:
-                    on_progress(min(0.99, done / total))
-        proc.wait()
-        if proc.returncode != 0:
-            raise subprocess.CalledProcessError(proc.returncode, "bsdtar")
-        on_progress(1.0)
-    else:
-        subprocess.run([tar_cmd(), "-xf", str(archive), "-C", str(staging)],
-                       check=True)
+    args = [tar_cmd(), "-xvf" if on_progress else "-xf", str(archive), "-C", str(staging)]
+    archive_command(args, on_progress=on_progress, total=total)
 
     # 3. Walk what landed. Any symlink (dir or file) is a traversal risk once
     #    we copy through it, so reject the archive outright. os.walk does not
@@ -1223,7 +1518,7 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
                 raise UnsafeArchiveError(
                     f"Archive '{archive.name}' contains a symlink "
                     f"({fn!r}); refusing to install it.")
-            if not os.path.isfile(full):
+            if not os.path.isfile(full) or os.stat(full).st_nlink > 1:
                 # sockets, fifos, devices — nothing a mod archive should hold.
                 raise UnsafeArchiveError(
                     f"Archive '{archive.name}' contains a non-regular file "
@@ -1240,6 +1535,34 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
 
 
 # shutil.disk_usage works on every platform; os.statvfs is Unix-only.
+def validate_payload_paths(rels: list[str], game_key: str,
+                           component: str | None, log) -> list[str]:
+    out, seen = [], set()
+    for rel in rels:
+        norm = rel.replace("\\", "/").lower()
+        parts = norm.split("/")
+        if (_rel_is_unsafe(rel) or MODKIT_DIRNAME in parts
+                or any(p.endswith("_savedata_win") for p in parts)
+                or parts[-1] in {g["exe"].lower() for g in GAMES.values()}):
+            raise UnsafeArchiveError(f"Archive cannot write protected destination {rel!r}.")
+        if norm in seen:
+            raise UnsafeArchiveError(f"Archive has conflicting paths: {rel!r}.")
+        seen.add(norm)
+        if component == "audio":
+            dirs = ("us/demo/", "us/movie/", "us/vox/")
+            if game_key == "mgs2":
+                dirs += ("us/demo2/", "us/movievr/")
+            if not norm.startswith(dirs) or not norm.endswith(AUDIO_EXTS):
+                if len(parts) == 1 and norm.endswith((".txt", ".md", ".pdf")):
+                    log(f"    Skipped archive documentation: {rel}")
+                    continue
+                raise UnsafeArchiveError(f"Audio archive contains an unexpected destination: {rel!r}.")
+        out.append(rel)
+    if not out:
+        raise UnsafeArchiveError("Archive contains no supported payload files.")
+    return out
+
+
 def free_gb(path: Path) -> float:
     return shutil.disk_usage(path).free / (1024 ** 3)
 
@@ -1261,8 +1584,7 @@ def archive_payload_bytes(archive: Path) -> int:
     rather than treated as an error.
     """
     try:
-        p = subprocess.run([tar_cmd(), "-tvf", str(archive)],
-                           capture_output=True, text=True, timeout=600)
+        p = archive_command([tar_cmd(), "-tvf", str(archive)], timeout=60)
     except (OSError, subprocess.SubprocessError):
         return 0
     if p.returncode != 0:
@@ -1343,341 +1665,437 @@ class CorruptManifestError(RuntimeError):
     """The mgs-modkit record exists but can't be read — refuse to guess."""
 
 
+def _sync_dir(path: Path) -> None:
+    """Flush directory entries where the platform supports it."""
+    if os.name == "nt":
+        return
+    fd = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def durable_mkdir(path: Path) -> None:
+    missing = []
+    current = path
+    while not current.exists():
+        missing.append(current)
+        current = current.parent
+    for directory in reversed(missing):
+        directory.mkdir(exist_ok=True)
+        _sync_dir(directory.parent)
+
+
+def flush_file(path: Path) -> None:
+    # Windows CRT _commit/fsync rejects a read-only descriptor. The files
+    # flushed here are staged payloads, snapshots or our own temporary copies.
+    with open(path, "r+b" if sys.platform == "win32" else "rb") as stream:
+        os.fsync(stream.fileno())
+
+
+def atomic_bytes(path: Path, data: bytes) -> None:
+    durable_mkdir(path.parent)
+    temp = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
+    try:
+        with open(temp, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp, path)
+        _sync_dir(path.parent)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
+def atomic_copy(src: Path, dest: Path) -> None:
+    durable_mkdir(dest.parent)
+    temp = dest.with_name(dest.name + "." + uuid.uuid4().hex + ".tmp")
+    try:
+        shutil.copy2(src, temp)
+        flush_file(temp)
+        os.replace(temp, dest)
+        _sync_dir(dest.parent)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
+def restore_snapshot(src: Path, dest: Path) -> None:
+    durable_mkdir(dest.parent)
+    temp = dest.with_name(dest.name + "." + uuid.uuid4().hex + ".tmp")
+    try:
+        try:
+            os.link(src, temp)
+        except OSError:
+            atomic_copy(src, temp)
+        os.replace(temp, dest)
+        _sync_dir(dest.parent)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
+def app_data_dir() -> Path:
+    if IS_WINDOWS:
+        return Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData/Local"))) / "MGSModKit"
+    return Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state"))) / "mgs-modkit"
+
+
+class GameLock:
+    """An OS-held lock: automatically released on exit, including crashes."""
+    def __init__(self, game_dir: Path):
+        key = hashlib.sha256(os.path.normcase(str(game_dir.resolve())).encode()).hexdigest()
+        self.path = app_data_dir() / "locks" / (key + ".lock")
+        self.file = None
+
+    def __enter__(self):
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.file = open(self.path, "a+b")
+        self.file.seek(0, 2)
+        if not self.file.tell():
+            self.file.write(b"0")
+            self.file.flush()
+        self.file.seek(0)
+        try:
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(self.file.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(self.file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as e:
+            self.file.close()
+            self.file = None
+            raise RuntimeError("Another installer is working on this game. Close it and try again.") from e
+        return self
+
+    def __exit__(self, *args):
+        if self.file is not None:
+            if os.name == "nt":
+                import msvcrt
+                self.file.seek(0)
+                msvcrt.locking(self.file.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(self.file.fileno(), fcntl.LOCK_UN)
+            self.file.close()
+            self.file = None
+
+
+def _read_record(path: Path) -> dict:
+    if path.is_symlink():
+        raise CorruptManifestError("A recovery record is linked; backups were kept.")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            raise ValueError("record is not an object")
+        return data
+    except (ValueError, OSError, UnicodeError) as e:
+        raise CorruptManifestError(
+            "This game's recovery record is damaged. No further changes were made. "
+            "Keep the mgs-modkit folder and its backups; see docs/TROUBLESHOOTING.md.") from e
+
+
+def recover_interrupted(game_dir: Path, log) -> tuple[list[str], bool]:
+    """Restore the pre-run files, never guess that a planned path was added."""
+    root = game_dir / MODKIT_DIRNAME
+    journal = root / JOURNAL_NAME
+    if not journal.exists():
+        return [], True
+    if root.is_symlink() or journal.is_symlink() or (root / "backups").is_symlink():
+        raise CorruptManifestError("Recovery records are linked; backups were kept.")
+    data = _read_record(journal)
+    if data.get("schema") != 2 or not isinstance(data.get("entries"), list):
+        raise CorruptManifestError(
+            "An old or damaged interrupted-install record needs manual recovery. "
+            "Keep the mgs-modkit folder and backups; see docs/TROUBLESHOOTING.md.")
+    run_id = data.get("transaction_id")
+    if not isinstance(run_id, str) or not re.fullmatch(r"[0-9a-f]{32}", run_id):
+        raise CorruptManifestError("Invalid recovery transaction ID; backups were kept.")
+    rollback_dir = root / "rollback" / run_id
+    if not _path_is_within(root, rollback_dir) or rollback_dir.is_symlink():
+        raise CorruptManifestError("Unsafe recovery folder; backups were kept.")
+    entries = data["entries"]
+    try:
+        if type(data.get("root_existed")) is not bool:
+            raise ValueError("invalid original folder state")
+        seen = set()
+        for entry in entries:
+            if not isinstance(entry, dict) or type(entry.get("existed")) is not bool:
+                raise ValueError("invalid recovery entry")
+            rel = entry.get("path")
+            folded = rel.replace("\\", "/").casefold() if isinstance(rel, str) else None
+            if folded in seen:
+                raise ValueError("duplicate recovery path")
+            seen.add(folded)
+            _safe_game_path(game_dir, rel)
+            if rel.replace("\\", "/").split("/")[0].casefold() == MODKIT_DIRNAME:
+                raise ValueError("recovery points at its own records")
+            if entry["existed"]:
+                before = rollback_dir / rel
+                if not _path_is_within(rollback_dir, before) or before.is_symlink():
+                    raise ValueError("unsafe recovery snapshot")
+        new_backups = data.get("new_original_backups", [])
+        if not isinstance(new_backups, list):
+            raise ValueError("invalid backup list")
+        for rel in new_backups:
+            _safe_game_path(root / "backups", rel)
+    except (ValueError, TypeError, RuntimeError, AttributeError) as e:
+        raise CorruptManifestError("Unsafe recovery record; files and backups were kept.") from e
+    # A durable matching manifest means the transaction committed before the
+    # interruption. Cleanup only; reverting here would undo an accepted install.
+    manifest = root / MANIFEST_NAME
+    committed = False
+    if manifest.exists():
+        record = _read_record(manifest)
+        try:
+            _validate_manifest(record, game_dir, root)
+        except (ValueError, RuntimeError) as e:
+            raise CorruptManifestError("Invalid install record; recovery data was kept.") from e
+        committed = record.get("transaction_id") == run_id
+    errors = []
+    if not committed:
+        for entry in reversed(entries):
+            rel = entry["path"]
+            try:
+                dest = _safe_game_path(game_dir, rel)
+                if entry["existed"]:
+                    before = rollback_dir / rel
+                    if not before.is_file():
+                        raise OSError("pre-run snapshot is missing")
+                    restore_snapshot(before, dest)
+                else:
+                    dest.unlink(missing_ok=True)
+            except (OSError, RuntimeError) as e:
+                errors.append(f"Could not restore {rel}: {e}")
+    if errors:
+        for note in errors:
+            log("    ⚠ " + note)
+        return errors, False
+    # Remove intent first, with its directory entry flushed. If cleanup is
+    # interrupted, harmless orphan snapshots remain, never a journal with
+    # missing snapshots. Failed restoration never reaches this point.
+    journal.unlink()
+    _sync_dir(root)
+    if not committed:
+        for rel in new_backups:
+            (root / "backups" / rel).unlink(missing_ok=True)
+        _prune_empty_dirs(game_dir, [e["path"] for e in entries if not e["existed"]])
+    shutil.rmtree(rollback_dir, ignore_errors=True)
+    shutil.rmtree(root / "staging", ignore_errors=True)
+    if not committed and not data.get("root_existed", True):
+        shutil.rmtree(root, ignore_errors=True)
+    log("    ✓ " + ("finished committed-install cleanup" if committed else "restored the interrupted run"))
+    return [], True
+
+
 class InstallTxn:
     def __init__(self, game_dir: Path, game_key: str, log) -> None:
-        self.game_dir = game_dir
-        self.game_key = game_key
-        self.log = log
+        self.game_dir, self.game_key, self.log = game_dir, game_key, log
         self.root = game_dir / MODKIT_DIRNAME
+        if self.root.is_symlink():
+            raise CorruptManifestError("The mgs-modkit folder is a symbolic link; nothing was changed.")
+        if self.root.exists():
+            notes, ok = recover_interrupted(game_dir, log)
+            if not ok:
+                raise CorruptManifestError("Recovery is incomplete. Backups were kept. " + "; ".join(notes))
+        self._root_existed = self.root.exists()
         self.backups = self.root / "backups"
         self.staging = self.root / "staging"
         self.journal = self.root / JOURNAL_NAME
-        self.added: list[str] = []
-        self.overwritten: list[dict] = []
-        self.mods: dict[str, str] = {}
-        self.settings: dict = {}        # user choices, persisted for re-runs
-        self._added_set: set[str] = set()
-        self._backed_up: set[str] = set()
-        # Rollback bookkeeping, tracked separately from the uninstall manifest:
-        # rollback must undo ONLY what THIS run did, and must never destroy a
-        # previous install's recovery data (its manifest + backups).
-        self._new_added: list[str] = []      # files this run created from scratch
-        self._new_backups: list[str] = []    # backup rel-paths this run wrote
-        # Did OUR folder already exist before this transaction? Rollback may
-        # only delete the whole mgs-modkit root when it did NOT — otherwise a
-        # failed run would destroy a previous install's backups. This is
-        # independent of _had_prior, which a corrupt/absent manifest can leave
-        # False even when real backups exist on disk.
-        self._root_existed = self.root.exists()
-        # Whether a previous run of this kit is already installed here. Its
-        # files are treated as "ours" (reclaimed, not re-backed-up as stock),
-        # and on a failed re-install its manifest/backups are left intact.
+        self.run_id = uuid.uuid4().hex
+        self.rollback_dir = self.root / "rollback" / self.run_id
+        self.added, self.overwritten = [], []
+        self.mods, self.settings = {}, {}
+        self._added_set, self._backed_up = set(), set()
+        self._prepared = set()
+        self._new_added, self._new_backups = [], []
+        self._entries = []
+        self._expected_files = {}
+        self.committed = False
         self._had_prior = False
-        self._prior_added: set[str] = set()
-        self._prior_added_list: list[str] = []   # ordered, for the merged manifest
-        self._prior_mods: dict[str, str] = {}
-        if self.root.is_symlink():
-            raise CorruptManifestError(
-                f"{game_key.upper()}: the {MODKIT_DIRNAME} folder is a "
-                "symbolic link. Nothing was changed; remove the link or "
-                "restore a normal folder before running the installer.")
+        self._prior_added = set()
+        self._prior_added_list = []
+        self._prior_mods = {}
+        self._prior_settings = {}
         prev = self.root / MANIFEST_NAME
-        if prev.is_file():
+        if prev.exists():
+            data = _read_record(prev)
             try:
-                data = json.loads(prev.read_text(encoding="utf-8"))
-            except (ValueError, OSError) as e:
-                # Never guess. Treating an unreadable record as "fresh install"
-                # would let us back up mod files as if they were stock (losing
-                # the real originals) and let rollback delete the backups.
-                raise CorruptManifestError(
-                    f"{game_key.upper()}: this game's mod record "
-                    f"({MODKIT_DIRNAME}/{MANIFEST_NAME}) is damaged and can't "
-                    f"be read ({e.__class__.__name__}).\n\n"
-                    "To protect the backups of your original files, nothing "
-                    "was changed. Run the installer's Uninstall option first, "
-                    f"or delete the '{MODKIT_DIRNAME}' folder inside the game "
-                    "directory and install again.") from e
-            try:
-                self._prior_added_list = list(data.get("added", []))
-                self._prior_added = set(self._prior_added_list)
+                added, overwritten = _validate_manifest(data, game_dir, self.root)
+                if data.get("game") != game_key:
+                    raise ValueError("record belongs to a different or unknown game")
+                if "added" not in data or "overwritten" not in data:
+                    raise ValueError("record is missing its file lists")
+                if not isinstance(data.get("mods", {}), dict):
+                    raise ValueError("invalid mod list")
+                self._prior_added_list = list(added)
+                self._prior_added = set(added)
                 self._prior_mods = dict(data.get("mods", {}))
-                # Carry prior backups forward: the REAL stock originals are
-                # already saved from the first run. On a re-install we must not
-                # re-back-up our own mod files over them (that would lose the
-                # true originals), and the manifest must keep pointing at them.
-                for o in data.get("overwritten", []):
-                    self.overwritten.append(o)
-                    self._backed_up.add(o["path"])
+                self._prior_settings = dict(data.get("settings", {}))
+                self.overwritten = list(overwritten)
+                self._backed_up = {o["path"] for o in overwritten}
                 self._had_prior = True
-            except (AttributeError, TypeError, KeyError) as e:
-                raise CorruptManifestError(
-                    f"{game_key.upper()}: this game's mod record "
-                    f"({MODKIT_DIRNAME}/{MANIFEST_NAME}) has unexpected "
-                    f"contents ({e.__class__.__name__}).\n\n"
-                    "Nothing was changed. Run the installer's Uninstall "
-                    f"option first, or delete the '{MODKIT_DIRNAME}' folder "
-                    "inside the game directory and install again.") from e
-
-        # An interrupted previous run (power loss / SIGKILL) leaves a journal of
-        # files it had already moved into place. Those are OURS, not stock — so
-        # reclaim them before any backup decision is made.
-        self._adopt_journal()
-        # ...and any backup on disk that no manifest entry points at (killed run,
-        # deleted record) is re-linked, so uninstall RESTORES that file rather
-        # than deleting it as if we had created it.
+            except (ValueError, TypeError, RuntimeError) as e:
+                raise CorruptManifestError("Invalid install record; backups were kept.") from e
+        for directory in (self.staging, self.root / "rollback"):
+            if directory.is_symlink():
+                raise CorruptManifestError("A transaction folder is linked; nothing was changed.")
         self._adopt_orphan_backups()
 
     def _adopt_orphan_backups(self) -> None:
-        if not self.backups.is_dir():
+        if not self.backups.exists():
             return
-        found = 0
-        for dirpath, _dirnames, filenames in os.walk(self.backups):
-            for fn in filenames:
-                rel = os.path.relpath(os.path.join(dirpath, fn),
-                                      self.backups).replace(os.sep, "/")
-                if rel in self._backed_up:
-                    continue
-                self._backed_up.add(rel)
-                self.overwritten.append(
-                    {"path": rel, "backup": f"backups/{rel}"})
-                found += 1
-        if found:
-            self.log(f"    ⚠ re-linked {found} orphaned backup(s) of your "
-                     "original files")
+        if self.backups.is_symlink():
+            raise CorruptManifestError("The backups folder is a link; nothing was changed.")
+        for dirpath, dirs, names in os.walk(self.backups):
+            if any((Path(dirpath) / n).is_symlink() for n in dirs + names):
+                raise CorruptManifestError("A backup is a link; nothing was changed.")
+            for name in names:
+                rel = (Path(dirpath) / name).relative_to(self.backups).as_posix()
+                if rel not in self._backed_up:
+                    self.overwritten.append({"path": rel, "backup": "backups/" + rel})
+                    self._backed_up.add(rel)
 
-    def _adopt_journal(self) -> None:
-        if not self.journal.is_file():
-            return
-        try:
-            rels = json.loads(self.journal.read_text(encoding="utf-8"))
-            rels = rels if isinstance(rels, list) else []
-            rels = [r for r in rels if isinstance(r, str)
-                    and not _rel_is_unsafe(r)]
-        except (ValueError, OSError):
-            rels = []          # torn write — nothing reliable to adopt
-        if rels:
-            adopted = [r for r in rels if r not in self._prior_added]
-            self._prior_added.update(rels)
-            self._prior_added_list.extend(
-                r for r in rels if r not in self._prior_added_list)
-            self.log(f"    ⚠ recovered {len(adopted)} file(s) from an "
-                     "interrupted previous run")
-        try:
-            self.journal.unlink(missing_ok=True)
-        except OSError:
-            pass
-
-    def _journal_planned(self, rels: list[str]) -> None:
-        """Record files we are ABOUT to change, failing closed if it cannot."""
-        for rel in rels:
-            _safe_game_path(self.game_dir, rel)
-        tmp = self.journal.with_suffix(".tmp")
-        try:
-            self.root.mkdir(parents=True, exist_ok=True)
-            known = sorted(set(self._prior_added_list) | set(self.added)
-                           | set(rels))
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(known, f)
-                f.flush()
-                os.fsync(f.fileno())
-            os.replace(tmp, self.journal)        # atomic
-        except OSError as e:
-            try:
-                tmp.unlink(missing_ok=True)
-            except OSError:
-                pass
-            raise RuntimeError(
-                "Could not record the install recovery journal; nothing was "
-                "changed. Check that the game folder is writable and try "
-                "again.") from e
-
-    # -- recording -------------------------------------------------------
     def note_mod(self, name: str, version: str) -> None:
         self.mods[name] = version
 
     def _prepare_dest(self, rel: str) -> None:
-        """Record what we're about to do to game_dir/rel (add vs overwrite)."""
-        if rel in self._added_set:
-            return  # already ours this run
+        if rel in self._prepared:
+            return
         dest = _safe_game_path(self.game_dir, rel)
-        if dest.exists():
-            if rel in self._prior_added:
-                # Our own file from a previous run — reclaim it as added so
-                # uninstall removes it, and don't back it up. It is NOT counted
-                # as new-this-run: rollback must leave the previous install's
-                # files in place, not delete them.
-                self._added_set.add(rel)
-                self.added.append(rel)
-                return
-            if rel not in self._backed_up:
+        if dest.is_symlink() or (dest.exists() and not dest.is_file()):
+            raise RuntimeError(f"Cannot replace {rel}: it is not a regular file.")
+        existed = dest.exists()
+        if existed:
+            snapshot = self.rollback_dir / rel
+            durable_mkdir(snapshot.parent)
+            # Hardlink snapshots do not duplicate multi-GB audio. All live writes
+            # below use atomic replacement, so the snapshot stays unchanged.
+            try:
+                os.link(dest, snapshot)
+                flush_file(snapshot)
+                _sync_dir(snapshot.parent)
+            except OSError:
+                snapshot.unlink(missing_ok=True)
+                if free_bytes(self.game_dir) < dest.stat().st_size + SPACE_MARGIN_BYTES:
+                    raise RuntimeError("Not enough space to safely preserve the current files for rollback.")
+                atomic_copy(dest, snapshot)
+            if rel not in self._prior_added and rel not in self._backed_up:
                 self._backed_up.add(rel)
-                size = dest.stat().st_size
-                if size <= BACKUP_MAX_BYTES:
-                    bpath = self.backups / rel
-                    bpath.parent.mkdir(parents=True, exist_ok=True)
-                    if bpath.exists():
-                        # A backup already exists from an earlier run whose
-                        # manifest we no longer have (interrupted run, deleted
-                        # record). It is closer to stock than what is on disk
-                        # now, so KEEP it — overwriting would destroy the only
-                        # copy of the user's original file. Adopt it instead.
-                        self.log(f"    ⚠ keeping existing backup of {rel} "
-                                 "(closer to your original file)")
-                        self.overwritten.append(
-                            {"path": rel, "backup": f"backups/{rel}"})
-                    else:
-                        shutil.copy2(dest, bpath)
-                        self.overwritten.append(
-                            {"path": rel, "backup": f"backups/{rel}"})
+                bpath = self.backups / rel
+                if dest.stat().st_size <= BACKUP_MAX_BYTES:
+                    if not bpath.exists():
+                        atomic_copy(dest, bpath)
                         self._new_backups.append(rel)
+                    self.overwritten.append({"path": rel, "backup": "backups/" + rel})
                 else:
-                    self.overwritten.append({"path": rel, "backup": None})
-        else:
-            self._added_set.add(rel)
+                    self.overwritten.append({"path": rel, "backup": None, "original_sha256": sha256_file(dest)})
+        if not existed or rel in self._prior_added:
             self.added.append(rel)
-            self._new_added.append(rel)
+            self._added_set.add(rel)
+            if not existed:
+                self._new_added.append(rel)
+        self._entries.append({"path": rel, "existed": existed})
+        self._prepared.add(rel)
 
-    # -- operations ------------------------------------------------------
-    def install_archive(self, archive: Path, on_progress=None) -> list[str]:
-        """Stage-validate `archive`, then move its files into the game dir."""
-        # Last line of defence against filling the drive mid-extraction, which
-        # would otherwise surface as a raw bsdtar error after a partial write.
+    def _journal_planned(self, rels: list[str]) -> None:
+        for rel in rels:
+            self._prepare_dest(rel)
+        data = {"schema": 2, "transaction_id": self.run_id,
+                "root_existed": self._root_existed, "entries": self._entries,
+                "new_original_backups": self._new_backups}
+        atomic_bytes(self.journal, json.dumps(data).encode("utf-8"))
+
+    def install_archive(self, archive: Path, on_progress=None,
+                        component: str | None = None) -> list[str]:
         ok, msg = check_space(self.game_dir, archive_payload_bytes(archive))
         if not ok:
             raise RuntimeError(msg)
-        self.staging.mkdir(parents=True, exist_ok=True)
+        durable_mkdir(self.staging)
         stage = Path(tempfile.mkdtemp(prefix="stage_", dir=self.staging))
         try:
             rels = staged_files(archive, stage, on_progress=on_progress)
-            for rel in rels:
-                _safe_game_path(self.game_dir, rel)
-            # Journal the intent BEFORE mutating the game folder: if the machine
-            # dies mid-loop, the next run adopts these as ours instead of
-            # mistaking them for stock files and backing them up.
+            rels = validate_payload_paths(rels, self.game_key, component, self.log)
             self._journal_planned(rels)
             for rel in rels:
-                self._prepare_dest(rel)
+                check_cancelled()
                 dest = _safe_game_path(self.game_dir, rel)
-                dest.parent.mkdir(parents=True, exist_ok=True)
+                durable_mkdir(dest.parent)
                 src = stage / rel
-                try:
-                    os.replace(src, dest)          # fast path: same filesystem
-                except OSError:
-                    shutil.copy2(src, dest)        # cross-device fallback
+                flush_file(src)
+                size = src.stat().st_size
+                digest = sha256_file(src) if size <= BACKUP_MAX_BYTES else None
+                os.replace(src, dest)
+                self._expected_files[rel] = {"size": size, "sha256": digest}
+                _sync_dir(dest.parent)
             return rels
         finally:
             shutil.rmtree(stage, ignore_errors=True)
 
     def write_bytes(self, rel: str, data: bytes) -> None:
-        """Create/replace a file we author (settings, launcher saves, ...)."""
-        _safe_game_path(self.game_dir, rel)
-        # Settings and launcher saves are transaction mutations too.
         self._journal_planned([rel])
-        self._prepare_dest(rel)
-        dest = _safe_game_path(self.game_dir, rel)
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(data)
+        atomic_bytes(_safe_game_path(self.game_dir, rel), data)
+        self._expected_files[rel] = {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
 
     def read_text_ours(self, rel: str, encoding: str = "utf-8") -> str:
         return _safe_game_path(self.game_dir, rel).read_text(encoding=encoding)
 
-    # -- finish ----------------------------------------------------------
+    def verify(self) -> None:
+        for rel, expected in self._expected_files.items():
+            check_cancelled()
+            dest = _safe_game_path(self.game_dir, rel)
+            if not dest.is_file() or dest.stat().st_size != expected["size"]:
+                raise RuntimeError(f"Verification failed: {rel} has changed or is missing.")
+            if expected["sha256"] and sha256_file(dest) != expected["sha256"]:
+                raise RuntimeError(f"Verification failed: {rel} does not match the installed payload.")
+
     def commit(self) -> None:
-        self.staging.mkdir(parents=True, exist_ok=True)
-        shutil.rmtree(self.staging, ignore_errors=True)
-        # Merge with the PREVIOUS install so the manifest is cumulative: a
-        # partial re-run (e.g. adding only MGS3 Update 2.0 later) must not drop
-        # the earlier install's files/mods from the record, or uninstall would
-        # orphan them. added is a de-duplicated union preserving order; mods
-        # carry forward with this run's entries overriding by key. (overwritten
-        # was already carried forward in __init__.)
-        merged_added = list(dict.fromkeys(self._prior_added_list + self.added))
-        merged_mods = {**self._prior_mods, **self.mods}
-        manifest = {
-            "modkit_version": MODKIT_VERSION,
-            "game": self.game_key,
-            "installed_utc": datetime.now(timezone.utc)
-                .replace(microsecond=0).isoformat(),
-            "mods": merged_mods,
-            "added": merged_added,
-            "overwritten": self.overwritten,
-        }
-        # Remember the user's choices so a later run can pre-answer instead of
-        # asking everything again (see load_saved_opts).
-        if self.settings:
-            manifest["settings"] = self.settings
-        self.root.mkdir(parents=True, exist_ok=True)
-        manifest_path = self.root / MANIFEST_NAME
-        manifest_tmp = manifest_path.with_suffix(".tmp")
+        self.verify()
+        added = list(dict.fromkeys(self._prior_added_list + self.added))
+        manifest = {"schema": 2, "transaction_id": self.run_id,
+                    "modkit_version": MODKIT_VERSION, "game": self.game_key,
+                    "installed_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                    "mods": {**self._prior_mods, **self.mods}, "added": added,
+                    "overwritten": self.overwritten,
+                    "settings": self.settings or self._prior_settings,
+                    "files": self._expected_files}
         try:
-            with open(manifest_tmp, "w", encoding="utf-8") as f:
-                json.dump(manifest, f, indent=2, ensure_ascii=False)
-                f.write("\n")
-                f.flush()
-                os.fsync(f.fileno())
-            os.replace(manifest_tmp, manifest_path)
+            atomic_bytes(self.root / MANIFEST_NAME, json.dumps(manifest, indent=2).encode("utf-8") + b"\n")
         except OSError:
-            try:
-                manifest_tmp.unlink(missing_ok=True)
-            except OSError:
-                pass
+            # Replacement may have completed before a directory flush failed.
+            record = self.root / MANIFEST_NAME
+            if record.exists() and _read_record(record).get("transaction_id") == self.run_id:
+                self.committed = True
             raise
-        # The record is now durable; the crash journal has done its job.
+        self.committed = True
+        # A failure here leaves a committed marker + journal: next run cleans
+        # up rather than falsely undoing the successfully committed install.
         try:
-            self.journal.unlink(missing_ok=True)
-        except OSError:
-            pass
-        try:
-            (self.root / MANIFEST_NAME).with_suffix(".tmp").unlink(
-                missing_ok=True)
-        except OSError:
-            pass
+            if self.journal.exists():
+                self.journal.unlink()
+                _sync_dir(self.root)
+        except OSError as e:
+            self.log(f"    ⚠ Installed successfully; recovery cleanup will be retried next run: {e}")
+            return
+        shutil.rmtree(self.rollback_dir, ignore_errors=True)
+        shutil.rmtree(self.staging, ignore_errors=True)
 
-    def rollback(self) -> None:
-        """Undo ONLY what this run did (best-effort, never raises).
-
-        Files this run created are removed and stock originals this run backed
-        up are restored. Files that belonged to a PREVIOUS install of this kit
-        are left in place, and that previous install's manifest + backups are
-        preserved — a failed re-install falls back to the last working install
-        rather than orphaning files or destroying its recovery data.
-        """
-        # 1. Remove only files this run created from scratch.
-        for rel in reversed(self._new_added):
+    def rollback(self) -> bool:
+        if self.journal.exists():
             try:
-                _safe_game_path(self.game_dir, rel).unlink(missing_ok=True)
-            except (OSError, RuntimeError):
-                pass
-        # 2. Restore stock originals this run overwrote-and-backed-up, then drop
-        #    those now-irrelevant backup copies (they belong to this aborted run).
+                _, ok = recover_interrupted(self.game_dir, self.log)
+                return ok
+            except (OSError, RuntimeError) as e:
+                self.log(f"    ⚠ Recovery incomplete: {e}. Backups were kept.")
+                return False
+        # No durable intent means no live mutation was permitted. Only this
+        # run's preparation data may be discarded.
+        shutil.rmtree(self.rollback_dir, ignore_errors=True)
         for rel in self._new_backups:
-            src = self.backups / rel
-            if src.is_file():
-                try:
-                    dst = _safe_game_path(self.game_dir, rel)
-                    dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst)
-                    src.unlink(missing_ok=True)
-                except (OSError, RuntimeError):
-                    pass
-        _prune_empty_dirs(self.game_dir, self._new_added)
-
-        try:
-            self.journal.unlink(missing_ok=True)
-        except OSError:
-            pass
-
-        if self._root_existed:
-            # Our folder predates this run, so it may hold a previous install's
-            # manifest and — crucially — backups of the user's original files.
-            # Only clear this run's transient staging. Gating on _root_existed
-            # rather than _had_prior matters: an absent/older-format manifest
-            # can leave _had_prior False while real backups sit on disk.
-            shutil.rmtree(self.staging, ignore_errors=True)
-        else:
-            # We created the folder in this run, so nothing in it predates us —
-            # a failed fresh install should leave no trace.
+            (self.backups / rel).unlink(missing_ok=True)
+        if not self._root_existed:
             shutil.rmtree(self.root, ignore_errors=True)
+        return True
 
 
 def _prune_empty_dirs(base: Path, rels: list[str]) -> None:
@@ -1736,7 +2154,7 @@ def install_better_audio(tx: InstallTxn, components: list[dict], log,
                 report(status, (j + frac) / n)     # this component's slice
         # install_archive stage-validates paths (no traversal/symlinks) and
         # moves every file into place, tracking it for rollback/uninstall.
-        rels = tx.install_archive(archive, on_progress=op)
+        rels = tx.install_archive(archive, on_progress=op, component="audio")
         # Verify the payload actually landed — every file entry must exist.
         missing = [e for e in rels if not (tx.game_dir / e).is_file()]
         if missing:
@@ -1761,16 +2179,32 @@ def install_m2fix(tx: InstallTxn, tmp: Path, opts: dict, log) -> None:
     if missing:
         raise RuntimeError(f"MGSM2Fix extraction failed (missing: "
                            f"{', '.join(missing)})")
-    text = tx.read_text_ours("MGSM2Fix.ini")
-    if not opts.get("update_check"):
-        text = text.replace("CheckForUpdates = true",
-                            "CheckForUpdates = false", 1)
-    if opts.get("skip_launcher", True):
-        # Safe even on a fresh install: per the author's docs this "boots
-        # the LAST LAUNCHED game version", so until the user has picked a
-        # version once, the selection menu still appears normally.
-        text = text.replace("StartGame = false", "StartGame = true", 1)
-    tx.write_bytes("MGSM2Fix.ini", text.encode("utf-8"))
+    parser = parse_ini(tx.read_text_ours("MGSM2Fix.ini"))
+    existing = opts.get("_existing_m2fix")
+    if existing and not opts.get("_reset"):
+        old = parse_ini(existing)
+        for section in old.sections():
+            if section not in parser:
+                raise RuntimeError(f"Unsupported MGSM2Fix section: {section}")
+            for key, value in old[section].items():
+                if key not in parser[section]:
+                    raise RuntimeError(f"Unsupported MGSM2Fix setting: {key}")
+                parser[section][key] = value
+    seen = set()
+    for section in parser.sections():
+        for key in parser[section]:
+            if key in ("CheckForUpdates", "StartGame"):
+                value = parser[section][key].casefold()
+                if value not in ("true", "false"):
+                    raise RuntimeError(f"MGSM2Fix {key} must be true or false")
+                seen.add(key)
+                if key == "CheckForUpdates":
+                    parser[section][key] = "false"
+                elif not existing or opts.get("_reset") or "skip_launcher" in opts.get("_changed", set()):
+                    parser[section][key] = str(opts.get("skip_launcher", True)).lower()
+    if seen != {"CheckForUpdates", "StartGame"}:
+        raise RuntimeError("MGSM2Fix configuration is missing required options")
+    tx.write_bytes("MGSM2Fix.ini", render_ini(parser, spaced=True).encode("utf-8"))
     log("    ✓ d3d11.dll + dinput8.dll + MGSM2Fix (vanilla-faithful "
         "shipped defaults; auto-boots your last-picked version)")
 
@@ -1789,35 +2223,92 @@ def install_bugfix(tx: InstallTxn, g: dict, tmp: Path, log) -> None:
     log(f"    ✓ plugins/{g['bugfix_asi']}")
 
 
+def parse_ini(body: str) -> configparser.ConfigParser:
+    parser = configparser.ConfigParser(interpolation=None, delimiters=("=",),
+                                       strict=True, empty_lines_in_values=False)
+    parser.optionxform = str
+    parser.read_string(body.lstrip("\ufeff"))
+    if parser.defaults():
+        raise ValueError("DEFAULT sections are not supported")
+    return parser
+
+
+def validate_settings(body: str) -> configparser.ConfigParser:
+    """Exact upstream key names and value types; ':' is part of some keys."""
+    try:
+        parser = parse_ini(body)
+        if set(parser.sections()) != set(SETTINGS_SCHEMA):
+            raise ValueError("section names do not match the pinned Config Tool")
+        for section, fields in SETTINGS_SCHEMA.items():
+            if set(parser[section]) != set(fields):
+                raise ValueError(f"keys in [{section}] do not match the pinned Config Tool")
+            for key, kind in fields.items():
+                value = parser[section][key]
+                if kind == "Bool" and value not in ("0", "1"):
+                    raise ValueError(f"[{section}] {key} must be 0 or 1")
+                if kind == "Int":
+                    int(value)
+                if kind == "Float" and not math.isfinite(float(value)):
+                    raise ValueError(f"[{section}] {key} must be finite")
+                if kind in ("Choice", "Hotkey", "Str") and not (
+                        value.startswith('"') and value.endswith('"') and len(value) >= 2):
+                    raise ValueError(f"[{section}] {key} must be quoted")
+        for section, fields in SETTINGS_CONSTRAINTS.items():
+            for key, constraint in fields.items():
+                value = parser[section][key]
+                if "choices" in constraint and value.strip('"') not in constraint["choices"]:
+                    raise ValueError(f"Unsupported [{section}] {key}")
+                if "range" in constraint:
+                    low, high = constraint["range"]
+                    if not low <= int(value) <= high:
+                        raise ValueError(f"[{section}] {key} must be between {low} and {high}")
+        if parser["Controller Settings"]["Button Icons"].strip('"') not in SAVED_BUTTON_ICONS:
+            raise ValueError("Unsupported button icons")
+        return parser
+    except (configparser.Error, ValueError) as e:
+        raise RuntimeError(f"Settings validation failed: {e}") from e
+
+
+def render_ini(parser: configparser.ConfigParser, spaced=False) -> str:
+    stream = io.StringIO()
+    parser.write(stream, space_around_delimiters=spaced)
+    return stream.getvalue()
+
+
 def write_settings(tx: InstallTxn, g: dict, opts: dict, log) -> None:
-    game_dir = tx.game_dir
     body = SETTINGS_TEMPLATE
     for ph, val in (
-        ("@BUTTON_ICONS@", opts["button_icons"]),
-        ("@REGION@", g["region"]),
+        ("@BUTTON_ICONS@", opts["button_icons"]), ("@REGION@", g["region"]),
         ("@SKIP_LAUNCHER@", "1" if opts["skip_launcher"] else "0"),
         ("@SKIP_SPLASH@", "1" if opts["skip_splash"] else "0"),
-        ("@AUDIO_MODE@", opts["audio_mode"]),
-        ("@UPDATE_CHECK@", "1" if opts["update_check"] else "0"),
+        ("@AUDIO_MODE@", opts["audio_mode"]), ("@UPDATE_CHECK@", "0"),
     ):
         body = body.replace(ph, val)
-
-    if "@" in re.sub(r"[^@]", "", body):  # any placeholder left unsubstituted
-        raise RuntimeError("Internal error: unsubstituted settings placeholder")
-
-    rel = "plugins/MGSHDFix.settings"
-    # The Config Tool writes CRLF; match it exactly.
-    tx.write_bytes(rel, body.replace("\n", "\r\n").encode("utf-8"))
-
-    text = (game_dir / rel).read_text(encoding="utf-8")
-    sections = len(re.findall(r"^\[", text, re.M))
-    keys = len(re.findall(r"^[^\[\r\n][^\r\n]*=", text, re.M))
-    if sections != SETTINGS_EXPECTED_SECTIONS or keys != SETTINGS_EXPECTED_KEYS:
-        raise RuntimeError(
-            f"Settings sanity check failed: got {sections} sections / {keys} "
-            f"keys, expected {SETTINGS_EXPECTED_SECTIONS}/"
-            f"{SETTINGS_EXPECTED_KEYS}")
-    log(f"    ✓ plugins/MGSHDFix.settings ({sections} sections, {keys} keys)")
+    parser = validate_settings(body)
+    existing = opts.get("_existing_settings")
+    if existing and not opts.get("_reset"):
+        # Refuse unsupported edits instead of silently discarding custom settings.
+        existing = existing.replace('Show Pressure Level Overlay="Disabled"', 'Show Pressure Level Overlay=0')
+        old = validate_settings(existing)
+        for section in old.sections():
+            for key, value in old[section].items():
+                parser[section][key] = value
+        changed = opts.get("_changed", set())
+        for option, section, key, value in (
+            ("button_icons", "Controller Settings", "Button Icons", '"' + opts["button_icons"] + '"'),
+            ("audio_mode", "System Specific Fixes", "Audio Output Mode", '"' + opts["audio_mode"] + '"'),
+            ("skip_launcher", "Launcher and Splashscreens", "Skip Launcher", str(int(opts["skip_launcher"]))),
+            ("skip_splash", "Launcher and Splashscreens", "Skip In-Game Splashscreens", str(int(opts["skip_splash"]))),
+            ("skip_splash", "Launcher and Splashscreens", "Skip Launcher Splashscreens", str(int(opts["skip_splash"]))),
+        ):
+            if option in changed:
+                parser[section][key] = value
+    # The kit controls version updates even when preserving manual edits.
+    parser["Update Notifications"]["Check For MGSHDFix Updates"] = "0"
+    body = render_ini(parser)
+    validate_settings(body)
+    tx.write_bytes("plugins/MGSHDFix.settings", body.replace("\n", "\r\n").encode("utf-8"))
+    log("    ✓ plugins/MGSHDFix.settings (exact pinned schema validated)")
 
 
 def steamid64s(steam_root: Path) -> list[int]:
@@ -1957,6 +2448,8 @@ def _validate_manifest(data: object, game_dir: Path, root: Path
     """Validate manifest paths before uninstall can touch the game folder."""
     if not isinstance(data, dict):
         raise ValueError("manifest is not a JSON object")
+    if "added" not in data or "overwritten" not in data:
+        raise ValueError("manifest is missing its file lists")
     added = data.get("added", [])
     overwritten = data.get("overwritten", [])
     if not isinstance(added, list) or not all(
@@ -1967,12 +2460,16 @@ def _validate_manifest(data: object, game_dir: Path, root: Path
 
     for rel in added:
         _safe_game_path(game_dir, rel)
+        if rel.replace("\\", "/").split("/")[0].casefold() == MODKIT_DIRNAME:
+            raise ValueError("manifest points at its own records")
 
     for entry in overwritten:
         if not isinstance(entry, dict):
             raise ValueError("manifest has an invalid overwritten-file entry")
         rel = entry.get("path")
         _safe_game_path(game_dir, rel)
+        if rel.replace("\\", "/").split("/")[0].casefold() == MODKIT_DIRNAME:
+            raise ValueError("manifest points at its own records")
         backup = entry.get("backup")
         if backup is None:
             continue
@@ -1981,7 +2478,8 @@ def _validate_manifest(data: object, game_dir: Path, root: Path
         backup = backup.replace("\\", "/")
         if (not backup.startswith("backups/")
                 or _rel_is_unsafe(backup)
-                or not _path_is_within(root / "backups", root / backup)):
+                or not _path_is_within(root / "backups", root / backup)
+                or not _path_is_within(root, root / backup)):
             raise ValueError("manifest has an unsafe backup path")
     return added, overwritten
 
@@ -2000,6 +2498,19 @@ LEGACY_M2FIX_FILES = ("MGSM2Fix.asi",)
 
 
 def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
+    try:
+        with GameLock(game_dir):
+            if (game_dir / MODKIT_DIRNAME).is_symlink():
+                return ["The mgs-modkit folder is a symbolic link; left untouched."], False
+            notes, ok = recover_interrupted(game_dir, log)
+            if not ok:
+                return notes, False
+            return _uninstall_game(game_dir, log)
+    except (OSError, RuntimeError) as e:
+        return [str(e)], False
+
+
+def _uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
     """Reverse a kit install in `game_dir`.
 
     Returns (notes, ok). If any file couldn't be removed or restored, ok is
@@ -2017,6 +2528,8 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
         notes.append("the mgs-modkit folder is a symbolic link; left it "
                      "untouched for safety")
         return notes, False
+    if (root / "backups").is_symlink():
+        return ["The backups folder is linked; files were left in place."], False
 
     # Always clear the obsolete legacy unified .asi, manifest or not.
     for name in LEGACY_M2FIX_FILES:
@@ -2046,7 +2559,7 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                                 f"backup source {rel} is a symbolic link")
                         dst = _safe_game_path(game_dir, rel)
                         dst.parent.mkdir(parents=True, exist_ok=True)
-                        shutil.copy2(src, dst)
+                        atomic_copy(src, dst)
                         restored += 1
                     except (OSError, RuntimeError) as e:
                         notes.append(f"couldn't restore {rel} ({e})")
@@ -2054,16 +2567,15 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
         if restored:
             notes.append(f"no install record was found, but {restored} "
                          "backed-up original file(s) were put back")
-            if not errors:
-                shutil.rmtree(root, ignore_errors=True)
-                notes.append("removed the mgs-modkit folder")
+            notes.append("Untracked mod files may remain. Inspect docs/TROUBLESHOOTING.md before removing them.")
         else:
             notes.append("no record of an install by this kit was found, so "
                          "there was nothing tracked to remove. Steam's Verify "
                          "integrity restores original files but does NOT "
                          "delete mod files — remove any left over by hand "
                          "(see the README's uninstall list)")
-        return notes, not errors
+        unknown = has_untracked_mods(game_dir)
+        return notes, not errors and not restored and not unknown and not root.exists()
 
     try:
         data = json.loads(manifest.read_text(encoding="utf-8"))
@@ -2086,7 +2598,7 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                             f"backup source {backup} is a symbolic link")
                     dst = _safe_game_path(game_dir, rel)
                     dst.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src, dst)
+                    atomic_copy(src, dst)
                     restored += 1
                 except (OSError, RuntimeError) as e:
                     notes.append(f"couldn't restore {rel} ({e})")
@@ -2095,7 +2607,10 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                 notes.append(f"backup for {rel} is missing; can't restore it")
                 errors = True
         else:
-            verify_hint = True
+            dest = _safe_game_path(game_dir, rel)
+            original_sha = o.get("original_sha256")
+            if not original_sha or not dest.is_file() or sha256_file(dest) != original_sha:
+                verify_hint = True
 
     removed = 0
     restored_paths = {o.get("path") for o in overwritten if o.get("backup")}
@@ -2118,12 +2633,16 @@ def uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                      "files to restore them")
 
     _prune_empty_dirs(game_dir, added)
-    if errors:
+    if errors or verify_hint:
         notes.append("left the mgs-modkit backup/manifest folder in place so "
-                     "you can retry — some files could not be reverted")
+                     "you can retry — some files could not be reverted. Steam verification is required for any unbacked originals.")
         return notes, False
 
-    shutil.rmtree(root, ignore_errors=True)
+    try:
+        shutil.rmtree(root)
+    except OSError as e:
+        notes.append(f"Originals were restored, but the recovery folder could not be removed: {e}")
+        return notes, False
     notes.append("removed the mgs-modkit backup/manifest folder")
     return notes, True
 
@@ -2919,7 +3438,7 @@ SAVED_OPT_KEYS = ("button_icons", "audio_mode", "hq_movies", "skip_splash",
                   "skip_launcher")
 SAVED_BUTTON_ICONS = (
     "Steam Deck", "Xbox One", "PlayStation 5", "PlayStation 2",
-    "Keyboard / Mouse")
+    "PlayStation 4", "Nintendo Switch", "Keyboard / Mouse")
 SAVED_AUDIO_MODES = ("Stereo (2.0)", "Surround Sound (5.1)")
 
 
@@ -2937,11 +3456,13 @@ def load_saved_opts(found: dict) -> dict:
             continue
         try:
             data = json.loads(mf.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                continue
             saved = data.get("settings")
             if not isinstance(saved, dict):
                 continue
             stamp = str(data.get("installed_utc", ""))
-        except (ValueError, OSError):
+        except (ValueError, OSError, UnicodeError):
             continue
         if stamp >= best_stamp:
             best_stamp = stamp
@@ -3000,7 +3521,7 @@ def run_uninstall(ui: UI, log) -> int:
     # of the user's original files are still in there and must be recoverable.
     modded = {k: v for k, v in found.items()
               if (v[0] / MODKIT_DIRNAME).is_dir()
-              or any((v[0] / n).is_file() for n in LEGACY_M2FIX_FILES)}
+              or has_untracked_mods(v[0])}
     if not modded:
         ui.info("Nothing to remove — none of the games found on this machine "
                 "was set up by this installer.")
@@ -3028,20 +3549,18 @@ def run_uninstall(ui: UI, log) -> int:
         return 0
 
     all_ok = True
+    outcomes = []
     for key in modded:
         g, (game_dir, _) = GAMES[key], modded[key]
         log(f"\n=== Uninstalling {g['name']} ===")
         notes, ok = uninstall_game(game_dir, log)
         all_ok = all_ok and ok
+        outcomes.append(f"{g['short']}: " + ("removed" if ok else "action required") + "\n" + "\n".join(notes))
         for note in notes:
             log(f"    • {note}")
 
     if not all_ok:
-        ui.error(
-            f"{names}: some files couldn't be removed or put back.\n\n"
-            "Your backups have been KEPT so you can try again. Close the "
-            "games and let any Steam downloads finish, then run this again "
-            "and choose Remove the mods.")
+        ui.error("Removal needs attention:\n\n" + "\n\n".join(outcomes))
         return 1
 
     ui.info(
@@ -3059,9 +3578,133 @@ def run_uninstall(ui: UI, log) -> int:
 # ---------------------------------------------------------------------------
 # Main flow
 # ---------------------------------------------------------------------------
-def main() -> int:
+def has_untracked_mods(game_dir: Path) -> bool:
+    return any((game_dir / rel).exists() for rel in (
+        "winhttp.dll", "wininet.dll", "plugins/MGSHDFix.asi",
+        "d3d11.dll", "dinput8.dll", "MGSM2Fix64.asi", *LEGACY_M2FIX_FILES))
+
+
+def start_session_log():
+    try:
+        directory = app_data_dir() / "logs"
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8] + ".log")
+        # Keep the 20 most recent sessions; game recovery records are separate.
+        for old in sorted(directory.glob("*.log"))[:-19]:
+            old.unlink(missing_ok=True)
+        stream = path.open("w", encoding="utf-8", buffering=1)
+        return path, stream
+    except OSError:
+        return None, None
+
+
+def version_tuple(tag: str) -> tuple:
+    match = re.fullmatch(r"v?(\d+)\.(\d+)\.(\d+)", tag)
+    return tuple(map(int, match.groups())) if match else ()
+
+
+def kit_update_notice(log) -> str:
+    """Advisory only. Never download or execute a new installer automatically."""
+    try:
+        cache = app_data_dir() / "update-check.json"
+        data = json.loads(cache.read_text()) if cache.exists() else {}
+        if not isinstance(data, dict):
+            data = {}
+        if time.time() - float(data.get("checked", 0)) >= 86400:
+            request = urllib.request.Request(
+                "https://api.github.com/repos/cntrl-alt-lenny/mgs-mc-modkit/releases/latest",
+                headers={"User-Agent": "MGS-Mod-Kit", "Accept": "application/vnd.github+json"})
+            with urllib.request.urlopen(request, timeout=3) as response:
+                release = json.loads(response.read(256 * 1024))
+            tag = release.get("tag_name", "")
+            if not version_tuple(tag) or release.get("prerelease") or release.get("draft"):
+                return ""
+            data = {"checked": time.time(), "tag": tag}
+            atomic_bytes(cache, json.dumps(data).encode())
+        tag = str(data.get("tag", ""))
+        if version_tuple(tag) > version_tuple(MODKIT_VERSION):
+            return (f"A newer kit ({tag}) is available. Download its shortcut from "
+                    "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/releases/latest. "
+                    f"This run still uses verified kit {MODKIT_VERSION}.")
+    except (OSError, ValueError, TypeError, urllib.error.URLError, AttributeError) as e:
+        log(f"Update notice unavailable ({e}); continuing with this pinned kit.")
+    return ""
+
+
+def run_with_progress(prog, operation):
+    """Keep all UI calls on the creating thread while archive/network work runs."""
+    # Non-GUI implementations used by integrations can run synchronously.
+    if not hasattr(prog, "pump"):
+        return operation()
+    result, failure = [], []
+
+    def worker():
+        try:
+            result.append(operation())
+        except BaseException as e:
+            failure.append(e)
+
+    thread = threading.Thread(target=worker, name="mgs-install")
+    thread.start()
+    try:
+        while thread.is_alive():
+            prog.pump()
+            thread.join(0.1)
+        prog.pump()
+    except BaseException:
+        prog.cancel_event.set()
+        while thread.is_alive():
+            thread.join(0.1)
+        raise
+    if failure:
+        raise failure[0]
+    return result[0] if result else None
+
+
+def options_for_game(key: str, location: tuple, defaults: dict, log) -> dict:
+    game_dir, _ = location
+    opts = dict(defaults)
+    opts.update(load_saved_opts({key: location}))
+    if (game_dir / MODKIT_DIRNAME / JOURNAL_NAME).exists():
+        # The worker recovers under the lock before reading potentially interrupted files.
+        return opts
+    if GAMES[key].get("kind", "hdfix") == "hdfix":
+        path = game_dir / "plugins/MGSHDFix.settings"
+        if path.is_file():
+            text = path.read_text(encoding="utf-8-sig")
+            text = text.replace('Show Pressure Level Overlay="Disabled"', 'Show Pressure Level Overlay=0')
+            parser = validate_settings(text)
+            opts["_existing_settings"] = text
+            opts["button_icons"] = parser["Controller Settings"]["Button Icons"].strip('"')
+            opts["audio_mode"] = parser["System Specific Fixes"]["Audio Output Mode"].strip('"')
+            opts["skip_launcher"] = parser["Launcher and Splashscreens"]["Skip Launcher"] == "1"
+            opts["skip_splash"] = parser["Launcher and Splashscreens"]["Skip In-Game Splashscreens"] == "1"
+        for path in sorted(game_dir.glob("*_savedata_win/*/launcher/launcher_sv")):
+            try:
+                value = _read_launcher_sv(path).get("HiresoMovie")
+                if value in ("0", "1"):
+                    opts["hq_movies"] = value == "1"
+                    break
+            except (ValueError, OSError):
+                continue
+    else:
+        path = game_dir / "MGSM2Fix.ini"
+        if path.is_file():
+            text = path.read_text(encoding="utf-8-sig")
+            parser = parse_ini(text)
+            opts["_existing_m2fix"] = text
+            for section in parser.sections():
+                if "StartGame" in parser[section]:
+                    value = parser[section]["StartGame"].casefold()
+                    if value not in ("true", "false"):
+                        raise RuntimeError("Existing MGSM2Fix StartGame must be true or false")
+                    opts["skip_launcher"] = value == "true"
+    opts["update_check"] = False
+    return opts
+
+
+def _main(log, log_path=None) -> int:
     ui = UI()
-    logs: list[str] = []
 
     import argparse
     ap = argparse.ArgumentParser(add_help=False)
@@ -3073,10 +3716,6 @@ def main() -> int:
                     help="Reverse a previous install (restore backups, remove "
                          "added files) instead of installing.")
     cli, _ = ap.parse_known_args()
-
-    def log(msg: str) -> None:
-        print(msg)
-        logs.append(msg)
 
     # Cosmetic, and done first so the shortcut looks right from now on whatever
     # the user does next (including quitting straight away).
@@ -3162,10 +3801,18 @@ def main() -> int:
         opts["button_icons"] = "Xbox One"
     # A previous run's choices win over the generic defaults, so someone who
     # picked 5.1 sound or PS2 buttons doesn't have to set them again.
-    saved = load_saved_opts(found)
-    if saved:
-        opts.update(saved)
-        log(f"  Reusing your settings from last time ({len(saved)} options).")
+    defaults = dict(opts)
+    try:
+        per_game = {key: options_for_game(key, location, defaults, log)
+                    for key, location in found.items()}
+    except (OSError, RuntimeError, configparser.Error) as e:
+        ui.error(f"Existing settings could not be read safely: {e}.\n"
+                 "Keep your settings file. Correct it with the pinned Config Tool before repairing.")
+        return 1
+    if len(found) == 1:
+        opts.update(per_game[next(iter(found))])
+    opts["_changed"] = set()
+    notice = kit_update_notice(log)
 
     # 4. Better Audio Mod — one checklist, then explicit per-archive picking.
     audio_archives = collect_audio_archives(ui, hdfix_sel)
@@ -3187,17 +3834,21 @@ def main() -> int:
 
         target_dir = next(iter(found.values()))[0]
         settings = []
-        if hdfix_sel:
-            settings.append(f"Buttons: {opts['button_icons']}    "
-                            f"Sound: {opts['audio_mode']}")
-            settings.append(
-                f"Skip intro logos: {'yes' if opts['skip_splash'] else 'no'}"
-                f"    Boot straight in: "
-                f"{'yes' if opts['skip_launcher'] else 'no'}")
+        for key in found:
+            game_opts = per_game[key]
+            settings.append(f"{GAMES[key]['short']}: Boot straight in: "
+                            f"{'yes' if game_opts['skip_launcher'] else 'no'}")
+            if key in hdfix_sel:
+                settings.append(f"  Buttons: {game_opts['button_icons']} · Sound: {game_opts['audio_mode']} · "
+                                f"HQ movies: {'on' if game_opts['hq_movies'] else 'off'} · "
+                                f"Skip logos: {'yes' if game_opts['skip_splash'] else 'no'}")
+        settings.append("Recommended defaults will replace custom settings." if any(
+            o.get("_reset") for o in per_game.values()) else
+            "Existing custom settings are preserved per game; reset is optional.")
         audio_block = audio_status_text(audio_archives)
         note = audio_recommendation_note(audio_archives)
 
-        body = ("Ready to go:\n\n" + "\n".join(plan) + "\n\n"
+        body = ((notice + "\n\n" if notice else "") + "Ready to go:\n\n" + "\n".join(plan) + "\n\n"
                 + ("\n".join(settings) + "\n\n" if settings else "")
                 + (audio_block + "\n\n" if audio_block
                    else ("Better Audio: not installing\n\n" if hdfix_sel else ""))
@@ -3208,124 +3859,138 @@ def main() -> int:
         choice = ui.menu("Ready to install", body,
                          [("go", "Install now"),
                           ("opts", "Change settings…"),
+                          ("reset", "Reset to recommended settings"),
                           ("cancel", "Cancel")])
         if choice in (None, "cancel"):
             return 0
         if choice == "go":
             break
-        ask_options(ui, opts, hdfix_sel, m2fix_sel)      # then loop and re-show
+        if choice == "reset":
+            opts.update(defaults)
+            for key in per_game:
+                per_game[key].update(defaults)
+                per_game[key]["_reset"] = True
+        else:
+            ask_options(ui, opts, hdfix_sel, m2fix_sel)
+            for game_opts in per_game.values():
+                for option in opts["_changed"]:
+                    game_opts[option] = opts[option]
+                game_opts["_changed"] = set(opts["_changed"])
 
-    # 6. Do the work --------------------------------------------------------
-    # Each game is installed in its own transaction: on any failure that game
-    # is rolled back to exactly how it was found (added files removed, backed-up
-    # originals restored), so no half-modified install is left behind. Games
-    # already committed before the failure stay installed. A progress window
-    # tracks the currently-installing game/component and its stage.
+    # Each game commits independently. Cancellation/failure keeps earlier successes.
     prog = ui.progress("Installing MGS mods", log)
     total = len(found)
-    try:
+    outcomes = {key: "not started" for key in found}
+    global CANCEL_EVENT, TRANSFER_PROGRESS
+    previous_cancel, previous_transfer = CANCEL_EVENT, TRANSFER_PROGRESS
+    CANCEL_EVENT = getattr(prog, "cancel_event", threading.Event())
+
+    def install_selected():
+        global TRANSFER_PROGRESS
         with tempfile.TemporaryDirectory(prefix="mgskit_") as td:
             tmp = Path(td)
             for i, key in enumerate(found):
+                check_cancelled()
                 g, (game_dir, sroot) = GAMES[key], found[key]
+                game_opts = per_game[key]
                 log(f"\n=== {g['name']} ===")
 
-                def stage(text: str, frac: float, short=g["short"], idx=i):
-                    # Map an in-game 0..1 fraction onto this game's slice.
+                def stage(text, frac, short=g["short"], idx=i):
                     prog.update(f"{short} — {text}", (idx + frac) / total * 100)
 
-                tx = InstallTxn(game_dir, key, log)
-                tx.settings = {k: opts[k] for k in SAVED_OPT_KEYS if k in opts}
+                def transfer(name, received, size):
+                    detail = f"{received / 1024**2:.1f} MB"
+                    if size:
+                        detail += f" / {size / 1024**2:.1f} MB"
+                    stage(f"Downloading {name}: {detail}", 0.10)
+
+                TRANSFER_PROGRESS = transfer
+                tx = None
                 try:
-                    stage("Preparing", 0.05)
-                    if g.get("kind", "hdfix") == "m2fix":
-                        stage("Extracting MGSM2Fix", 0.4)
-                        install_m2fix(tx, tmp, opts, log)
-                        stage("Verifying", 0.9)
-                    else:
-                        # Pre-download every networked archive BEFORE touching
-                        # the game, so a download failure can't strike after the
-                        # large, un-backed-up Better Audio files are overwritten.
-                        stage("Downloading mods (verifying checksums)", 0.1)
-                        fetch(HDFIX_URL, tmp / f"MGSHDFix_{HDFIX_VERSION}.zip",
-                              log, sha256=HDFIX_SHA256)
-                        fetch(g["bugfix_url"],
-                              tmp / f"{g['short']}_bugfix_base.zip",
-                              log, sha256=g.get("bugfix_sha256"))
-                        stage("Extracting MGSHDFix", 0.2)
-                        install_hdfix(tx, tmp, log)              # 1
-                        if key in audio_archives:                # 2
-                            def audio_report(status, frac, short=g["short"],
-                                             idx=i):
-                                # Map audio extraction onto 0.30–0.65 of slice.
-                                prog.update(
-                                    f"{short} — Extracting {status} audio",
-                                    (idx + 0.30 + 0.35 * frac) / total * 100)
-                            install_better_audio(tx, audio_archives[key], log,
-                                                 report=audio_report)
-                        stage("Extracting Bugfix Compilation", 0.7)
-                        install_bugfix(tx, g, tmp, log)          # 3
-                        stage("Writing config + launcher options", 0.85)
-                        write_settings(tx, g, opts, log)
-                        if not set_launcher_options(tx, g, sroot, opts, log):
-                            raise RuntimeError(
-                                "One or more launcher saves could not be "
-                                "parsed safely; no launcher settings were "
-                                "changed.")
-                        stage("Verifying", 0.95)
-                    tx.commit()
+                    with GameLock(game_dir):
+                        tx = InstallTxn(game_dir, key, log)
+                        # Refresh inside the lock, after any interrupted run is recovered.
+                        fresh = options_for_game(key, found[key], defaults, log)
+                        if game_opts.get("_reset"):
+                            fresh.update(defaults)
+                            fresh["_reset"] = True
+                        for option in game_opts.get("_changed", set()):
+                            fresh[option] = game_opts[option]
+                        fresh["_changed"] = game_opts.get("_changed", set())
+                        game_opts = per_game[key] = fresh
+                        tx.settings = {k: game_opts[k] for k in SAVED_OPT_KEYS if k in game_opts}
+                        try:
+                            stage("Preparing", 0.05)
+                            if g.get("kind", "hdfix") == "m2fix":
+                                stage("Installing MGSM2Fix", 0.4)
+                                install_m2fix(tx, tmp, game_opts, log)
+                            else:
+                                stage("Downloading mods (verifying checksums)", 0.1)
+                                fetch(HDFIX_URL, tmp / f"MGSHDFix_{HDFIX_VERSION}.zip", log, sha256=HDFIX_SHA256)
+                                fetch(g["bugfix_url"], tmp / f"{g['short']}_bugfix_base.zip", log, sha256=g.get("bugfix_sha256"))
+                                stage("Extracting MGSHDFix", 0.2)
+                                install_hdfix(tx, tmp, log)
+                                if key in audio_archives:
+                                    def audio_report(status, frac):
+                                        stage(f"Extracting {status} audio", 0.30 + 0.35 * frac)
+                                    install_better_audio(tx, audio_archives[key], log, report=audio_report)
+                                stage("Extracting Bugfix Compilation", 0.7)
+                                install_bugfix(tx, g, tmp, log)
+                                stage("Writing settings + launcher options", 0.85)
+                                write_settings(tx, g, game_opts, log)
+                                if not set_launcher_options(tx, g, sroot, game_opts, log):
+                                    raise RuntimeError("A launcher save could not be parsed safely.")
+                            stage("Verifying installed content", 0.95)
+                            problems = verify_install(g, game_dir)
+                            if problems:
+                                raise RuntimeError("Verification failed: " + ", ".join(problems))
+                            if key in hdfix_sel:
+                                validate_settings((game_dir / "plugins/MGSHDFix.settings").read_text(encoding="utf-8-sig"))
+                            check_cancelled()
+                            tx.commit()
+                            outcomes[key] = "installed and verified"
+                        except BaseException:
+                            log(f"  ✗ {g['short']} interrupted — restoring pre-run files …")
+                            if tx.committed:
+                                outcomes[key] = "installed and verified; recovery cleanup needs attention"
+                            else:
+                                restored = tx.rollback()
+                                outcomes[key] = "previous setup restored" if restored else "recovery incomplete; backups kept"
+                            raise
                     stage("Complete", 1.0)
                 except BaseException:
-                    log(f"  ✗ {g['short']} failed — rolling back its changes …")
-                    tx.rollback()
+                    if tx is None:
+                        outcomes[key] = "not changed; inspect recovery record / lock"
                     raise
-                for f in tmp.glob("*.zip"):
-                    f.unlink(missing_ok=True)
-    except CorruptManifestError as e:
-        # Nothing was touched — say so, and don't offer rollback advice.
+                for archive in tmp.glob("*.zip"):
+                    archive.unlink(missing_ok=True)
+
+    try:
+        run_with_progress(prog, install_selected)
+    except (RuntimeError, OSError, subprocess.SubprocessError, configparser.Error, KeyboardInterrupt) as e:
+        log(traceback.format_exc())
         prog.close()
-        ui.error(str(e))
-        return 1
-    except (urllib.error.URLError, urllib.error.HTTPError, RuntimeError,
-            subprocess.CalledProcessError, OSError) as e:
-        ui.error(f"Install failed:\n\n{e}\n\n"
-                 "The affected game was put back the way it was — files this "
-                 "run added were removed and the originals it backed up were "
-                 "restored. (A failed repeat install falls back to your "
-                 "previous working setup.)\n\n"
-                 "The large Better Audio files are too big to back up, so if "
-                 "audio had already been written, use Steam → Properties → "
-                 "Installed Files → Verify integrity of game files to restore "
-                 "them. You can also just run this installer again.")
+        label = "Installation cancelled" if isinstance(e, (CancelledInstall, KeyboardInterrupt)) else "Installation stopped"
+        summary = "\n".join(f"{GAMES[k]['short']}: {outcomes[k]}" for k in found)
+        ui.error(f"{label}: {e}\n\n{summary}\n\n" +
+                 (f"Diagnostic log: {log_path}" if log_path else "Diagnostic log could not be saved."))
         return 1
     finally:
+        CANCEL_EVENT, TRANSFER_PROGRESS = previous_cancel, previous_transfer
         prog.close()
-
-    # 7. Verify -------------------------------------------------------------
-    all_problems = []
-    for key in found:
-        probs = verify_install(GAMES[key], found[key][0])
-        if probs:
-            all_problems.append(f"{GAMES[key]['short']}: {', '.join(probs)}")
-    if all_problems:
-        ui.error("Install finished but verification found problems:\n\n"
-                 + "\n".join(all_problems))
-        return 1
 
     # 8. Final manual steps -------------------------------------------------
     names = ", ".join(GAMES[k]["short"] for k in found)
 
     tips = []
     if hdfix_sel:
-        if opts["skip_launcher"]:
-            tips.append("• MGS2/MGS3 boot straight in, with high-quality "
-                        "cinematics on.")
-        else:
-            tips.append("• The Konami launcher still appears — its settings are "
-                        "already done, just press Play.")
+        for key in hdfix_sel:
+            game_opts = per_game[key]
+            tips.append(f"• {GAMES[key]['short']}: " +
+                        ("boots straight in" if game_opts["skip_launcher"] else "launcher appears; press Play") +
+                        f"; high-quality cinematics {'on' if game_opts['hq_movies'] else 'off'}.")
         if not IS_WINDOWS:
-            tips.append("• Playing on a TV and it looks soft? In Steam set "
-                        "Properties → Game Resolution to Native.")
+            tips.append("• Playing on a TV and it looks soft? In Steam set Properties → Game Resolution to Native.")
     if any(GAMES[k].get("kind") == "m2fix" for k in found):
         tips.append("• MGS1 asks which version to play the first time: choose "
                     "METAL GEAR SOLID (US), Max resolution, 4:3.")
@@ -3365,12 +4030,40 @@ def main() -> int:
     return 0
 
 
+def main() -> int:
+    path, stream = start_session_log()
+    lock = threading.Lock()
+
+    def log(message):
+        with lock:
+            print(message)
+            if stream:
+                try:
+                    stream.write(str(message) + "\n")
+                    stream.flush()
+                except OSError:
+                    pass
+
+    log(f"MGS Mod Kit {MODKIT_VERSION}; platform={sys.platform}; Python={sys.version.split()[0]}")
+    if path:
+        log(f"Diagnostic log: {path}")
+    try:
+        return _main(log, path)
+    except Exception:
+        log(traceback.format_exc())
+        raise
+    finally:
+        if stream:
+            stream.close()
+
+
 def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
     """The 'Change settings' branch — only reached if the user asks for it.
 
     Every option here already defaults to the recommended answer, which is why
     it is not on the main path.
     """
+    opts.setdefault("_changed", set())
     if hdfix_sel:
         icon_items = [
             ("Steam Deck", "Steam Deck buttons"),
@@ -3381,17 +4074,23 @@ def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
         ]
         if opts.get("device") != "steam_deck":
             icon_items.insert(0, icon_items.pop(1))    # Xbox first
-        opts["button_icons"] = ui.menu(
+        picked = ui.menu(
             "Button prompts",
             "Which controller buttons should the games show?",
-            icon_items) or opts["button_icons"]
+            icon_items)
+        if picked:
+            opts["button_icons"] = picked
+            opts["_changed"].add("button_icons")
 
-        opts["audio_mode"] = ui.menu(
+        picked = ui.menu(
             "Sound",
             "How are you listening?",
             [("Stereo (2.0)", "Headphones, the Deck, or a TV (best for most)"),
              ("Surround Sound (5.1)", "A real 5.1 surround speaker setup")],
-        ) or opts["audio_mode"]
+        )
+        if picked:
+            opts["audio_mode"] = picked
+            opts["_changed"].add("audio_mode")
 
     extra_items: list[tuple[str, str, bool]] = []
     if hdfix_sel:
@@ -3414,6 +4113,7 @@ def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
         if extras is not None:
             for tag, _, _ in extra_items:
                 opts[tag] = tag in extras
+                opts["_changed"].add(tag)
 
 
 def offer_clipboard_copy(ui: UI, found_keys) -> None:

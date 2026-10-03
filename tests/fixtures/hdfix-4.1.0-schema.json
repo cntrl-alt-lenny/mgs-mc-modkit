@@ -1,0 +1,389 @@
+{
+  "upstream": "ShizCalev/MGSHDFix",
+  "tag": "4.1.0",
+  "tree": "f4f662d67a2a033dee0877e436a0fe65eb719e0b",
+  "sources": [
+    "ConfigTool/tab_data.cpp",
+    "src/resources/config_keys.hpp"
+  ],
+  "fields": {
+    "Bugfixes": {
+      "Boost Reverb Volume": "Bool",
+      "Depth of Field Blur Strength": "Float",
+      "Fix  High  CPU  Usage": "Choice",
+      "Fix Achievement Stat Tracking": "Bool",
+      "Fix Aiming After Equip": "Bool",
+      "Fix Aiming On Full Tilt": "Bool",
+      "Fix Alt-Tab Loading Bugs": "Bool",
+      "Fix Broken PS2 Visual Effects": "Bool",
+      "Fix Depth of Field": "Bool",
+      "Fix Film Grain": "Bool",
+      "Fix M92 Laser Origin in FPV": "Bool",
+      "Fix Motion Trails": "Choice",
+      "Fix Mouse Cursor Showing": "Bool",
+      "Reverb Volume Multiplier": "Float"
+    },
+    "CAUTION - THIS WILL RESET ALL ACHIEVEMENTS": {
+      "Reset All Achievements": "Bool"
+    },
+    "Camera Positioning": {
+      "Disable HD Collection Camera Positioning": "Bool",
+      "HD Collection Camera Toggle": "Hotkey"
+    },
+    "Caption Settings": {
+      "Caption Opacity (%)": "Int",
+      "Caption Outline Opacity (%)": "Int",
+      "Caption Size (%)": "Int"
+    },
+    "Controller Settings": {
+      "Button Icons": "Choice",
+      "DualShock Rumble Strength (%)": "Int",
+      "Dualshock 2 && 3 Controller Support": "Bool",
+      "Restore PS2 Pressure Sensitive Binds": "Bool",
+      "Set Menu OK && Cancel Button": "Choice"
+    },
+    "DISABLE STEAM ACHIEVEMENTS": {
+      "Disable Unlocking Steam Achievements": "Bool"
+    },
+    "Damaged Steam Cloud Save Data Fix": {
+      "Enable Console Notification When Fixed": "Bool",
+      "Fix Mode": "Choice"
+    },
+    "Debugging": {
+      "Debug Logging": "Bool",
+      "Start Game in Developer Menu": "Bool"
+    },
+    "Difficulty Restoration": {
+      "Enable Grenade Cooking": "Bool",
+      "Restore PS2 Solidus Choking Difficulty": "Choice",
+      "Toggle Grenade Cooking": "Hotkey"
+    },
+    "Enable Game Warnings": {
+      "Warn When FSR Upscaling is Enabled": "Bool",
+      "Warn When Game is Muted": "Bool",
+      "Warn When Missing Major Bugfix Mods": "Bool",
+      "Warn When Save Files Are Read-Only": "Bool",
+      "Warn When Save Folders Not Writable": "Bool",
+      "Warn When Windows Slideshow Enabled": "Bool"
+    },
+    "Enhancements and Tweaks": {
+      "Anisotropic Filtering Level": "Int",
+      "Correct Gamma Levels": "Bool",
+      "Enable SMAA Anti-Aliasing": "Bool",
+      "Nearest Neighbor Texture Filtering": "Bool",
+      "Reduce Photosensitive Effects": "Bool"
+    },
+    "First Person Shooter Mode": {
+      "Enable First Person Shooter Mode": "Bool",
+      "First Person Shooter - Movement Enabled By Default": "Bool",
+      "Keep First Person View Across Rooms": "Bool",
+      "Tap to Keep First Person View Active": "Bool",
+      "Toggle First Person Shooter Mode": "Hotkey",
+      "Toggle First Person Shooter Movement": "Hotkey",
+      "Toggle Tap for First Person View": "Hotkey"
+    },
+    "Hotkeys": {
+      "Capture Hotkeys While Alt Tabbed": "Bool",
+      "Cycle Wireframe Mode": "Hotkey",
+      "Return to Developer Menu": "Hotkey",
+      "Toggle Vector Line Fixes": "Hotkey"
+    },
+    "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+      "Render Height": "Int",
+      "Render Width": "Int"
+    },
+    "Keep Aiming After Firing": {
+      "Always Keep Aiming": "Bool",
+      "While Holding Lock On": "Bool",
+      "While in FPS Mode": "Bool",
+      "While in First Person": "Bool"
+    },
+    "Language Settings": {
+      "Game Language": "Choice",
+      "Game Region": "Choice"
+    },
+    "Launcher and Splashscreens": {
+      "Skip In-Game Splashscreens": "Bool",
+      "Skip Launcher": "Bool",
+      "Skip Launcher Splashscreens": "Bool"
+    },
+    "MGS2 Community Bugfix Compilation Integration": {
+      "Restore Title Screen 2 Color Swapping": "Bool",
+      "Retro MSX Colonel Sprite": "Choice"
+    },
+    "Model Quality && Level of Detail Enhancements": {
+      "Always Show Grass": "Bool",
+      "Always Show Weapon Shell Casings": "Bool",
+      "Custom Grass Distance Multiplier": "Float",
+      "Force High Quality Characters": "Bool",
+      "Increase Shadow Resolution": "Bool",
+      "Make Snake's Bandana Heavier": "Bool",
+      "Show Soft Particles": "Bool",
+      "Toggle Always Show Grass": "Hotkey"
+    },
+    "Mouse Sensitivity": {
+      "Override Mouse Sensitivity": "Bool",
+      "X Multiplier": "Int",
+      "Y Multiplier": "Int"
+    },
+    "Speedrunner Settings": {
+      "Fix In-Game Timer Loading Pause": "Bool",
+      "Force RTC Hostage Type": "Choice",
+      "Gameplay Stats Overlay": "Choice",
+      "Restore SoL Elevator Glitch": "Bool",
+      "Show Pressure Level Overlay": "Bool"
+    },
+    "System Specific Fixes": {
+      "Audio Output Mode": "Choice",
+      "Disable Windows Fullscreen Optimization": "Bool",
+      "Force Dedicated GPU": "Bool",
+      "Limit Game to 2 CPU Cores": "Bool"
+    },
+    "Third Person Freecam": {
+      "Camera - Zoom In Hotkey": "Hotkey",
+      "Camera - Zoom Out Hotkey": "Hotkey",
+      "Camera - Zoom Reset Hotkey": "Hotkey",
+      "Camera - Zoom Speed": "Int",
+      "Camera - Zoom Step Amount": "Int",
+      "Enable Third Person Freecam": "Bool",
+      "Horizontal Camera Sensitivity": "Float",
+      "Inherit Camera Rotation": "Bool",
+      "Inherit Camera Rotation Toggle": "Hotkey",
+      "Max Camera Distance": "Int",
+      "Third Person View Toggle": "Hotkey",
+      "Vertical Camera Sensitivity": "Float"
+    },
+    "Ultra-Wide / 16:10+": {
+      "Fix Aspect Ratio": "Bool",
+      "Fix FOV": "Bool",
+      "Fix Framebuffer": "Bool",
+      "Lock HUD && Movies to 16:9": "Bool"
+    },
+    "Update Notifications": {
+      "Check For MGSHDFix Updates": "Bool",
+      "In-Game Update Notifications": "Bool"
+    },
+    "Various": {
+      "Camera Triggers Steam Screenshot": "Bool",
+      "Custom Lifebar Name": "Str",
+      "Enable Radar in Snake Tales": "Bool",
+      "Fix Vamp Punch Damage Type": "Bool",
+      "Force Sunglasses": "Choice",
+      "High Frequency Blade Anywhere": "Bool",
+      "Pause On Focus Loss": "Bool",
+      "Restore Japanese Phone Ringtone": "Bool",
+      "Restore Main Menu Voiceovers": "Bool",
+      "Restore Node DoB && Bloodtype Entry": "Bool",
+      "Restore Original Dogtag Names": "Bool",
+      "Restore PS2 Memory Card Strings": "Bool",
+      "Restore SoL Radar Rotation": "Bool",
+      "T.Goggle Color Cycle Hotkey": "Hotkey",
+      "Thermal Goggle Default Palette": "Choice",
+      "Thermal Goggle Palette Swapping": "Bool",
+      "Use Character Names for Lifebar": "Bool",
+      "Use Custom Lifebar Name": "Bool"
+    },
+    "Window Settings": {
+      "Enable Resolution Overrides": "Bool",
+      "Fullscreen, Borderless, and Windowed": "Choice",
+      "Window Height": "Int",
+      "Window Width": "Int"
+    }
+  },
+  "constraints": {
+    "Bugfixes": {
+      "Fix  High  CPU  Usage": {
+        "choices": [
+          "Full",
+          "Half",
+          "Disabled"
+        ]
+      },
+      "Fix Motion Trails": {
+        "choices": [
+          "Full (Gameplay + Cutscenes)",
+          "Cutscenes Only",
+          "Disabled"
+        ]
+      }
+    },
+    "System Specific Fixes": {
+      "Audio Output Mode": {
+        "choices": [
+          "Stereo (2.0)",
+          "Surround Sound (5.1)"
+        ]
+      }
+    },
+    "Damaged Steam Cloud Save Data Fix": {
+      "Fix Mode": {
+        "choices": [
+          "Move Outdated Save Data to Backup Folder",
+          "Delete Outdated Save Data",
+          "Disable Damaged Save Data Fix"
+        ]
+      }
+    },
+    "Controller Settings": {
+      "Set Menu OK && Cancel Button": {
+        "choices": [
+          "Default",
+          "East for OK",
+          "South for OK"
+        ]
+      },
+      "DualShock Rumble Strength (%)": {
+        "range": [
+          0,
+          200
+        ]
+      }
+    },
+    "Window Settings": {
+      "Window Width": {
+        "range": [
+          0,
+          16384
+        ]
+      },
+      "Fullscreen, Borderless, and Windowed": {
+        "choices": [
+          "Exclusive Fullscreen",
+          "Borderless Fullscreen",
+          "Borderless Windowed",
+          "Windowed (with borders)"
+        ]
+      },
+      "Window Height": {
+        "range": [
+          0,
+          16384
+        ]
+      }
+    },
+    "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+      "Render Width": {
+        "range": [
+          0,
+          16384
+        ]
+      },
+      "Render Height": {
+        "range": [
+          0,
+          16384
+        ]
+      }
+    },
+    "Enhancements and Tweaks": {
+      "Anisotropic Filtering Level": {
+        "range": [
+          0,
+          16
+        ]
+      }
+    },
+    "Various": {
+      "Force Sunglasses": {
+        "choices": [
+          "Normal",
+          "Always",
+          "Never"
+        ]
+      },
+      "Thermal Goggle Default Palette": {
+        "choices": [
+          "Substance",
+          "Sons of Liberty",
+          "Splinter Cell",
+          "White Hot",
+          "Black Hot"
+        ]
+      }
+    },
+    "Caption Settings": {
+      "Caption Size (%)": {
+        "range": [
+          1,
+          100
+        ]
+      },
+      "Caption Opacity (%)": {
+        "range": [
+          0,
+          100
+        ]
+      },
+      "Caption Outline Opacity (%)": {
+        "range": [
+          0,
+          100
+        ]
+      }
+    },
+    "Speedrunner Settings": {
+      "Gameplay Stats Overlay": {
+        "choices": [
+          "Disabled",
+          "Top Left",
+          "Top Right",
+          "Bottom Left",
+          "Bottom Right"
+        ]
+      },
+      "Force RTC Hostage Type": {
+        "choices": [
+          "Normal",
+          "Kato-chan",
+          "Old Beauties",
+          "Jennifer"
+        ]
+      }
+    },
+    "MGS2 Community Bugfix Compilation Integration": {
+      "Retro MSX Colonel Sprite": {
+        "choices": [
+          "Disabled",
+          "MSX2",
+          "Subsistence"
+        ]
+      }
+    },
+    "Difficulty Restoration": {
+      "Restore PS2 Solidus Choking Difficulty": {
+        "choices": [
+          "Disabled",
+          "Duration Increase Only",
+          "Life Reduction Only",
+          "Full Restoration"
+        ]
+      }
+    },
+    "Third Person Freecam": {
+      "Camera - Zoom Speed": {
+        "range": [
+          1,
+          500
+        ]
+      }
+    },
+    "Mouse Sensitivity": {
+      "X Multiplier": {
+        "range": [
+          1,
+          100
+        ]
+      },
+      "Y Multiplier": {
+        "range": [
+          1,
+          100
+        ]
+      }
+    }
+  },
+  "source_sha256": {
+    "ConfigTool/tab_data.cpp": "4b7cec4708ae0fa4af6de06ec0244426ba67a826376f6a6d6e37b2aa1a2690c8",
+    "src/resources/config_keys.hpp": "2c06734d5c9ad2abcf7756dc09aa7cc72cce0cb6bc037d7594fbabd9edc40882"
+  }
+}
