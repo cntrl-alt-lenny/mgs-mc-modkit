@@ -244,3 +244,9 @@ class FakeUI:
     def progress(self, title, log):
         # A real (terminal-mode) Progress, so main() can be driven end to end.
         return install.Progress("term", title, log)
+
+
+@pytest.fixture(autouse=True)
+def isolated_app_state(tmp_path, monkeypatch):
+    monkeypatch.setattr(install, "app_data_dir", lambda: tmp_path / "app-state")
+    monkeypatch.setattr(install, "kit_update_notice", lambda log: "")

@@ -7,6 +7,7 @@ construction and defensive fallback are unit-testable by faking `which` and
 from __future__ import annotations
 
 import install
+import pytest
 
 
 class FakeRun:
@@ -77,7 +78,7 @@ def test_kdialog_dbus_failure_degrades_without_crashing(monkeypatch):
 
     logs = []
     p = install.Progress("kdialog", "Installing", logs.append)
-    assert p._backend == "kdialog"
+    assert p._backend == "term"  # enabling cancellation detects unavailable D-Bus
     p.update("Extracting", 30)            # first qdbus call raises -> degrade
     assert p._backend == "term"           # degraded, did not raise
     p.close()                             # safe after degrade
@@ -101,4 +102,45 @@ def test_zenity_progress_pipe(monkeypatch):
     p.update("Extracting", 60)
     written = p._proc.stdin.getvalue()
     assert "60" in written and "# Extracting" in written
+    p.close()
+
+
+class BrokenZenity:
+    """A closed pipe whose exit status can become available on a later pump."""
+    def __init__(self, returncode):
+        self.returncode = returncode
+        self.stdin = self
+
+    def write(self, text):
+        raise BrokenPipeError("Zenity closed")
+
+    def poll(self):
+        return self.returncode
+
+    def wait(self, timeout=None):
+        return self.returncode
+
+
+@pytest.mark.parametrize("returncode, cancelled", [(1, True), (0, False), (255, False)])
+def test_zenity_exit_with_queued_update(returncode, cancelled):
+    p = install.Progress("term", "Installing", lambda m: None)
+    p._backend = "zenity"
+    p._proc = BrokenZenity(returncode)
+    p._pending.put(("Extracting", 60))
+    p.pump()
+    assert p.cancel_event.is_set() is cancelled
+    assert p._backend == "term"
+    p.close()
+
+
+def test_zenity_cancel_status_arrives_after_pipe_failure():
+    p = install.Progress("term", "Installing", lambda m: None)
+    proc = p._proc = BrokenZenity(None)
+    p._backend = "zenity"
+    p._pending.put(("Extracting", 60))
+    p.pump()
+    assert not p.cancel_event.is_set()
+    proc.returncode = 1
+    p.pump()
+    assert p.cancel_event.is_set()
     p.close()
