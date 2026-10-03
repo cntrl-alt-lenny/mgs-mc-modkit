@@ -2,10 +2,10 @@
 round: 006-schema-capture-safety
 role: verifier
 branch: verifier/006-schema-capture-safety
-head: 0e083b27f83216762b0ed025a5293116782a1258
+head: 4960e471e49967ff66adf69d5bd5283512e678a4
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T20:28:09Z
+written: 2026-10-03T20:28:48Z
 -->
 Reviewed Worker commit: `0e083b27f83216762b0ed025a5293116782a1258`.
 Main baseline: `f28f9eaea634b71f5bb788794635304e0987a764`.
@@ -207,6 +207,31 @@ the canonical-string counterexample exits 0 without any error. The reported
 limitations for exports, dynamic choices, float bounds/defaults and release
 applicability are accurate. Final direct CI independently confirms the
 report-only delivery SHA, beyond the report's earlier implementation CI.
+
+### Report publication and freshness
+
+Initial `python3 tools/fw.py report --role verifier --round 006-schema-capture-safety --push`
+exited 2 because the hygiene scanner interpreted a bracketed dictionary lookup
+followed by a parenthesized function call in the reproduction as a Markdown link.
+Rephrased that snippet using a function variable; reexecuting the recorded
+snippet exits 0 and reproduces the same failure output. No implementation changed.
+
+The repeated report command exits 0:
+
+```text
+report committed: docs/rounds/006-schema-capture-safety/verifier.md at 4960e471e499; it describes 0e083b27f832 on verifier/006-schema-capture-safety
+pushed verifier/006-schema-capture-safety to origin
+```
+
+`python3 tools/fw.py delivery --round 006-schema-capture-safety` exits 0:
+`origin/verifier/006-schema-capture-safety (4960e471e499): delivered`;
+`verifier: report describes 0e083b27f832`;
+`worker: report describes 6e5ba2059fc2`.
+`git status --short` exits 0, no output.
+`git diff 0e083b27f83216762b0ed025a5293116782a1258 HEAD --name-only` exits 0,
+listing only this Verifier report. This publication evidence is the only content
+added before final restamping/pushing. The literal reviewed Worker SHA above
+continues to identify all source/test/CI evidence.
 
 ## Not verified
 
