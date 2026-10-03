@@ -2,10 +2,10 @@
 round: 002-framework-adoption
 role: worker
 branch: worker/002-framework-adoption
-head: 615a7f3ecf53f95299f8e02ecd78f2488d940149
+head: 13c30c031d4aa892cfe9c69107ec59b7142c8f31
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T16:52:37Z
+written: 2026-10-03T16:53:37Z
 -->
 # Worker report: 002-framework-adoption
 
@@ -174,6 +174,24 @@ Finish, even if you stop early, by writing docs/rounds/002-framework-adoption/ve
 
 ```text
 (no output)
+```
+
+Delivery command: `python3 tools/fw.py report --role worker --round 002-framework-adoption --push` → exit 0.
+This first push is retained here as actual delivery evidence; the final invocation
+restamps and pushes this report after adding the command's own output. Its result
+is also returned in the final chat response, avoiding a self-referential commit id.
+
+```text
+report committed: docs/rounds/002-framework-adoption/worker.md at 13c30c031d4a; it describes 615a7f3ecf53 on worker/002-framework-adoption
+pushed worker/002-framework-adoption to origin
+end your final reply with: mgs-mc-modkit · ROUND 002 · WORKER · DONE — report pushed at 13c30c031d4a
+  (or STOPPED or BLOCKED instead of DONE, with the reason, if you stopped early)
+```
+
+PR creation: `gh pr create --base main --head worker/002-framework-adoption --title "Adopt pinned framework and project seat guidance" --body-file <body-file>` → exit 0.
+
+```text
+https://github.com/cntrl-alt-lenny/mgs-mc-modkit/pull/3
 ```
 
 ## Not verified
