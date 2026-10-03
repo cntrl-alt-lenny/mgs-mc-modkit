@@ -37,6 +37,18 @@ def test_failed_repair_restores_changed_mod_and_custom_file(game_dir):
     assert original.read_bytes() == b"stock"
 
 
+def test_new_recovery_directory_is_flushed_before_live_install(game_dir, tmp_path, monkeypatch):
+    flushed = []
+    monkeypatch.setattr(install, "_sync_dir", lambda path: flushed.append(path))
+    archive = build_zip(tmp_path / "payload.zip", {"payload": b"new"})
+    tx = install.InstallTxn(game_dir, "mgs2", noop)
+    tx.install_archive(archive)
+    # Flushing just mgs-modkit is insufficient: its name lives in game_dir.
+    assert game_dir in flushed
+    assert flushed.index(game_dir) < flushed.index(tx.root)
+    assert tx.rollback()
+
+
 @pytest.mark.parametrize("point", ["before_journal", "after_journal", "after_write"])
 def test_process_death_preserves_original(game_dir, point):
     """Real process exits, including the old dangerous backup/intent interval."""

@@ -1686,6 +1686,13 @@ def durable_mkdir(path: Path) -> None:
         _sync_dir(directory.parent)
 
 
+def flush_file(path: Path) -> None:
+    # Windows CRT _commit/fsync rejects a read-only descriptor. The files
+    # flushed here are staged payloads, snapshots or our own temporary copies.
+    with open(path, "r+b" if sys.platform == "win32" else "rb") as stream:
+        os.fsync(stream.fileno())
+
+
 def atomic_bytes(path: Path, data: bytes) -> None:
     durable_mkdir(path.parent)
     temp = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
@@ -1705,8 +1712,7 @@ def atomic_copy(src: Path, dest: Path) -> None:
     temp = dest.with_name(dest.name + "." + uuid.uuid4().hex + ".tmp")
     try:
         shutil.copy2(src, temp)
-        with open(temp, "rb") as f:
-            os.fsync(f.fileno())
+        flush_file(temp)
         os.replace(temp, dest)
         _sync_dir(dest.parent)
     finally:
@@ -1966,8 +1972,7 @@ class InstallTxn:
             # below use atomic replacement, so the snapshot stays unchanged.
             try:
                 os.link(dest, snapshot)
-                with open(snapshot, "rb") as f:
-                    os.fsync(f.fileno())
+                flush_file(snapshot)
                 _sync_dir(snapshot.parent)
             except OSError:
                 snapshot.unlink(missing_ok=True)
@@ -2005,7 +2010,7 @@ class InstallTxn:
         ok, msg = check_space(self.game_dir, archive_payload_bytes(archive))
         if not ok:
             raise RuntimeError(msg)
-        self.staging.mkdir(parents=True, exist_ok=True)
+        durable_mkdir(self.staging)
         stage = Path(tempfile.mkdtemp(prefix="stage_", dir=self.staging))
         try:
             rels = staged_files(archive, stage, on_progress=on_progress)
@@ -2016,8 +2021,7 @@ class InstallTxn:
                 dest = _safe_game_path(self.game_dir, rel)
                 durable_mkdir(dest.parent)
                 src = stage / rel
-                with open(src, "rb") as f:
-                    os.fsync(f.fileno())
+                flush_file(src)
                 size = src.stat().st_size
                 digest = sha256_file(src) if size <= BACKUP_MAX_BYTES else None
                 os.replace(src, dest)
