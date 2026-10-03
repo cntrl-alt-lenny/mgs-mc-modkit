@@ -2,10 +2,10 @@
 round: 006-schema-capture-safety
 role: worker
 branch: worker/006-schema-capture-safety
-head: 95c6cc7092f876d35f7e98011b3bcff09dd49475
+head: 6e5ba2059fc262b47108168b698225b57695e418
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T20:07:26Z
+written: 2026-10-03T20:08:32Z
 -->
 ## Verified
 
@@ -204,6 +204,23 @@ At `95c6cc7092f876d35f7e98011b3bcff09dd49475`:
 The report stamp will add only this report. Final-stamp direct and PR CI logs
 will be checked and recorded on PR #9 without making a claim that metadata
 headSha identifies a generated PR merge checkout.
+
+### Report publication
+
+`python3 tools/fw.py report --role worker --round 006-schema-capture-safety --push`
+→ exit 0:
+
+```text
+report committed: docs/rounds/006-schema-capture-safety/worker.md at 6e5ba2059fc2; it describes 95c6cc7092f8 on worker/006-schema-capture-safety
+pushed worker/006-schema-capture-safety to origin
+```
+
+`python3 tools/fw.py delivery --round 006-schema-capture-safety` → exit 0:
+`origin/worker/006-schema-capture-safety (6e5ba2059fc2): delivered`;
+`worker: report describes 95c6cc7092f8`.
+This actual publication evidence is the only added content before restamping
+with the same report command. The final stamp and seat reply identify its
+report-only delivery; final CI evidence is retained on the draft PR.
 
 ## Not verified
 
