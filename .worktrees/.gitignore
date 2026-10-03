@@ -1,0 +1,5 @@
+# Seats' linked checkouts (git worktree add .worktrees/<role>-<round>) live
+# here, inside the project, and are never part of it. Installed by the
+# agentic framework; delete this file if .gitignore already covers .worktrees/.
+*
+!.gitignore
