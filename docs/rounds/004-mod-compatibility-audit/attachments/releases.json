@@ -1,0 +1,159 @@
+{
+  "retrieved_utc": "2026-10-03T18:58:35.417241+00:00",
+  "releases": [
+    {
+      "id": 391365737,
+      "tag_name": "4.1.2",
+      "published_at": "2026-09-18T10:45:29Z",
+      "html_url": "https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.2",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "ShizCalev/MGSHDFix",
+      "body_sha256": "9f0607361aa106ae4068527e9e38dae63ae441b96d3f57b6cfccbd630fa0a68a"
+    },
+    {
+      "id": 380126819,
+      "tag_name": "4.1.1",
+      "published_at": "2026-09-01T10:07:57Z",
+      "html_url": "https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.1",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "ShizCalev/MGSHDFix",
+      "body_sha256": "4a5c5bb9fdcbd18ff1666d698ba5e76d9eff4c2e0fc45c56be42b9ff9fd52021"
+    },
+    {
+      "id": 376804029,
+      "tag_name": "4.1.0",
+      "published_at": "2026-08-26T01:47:59Z",
+      "html_url": "https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.0",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "ShizCalev/MGSHDFix",
+      "body_sha256": "e01ce62fe944faf7b5e6e54f55eefda01f39988983f23722d0161d28cda74f46"
+    },
+    {
+      "id": 385854468,
+      "tag_name": "v3.7.3",
+      "published_at": "2026-09-09T21:22:07Z",
+      "html_url": "https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.7.3",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "nuggslet/MGSM2Fix",
+      "body_sha256": "acd5e2596ab6f1137042eb1a4bbfcf56068493d911af6f31cdc688ded09c59e7"
+    },
+    {
+      "id": 382437035,
+      "tag_name": "v3.7.2",
+      "published_at": "2026-09-04T02:18:06Z",
+      "html_url": "https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.7.2",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "nuggslet/MGSM2Fix",
+      "body_sha256": "df81aee71cf3de7446b6c4fca0864f73a3e19fcd701820f8ec780e7d8c9c8b95"
+    },
+    {
+      "id": 382199685,
+      "tag_name": "v3.7.1",
+      "published_at": "2026-09-03T17:14:05Z",
+      "html_url": "https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.7.1",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "nuggslet/MGSM2Fix",
+      "body_sha256": "419b87aa7d572f93aba683ab0511c2625c39bffc704d1e1ebfcd62642d776253"
+    },
+    {
+      "id": 380852320,
+      "tag_name": "v3.7",
+      "published_at": "2026-09-01T22:08:13Z",
+      "html_url": "https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.7",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "nuggslet/MGSM2Fix",
+      "body_sha256": "c5baf498c0b8b591b0371a6e841f5216664148561fdcc9ad1cf551be29fb9cd2"
+    },
+    {
+      "id": 301495977,
+      "tag_name": "v3.6",
+      "published_at": "2026-03-25T23:41:37Z",
+      "html_url": "https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.6",
+      "target_commitish": "master",
+      "prerelease": false,
+      "draft": false,
+      "repo": "nuggslet/MGSM2Fix",
+      "body_sha256": "7681dae2a65e75947ff8034caf2c399685dbbb152cb5b56a267b9c3b0150781e"
+    },
+    {
+      "id": 359634137,
+      "tag_name": "3.0.0",
+      "published_at": "2026-07-25T08:19:06Z",
+      "html_url": "https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/tag/3.0.0",
+      "target_commitish": "main",
+      "prerelease": false,
+      "draft": false,
+      "repo": "ShizCalev/MGS2-Community-Bugfix-Compilation",
+      "body_sha256": "88e25a6fa7ea653ddf7e9237b873f0299b96c3d540699e75d6cfd20e3a4ec3a9"
+    },
+    {
+      "id": 360743236,
+      "tag_name": "2.0.1",
+      "published_at": "2026-07-27T23:06:36Z",
+      "html_url": "https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/tag/2.0.1",
+      "target_commitish": "main",
+      "prerelease": false,
+      "draft": false,
+      "repo": "ShizCalev/MGS3-Community-Bugfix-Compilation",
+      "body_sha256": "c652aa03692c321865cf4c004813e678ed855263e11ecac566ad154e7979af56"
+    }
+  ],
+  "archives": [
+    {
+      "name": "MGSHDFix_4.1.2.zip",
+      "url": "https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.2/MGSHDFix_4.1.2.zip",
+      "api_digest": "sha256:fbac84acc36bd395ab649beb576cf60e861fb43d3b36c26057fe900f5fa38e1d",
+      "asset_id": 572325025,
+      "release_id": 391365737
+    },
+    {
+      "name": "MGSHDFix_4.1.0.zip",
+      "url": "https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.0/MGSHDFix_4.1.0.zip",
+      "api_digest": "sha256:413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523",
+      "asset_id": 530017314,
+      "release_id": 376804029
+    },
+    {
+      "name": "MGSM2Fix_3.7.3.zip",
+      "url": "https://github.com/nuggslet/MGSM2Fix/releases/download/v3.7.3/MGSM2Fix_3.7.3.zip",
+      "api_digest": "sha256:0dabbe0b74bd1844d9f03d864949534ca3c29ea7bd9cf109f877963186e4aa80",
+      "asset_id": 553597605,
+      "release_id": 385854468
+    },
+    {
+      "name": "MGSM2Fix_3.6.0.zip",
+      "url": "https://github.com/nuggslet/MGSM2Fix/releases/download/v3.6/MGSM2Fix_3.6.0.zip",
+      "api_digest": "sha256:a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d",
+      "asset_id": 381645998,
+      "release_id": 301495977
+    },
+    {
+      "name": "MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "url": "https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/download/3.0.0/MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "api_digest": "sha256:a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003",
+      "asset_id": 489049028,
+      "release_id": 359634137
+    },
+    {
+      "name": "MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "url": "https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/download/2.0.1/MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "api_digest": "sha256:a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769",
+      "asset_id": 492007354,
+      "release_id": 360743236
+    }
+  ]
+}
