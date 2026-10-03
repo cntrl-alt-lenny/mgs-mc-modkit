@@ -1,0 +1,55 @@
+{
+  "about": "Written by the agentic framework's tools/adopt.py. Do not edit by hand, except 'settings'.",
+  "files": {
+    ".gitattributes": {
+      "kind": "seed"
+    },
+    ".worktrees/.gitignore": {
+      "kind": "seed"
+    },
+    "AGENTS.md": {
+      "kind": "seed"
+    },
+    "docs/agents/FRAMEWORK.md": {
+      "kind": "copy",
+      "sha256": "ddb93e8847e1254f4845d1194cc5b1198dc519a0d8de374fa7308e8eb7ae08e8"
+    },
+    "docs/agents/roles/brain.md": {
+      "kind": "copy",
+      "sha256": "446e4fc0f3f85818d25f86ee2e2662c5806d334dd166106ca5db72cf8a3c4373"
+    },
+    "docs/agents/roles/verifier.md": {
+      "kind": "copy",
+      "sha256": "30870db8d4782650b408ca01dc68f0ff178386c5e3a79f8004592098f25e2fef"
+    },
+    "docs/agents/roles/worker.md": {
+      "kind": "copy",
+      "sha256": "d88c7c7da81ec70f13d66c8d9bfd025b4a6d4aa6aa7b6fa03598c7e2a8192381"
+    },
+    "docs/rounds/README.md": {
+      "kind": "seed"
+    },
+    "docs/state.md": {
+      "kind": "seed"
+    },
+    "tests/test_framework.py": {
+      "kind": "copy",
+      "sha256": "6df59bd81a49ba7bf378ddf2f94a0ca7d7831bf70901dff55b8ccfa1e6ff626b"
+    },
+    "tools/fw.py": {
+      "kind": "copy",
+      "sha256": "13c8ee81784a2e83b86fee4ac369ed7273c123e5b9f9852e7b2600b9cc3c9e19"
+    }
+  },
+  "framework": {
+    "release": "3.1.0",
+    "repository": "https://github.com/cntrl-alt-lenny/agentic-framework"
+  },
+  "options": {
+    "adapters": [],
+    "hooks": false
+  },
+  "settings": {
+    "state_words": 1000
+  }
+}
