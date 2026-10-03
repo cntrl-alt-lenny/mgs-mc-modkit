@@ -67,6 +67,42 @@ On a Windows machine (or the Deck via Proton):
    `SETTINGS_SCHEMA` / `SETTINGS_CONSTRAINTS`. Validate exact section/key names
    and values against the new export; section/key counts alone are insufficient.
 
+#### Static capture boundary
+
+`python3 tools/capture_settings_schema.py <reviewed-checkout> --tag <tag> --tree <literal-commit>`
+prints JSON only after successfully reading the whole reviewed `kTabs` initializer.
+The caller must verify the checkout identity; the supplied tag/tree labels are
+recorded, not authenticated by this tool. `source_sha256` hashes the original
+bytes of both source files, including BOM and line endings. No source is rewritten.
+
+The supported layouts are those reviewed at 4.1.0, 4.1.1 and 4.1.2: braced tab
+and field initializers, canonical `ConfigKeys::*_Section` / `*_Setting` references,
+literal string constants (including concatenation) and string aliases. Spacers
+and the reviewed inline achievement Safety Switch row are outside the canonical
+schema. Known `MG`-only fields are excluded. Unknown game names, computed keys,
+new field types, malformed initializers and unreviewed flag/preprocessor syntax
+stop capture with an offending-construct error requesting source-format review.
+Do not turn an error into a count-based guess.
+
+Game expressions support `MG`, `MGS2`, `MGS3`, parentheses and bitwise OR, plus
+`constexpr int` aliases and alias chains. The reviewed conditional form is
+`#if defined(NAME)` / one alias declaration / `#else` / the same alias declaration
+/ `#endif`. Capture takes the **union of both branches** and records resolved
+`flag_unions` when aliases occur. It does not evaluate macros or assert which
+branch an upstream release binary uses. In particular, 4.1.2's
+`kFirstPersonViewGameFlags` union includes MGS3 through `MGS3_FPS_DEV`; this does
+**not** establish MGS3 FPS support in a release build or a per-game export.
+Nested/other directives and field declarations behind directives are unsupported.
+
+Constraints remain bounded: explicit literal/ConfigKeys choice lists and integer
+bounds written as integers or the two reviewed D3D11 limits are captured. Empty
+choice lists and the reviewed launcher-controller iterator list are dynamic and
+not captured. The reviewed `k3rdPersonMinCameraDistance` /
+`k3rdPersonMaxCameraDistance` bounds remain opaque. Float bounds, defaults,
+dynamic language/button/hotkey choices and actual generated per-game settings
+remain unverified by static capture. Validate them against real Config Tool
+exports before changing the coupled template, schema, constraints or pins.
+
 > Keep CRLF line endings. The Config Tool writes them and the kit reproduces
 > them byte-for-byte.
 
