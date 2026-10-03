@@ -2,10 +2,10 @@
 round: 003-product-integration
 role: verifier
 branch: verifier/003-product-integration
-head: 95f1b2fb7a08938c048ef7855285a7a97249d3a0
+head: 87f734bc0855a8fd61e3d89be8d6366cd8bcbed6
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T18:39:36Z
+written: 2026-10-03T18:40:01Z
 -->
 # Verifier report: 003-product-integration
 
@@ -174,6 +174,29 @@ this round's report only; delivery considers its stamp current. The substantive
 exception is exact-head CI attribution: metadata alone does not prove the
 checkout, as the independently inspected logs demonstrate. The direct run now
 supplies the missing literal-SHA evidence without altering delivery files.
+
+### Publication and freshness evidence
+
+`python3 tools/fw.py report --role verifier --round 003-product-integration --push`
+exited 0 for the first report publication:
+
+```text
+report committed: docs/rounds/003-product-integration/verifier.md at 87f734bc0855; it describes 95f1b2fb7a08 on verifier/003-product-integration
+pushed verifier/003-product-integration to origin
+```
+
+`python3 tools/fw.py delivery --round 003-product-integration` exited 0:
+
+```text
+origin/verifier/003-product-integration (87f734bc0855): delivered
+  verifier: report describes 95f1b2fb7a08 (written 2026-10-03T18:39:36Z on macOS 27.0)
+  worker: report describes 84fbdfd94ef5 (written 2026-10-03T18:30:45Z on macOS 27.0)
+```
+
+This evidence-only addition is followed by the same report command to restamp
+and push it. The final commit is returned in the final seat reply, avoiding a
+self-referential commit identifier. The literal reviewed Worker delivery at the
+top is unchanged; only this report changes after it.
 
 ## Not verified
 
