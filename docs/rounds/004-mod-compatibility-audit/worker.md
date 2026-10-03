@@ -2,10 +2,10 @@
 round: 004-mod-compatibility-audit
 role: worker
 branch: worker/004-mod-compatibility-audit
-head: cab17ae5a1ab7211cd46a65c20e0b5f3ab0cb9db
+head: 5993e5c6693566c56289e59dcfc25a13d7d36d3f
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T19:12:21Z
+written: 2026-10-03T19:14:46Z
 -->
 ## Verified
 
@@ -252,6 +252,42 @@ All commands below ran at `cab17ae5a1ab7211cd46a65c20e0b5f3ab0cb9db`:
 This is a successful advisory query reporting updates, not a network or code
 failure. It was inspected before execution and authorizes no pin change.
 
+### Published report and CI evidence
+
+- `python3 tools/fw.py report --role worker --round 004-mod-compatibility-audit --push`
+  → exit 0: `report committed: docs/rounds/004-mod-compatibility-audit/worker.md at 5993e5c66935; it describes cab17ae5a1ab on worker/004-mod-compatibility-audit`;
+  `pushed worker/004-mod-compatibility-audit to origin`.
+- `python3 tools/fw.py delivery --round 004-mod-compatibility-audit` → exit 0:
+  `origin/worker/004-mod-compatibility-audit (5993e5c66935): delivered`;
+  `worker: report describes cab17ae5a1ab (written 2026-10-03T19:12:21Z on macOS 27.0)`.
+- `gh pr create --base main --head worker/004-mod-compatibility-audit --title <audit-title> --body-file <scratch>/pr-body.md`
+  → exit 0: `https://github.com/cntrl-alt-lenny/mgs-mc-modkit/pull/7`.
+  PR is an audit review candidate; it has not been accepted or merged.
+- `gh workflow run ci.yml --ref worker/004-mod-compatibility-audit` → exit 0:
+  `https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37147081459`.
+- `gh run view 37147081459 --log` → exit 0. Each of four checkout logs prints
+  literal `5993e5c6693566c56289e59dcfc25a13d7d36d3f` after
+  `git log -1 --format=%H`. Linux 3.9: `203 passed in 5.53s`;
+  3.11: `203 passed in 5.41s`; 3.12: `203 passed in 4.59s`;
+  Windows 3.12: `201 passed, 2 skipped in 16.83s`.
+  All three Linux lint steps print `All checks passed!`; compilation and
+  desktop-file validation steps succeed. `gh run view 37147081459 --json status,conclusion`
+  → exit 0: `status: completed; conclusion: success`.
+- `gh run view 37147068769 --log` → exit 0. PR run checkout logs instead print
+  synthetic merge `3f594eac14637745871b17ded7a512729164b7be` in all four jobs,
+  merging the report head into main. Linux 3.9/3.11/3.12: respectively
+  `203 passed in 5.62s`, `203 passed in 6.25s`, `203 passed in 4.62s`;
+  Windows: `201 passed, 2 skipped in 25.02s`. Linux lint, compilation and
+  desktop validation succeed. `gh run view 37147068769 --json status,conclusion`
+  → exit 0: `status: completed; conclusion: success`.
+  Metadata headSha is not being presented as the PR checkout identity.
+
+This appended evidence changes only the report. The report is being restamped
+and pushed after this addition; its generated stamp gives that delivery commit.
+CI on that final stamp will be inspected and recorded on PR #7 without moving
+this branch again. The independent Verifier must review the final stamped
+commit rather than carrying an earlier review forward.
+
 ## Not verified
 
 No licensed game boots, Config Tool exports, native GUI rendering, controller
@@ -263,8 +299,8 @@ release notes/READMEs. No Nexus payload was obtained, redistributed or inspected
 Archive listing proves paths, not correct data or execution. Existing
 "known-good" descriptions cover the pinned synthetic schema/checksum/transaction
 checks; they must not be interpreted as licensed Windows/Deck boot evidence.
-CI and stamped delivery evidence will be appended after publication of this
-report; the report command stamps the actual delivery identity separately.
+The CI evidence above concerns the named literal report commit and named PR
+merge commit. It does not establish real-machine compatibility.
 
 ## Changed
 
