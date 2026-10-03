@@ -2,10 +2,10 @@
 round: 004-mod-compatibility-audit
 role: verifier
 branch: verifier/004-mod-compatibility-audit
-head: 6105156a4749334f6ac03c9b78a948be948324f3
+head: 2bff141dc33820d34c0b788159fff564f5cf79f7
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T19:28:11Z
+written: 2026-10-03T19:28:41Z
 -->
 # Verifier report: 004-mod-compatibility-audit
 
@@ -229,6 +229,29 @@ and automated-versus-hardware distinction. Its final direct CI is correctly
 attributed and distinct from PR merge CI. The recommendation to keep the complete
 current set and defer M2 is justified as an audit judgement, not a compatibility
 certification. No contradictory or unsupported readiness claim was found.
+
+### Publication evidence
+
+`python3 tools/fw.py report --role verifier --round 004-mod-compatibility-audit --push`
+exited 0 for the first report publication:
+
+```text
+report committed: docs/rounds/004-mod-compatibility-audit/verifier.md at 2bff141dc338; it describes 6105156a4749 on verifier/004-mod-compatibility-audit
+pushed verifier/004-mod-compatibility-audit to origin
+```
+
+`python3 tools/fw.py delivery --round 004-mod-compatibility-audit` exited 0:
+
+```text
+origin/verifier/004-mod-compatibility-audit (2bff141dc338): delivered
+  verifier: report describes 6105156a4749 (written 2026-10-03T19:28:11Z on macOS 27.0)
+  worker: report describes 5993e5c66935 (written 2026-10-03T19:14:46Z on macOS 27.0)
+```
+
+The same report command restamps and pushes this evidence-only addition. Its
+final commit is given in the final seat reply, avoiding self-reference. The
+literal reviewed Worker delivery at the top does not change. No production,
+framework or attachment file is modified by either report publication.
 
 ## Not verified
 
