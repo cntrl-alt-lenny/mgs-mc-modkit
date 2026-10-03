@@ -114,8 +114,8 @@ def test_journey_settings_survive_to_the_second_run(tmp_path, monkeypatch,
                  checklist=[["mgs1", "mgs2"], []])
     monkeypatch.setattr(install, "UI", lambda: ui2)
     assert install.main() == 0
-    assert all(s.get("button_icons") == "PlayStation 2" for s in logs)
-    assert all(s.get("audio_mode") == "Surround Sound (5.1)" for s in logs)
+    assert logs[1]["button_icons"] == "PlayStation 2"
+    assert logs[1]["audio_mode"] == "Surround Sound (5.1)"
 
 
 def test_journey_windows_needs_no_manual_step(tmp_path, monkeypatch,

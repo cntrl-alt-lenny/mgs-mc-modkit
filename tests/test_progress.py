@@ -77,7 +77,7 @@ def test_kdialog_dbus_failure_degrades_without_crashing(monkeypatch):
 
     logs = []
     p = install.Progress("kdialog", "Installing", logs.append)
-    assert p._backend == "kdialog"
+    assert p._backend == "term"  # enabling cancellation detects unavailable D-Bus
     p.update("Extracting", 30)            # first qdbus call raises -> degrade
     assert p._backend == "term"           # degraded, did not raise
     p.close()                             # safe after degrade

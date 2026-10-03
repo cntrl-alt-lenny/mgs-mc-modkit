@@ -56,16 +56,16 @@ On a Windows machine (or the Deck via Proton):
 
 1. Install the new MGSHDFix into a copy of the game folder.
 2. Run `plugins/MGSHDFix Config Tool.exe`.
-3. Set the options to match the kit's defaults — see the *Settings and their
-   defaults* table in the README (Steam Deck buttons, Stereo, HQ cutscenes on,
+3. Set the options to match the kit's defaults — see the defaults in `docs/SETTINGS.md` (Steam Deck buttons, Stereo, HQ cutscenes on,
    skip logos on, skip launcher on, **update checks off**).
 4. Hit **Save and Exit** to write a fresh `plugins/MGSHDFix.settings`.
 5. Paste its contents into `SETTINGS_TEMPLATE` in `install.py`, restoring the
    `@PLACEHOLDER@` tokens: `@BUTTON_ICONS@`, `@REGION@`, `@SKIP_LAUNCHER@`,
    `@SKIP_SPLASH@`, `@AUDIO_MODE@`, `@UPDATE_CHECK@`.
-6. Update `SETTINGS_EXPECTED_SECTIONS` / `SETTINGS_EXPECTED_KEYS` to the new
-   counts — `write_settings()` refuses to install if they disagree, which is
-   your safety net against a bad paste.
+6. Capture the exact upstream fields with `tools/capture_settings_schema.py`;
+   review its supported syntax, then update the fixture and embedded
+   `SETTINGS_SCHEMA` / `SETTINGS_CONSTRAINTS`. Validate exact section/key names
+   and values against the new export; section/key counts alone are insufficient.
 
 > Keep CRLF line endings. The Config Tool writes them and the kit reproduces
 > them byte-for-byte.
@@ -102,9 +102,10 @@ Then a real install on a real machine: install → launch **both** MGS2 and MGS3
 breakage) → re-run for repair → uninstall back to stock.
 
 ### 6. Release
-Bump `MODKIT_VERSION`, update `TAG=`/`SHA=` in **both** shortcuts
-(`Install-MGS-Mods.desktop` and `Install-MGS-Mods.cmd`), commit, tag. CI refuses
-to publish if either shortcut's pin disagrees with `install.py`.
+Follow `docs/RELEASING.md`: bump `MODKIT_VERSION`, write release notes, run
+`tools/pin_shortcuts.py`, commit, then tag after real-machine validation. CI
+requires Linux and Windows checks on that tagged commit and refuses to publish
+if either shortcut's pin disagrees with `install.py`.
 
 ---
 

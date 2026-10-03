@@ -165,7 +165,8 @@ def test_large_overwrite_not_backed_up(tmp_path, game_dir, patch_download,
     assert over["winhttp.dll"]["backup"] is None
 
     notes, ok = install.uninstall_game(game_dir, _noop)
-    assert ok
+    assert not ok  # originals still need Steam restoration
+    assert (game_dir / install.MODKIT_DIRNAME).exists()
     assert any("Verify integrity" in n for n in notes)
 
 
@@ -278,14 +279,14 @@ def test_incremental_install_merges_manifest(tmp_path):
     assert "us/demo/clip0000.sdt" in base_added
 
     # Run 2: Update only — must NOT drop the Base files/mods from the manifest.
-    upd = build_audio_zip(tmp_path / "update.zip", {"us/patch/fix.sdt": b"p"})
+    upd = build_audio_zip(tmp_path / "update.zip", {"us/demo/fix.sdt": b"p"})
     tx2 = install.InstallTxn(game_dir, "mgs3", _noop)
     install.install_better_audio(
         tx2, install.order_audio_components("mgs3", {"update": upd}), _noop)
     tx2.commit()
     m2 = json.loads(manifest_path.read_text())
     assert base_added <= set(m2["added"])                 # Base files carried over
-    assert "us/patch/fix.sdt" in m2["added"]              # Update file recorded
+    assert "us/demo/fix.sdt" in m2["added"]              # Update file recorded
     assert "MGS3 Better Audio" in m2["mods"]              # both mods present
     assert "MGS3 Better Audio update" in m2["mods"]
 
@@ -371,7 +372,8 @@ def test_authored_file_is_in_recovery_journal(tmp_path):
     journal = json.loads(
         (game_dir / install.MODKIT_DIRNAME / install.JOURNAL_NAME)
         .read_text())
-    assert journal == ["plugins/MGSHDFix.settings"]
+    assert journal["schema"] == 2
+    assert journal["entries"] == [{"path": "plugins/MGSHDFix.settings", "existed": False}]
     tx.rollback()
 
 
@@ -427,7 +429,8 @@ def test_interrupted_run_journal_is_adopted(tmp_path, game_dir, patch_download):
     # Next run: adopts the journal, so MOD files are not re-backed-up as stock.
     with tempfile.TemporaryDirectory() as td:
         tx2 = install.InstallTxn(game_dir, "mgs2", _noop)
-        assert "winhttp.dll" in tx2._prior_added      # recovered from journal
+        assert (game_dir / "winhttp.dll").read_bytes() == b"TRUE-STOCK"
+        assert not (game_dir / "wininet.dll").exists()  # pre-run state recovered
         install.install_hdfix(tx2, Path(td), _noop)
         tx2.commit()
 
@@ -443,9 +446,10 @@ def test_torn_journal_does_not_crash(tmp_path, game_dir, patch_download):
     root = game_dir / install.MODKIT_DIRNAME
     root.mkdir(parents=True)
     (root / install.JOURNAL_NAME).write_text('["partial writ')   # torn
-    tx = install.InstallTxn(game_dir, "mgs2", _noop)             # must not raise
-    assert tx._prior_added == set()
-    assert not (root / install.JOURNAL_NAME).exists()            # cleaned up
+    import pytest
+    with pytest.raises(install.CorruptManifestError):
+        install.InstallTxn(game_dir, "mgs2", _noop)
+    assert (root / install.JOURNAL_NAME).read_text() == '["partial writ'
 
 
 # ---------------------------------------------------------------------------
@@ -522,9 +526,9 @@ def test_uninstall_recovers_originals_when_manifest_lost(tmp_path, game_dir,
     (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).unlink()
 
     notes, ok = install.uninstall_game(game_dir, _noop)
-    assert ok
+    assert not ok  # restoration cannot identify/remove untracked mod files
     assert (game_dir / "winhttp.dll").read_bytes() == b"TRUE-STOCK"
-    assert not (game_dir / install.MODKIT_DIRNAME).exists()
+    assert (game_dir / install.MODKIT_DIRNAME).exists()
     assert any("put back" in n for n in notes)
 
 
