@@ -2,10 +2,10 @@
 round: 003-product-integration
 role: worker
 branch: worker/003-product-integration
-head: 079b9bbfe60ca47ee59324924a48086f8a2a054f
+head: 84fbdfd94ef57ec6058715ab75ec465f34f10c55
 os: macOS 27.0
 python: 3.9.6
-written: 2026-10-03T18:28:40Z
+written: 2026-10-03T18:30:45Z
 -->
 # Worker report: 003-product-integration
 
@@ -202,10 +202,132 @@ Install-MGS-Mods.cmd: TAG=v2.3.0 SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b2092
 (no output)
 ```
 
+CI evidence for the first stamped delivery `84fbdfd94ef57ec6058715ab75ec465f34f10c55`:
+`https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37144360063`.
+All three Linux Python versions pass 203 tests; Windows Python 3.12 passes 201
+with two platform-specific skips. Linux compilation, Ruff and desktop validation
+passed. Final report-only changes require a new final-head CI run; its exact
+SHA/run/results will be recorded on the PR and in the final seat response after
+this report is pushed, without inventing a self-referential report commit.
+
+`gh run view 37144360063 --json status,conclusion,headSha,jobs --jq {status,conclusion,headSha,jobs: [.jobs[] | {name,status,conclusion}]}` → exit 0
+
+```text
+{"conclusion":"success","headSha":"84fbdfd94ef57ec6058715ab75ec465f34f10c55","jobs":[{"conclusion":"success","name":"test-windows","status":"completed"},{"conclusion":"success","name":"test (3.9)","status":"completed"},{"conclusion":"success","name":"test (3.12)","status":"completed"},{"conclusion":"success","name":"test (3.11)","status":"completed"}],"status":"completed"}
+```
+
+`python3 tools/fw.py delivery --round 003-product-integration` → exit 0
+
+```text
+origin/worker/003-product-integration (84fbdfd94ef5): delivered
+  worker: report describes 079b9bbfe60c (written 2026-10-03T18:28:40Z on macOS 27.0)
+```
+
+`python3 tools/fw.py status` → exit 0
+
+```text
+Framework
+  pinned to agentic-framework 3.1.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  up to date with the latest release (3.1.0)
+Merge rule
+  owner-approves
+Rounds
+  in flight: 003-product-integration (Tier 2)
+    worker: reported at 079b9bbfe60c
+    verifier: not started
+  1 round(s) merged under docs/rounds/, latest by name: 002-framework-adoption
+This machine
+  on worker/003-product-integration; no uncommitted changes
+  safe to leave this machine: yes
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: send the Verifier prompt for round 003-product-integration (Brain prints it with: python3 tools/fw.py prompt --round 003-product-integration --role verifier)
+```
+
+`python3 docs/rounds/003-product-integration/attachments/verify_sources.py <framework>` → exit 0
+
+```text
+All 40 product files match reviewed source 7630a81a04abf4e7f96dd75663bae70ba31c4f2e
+Files differing from reviewed source (adoption and round records only):
+  .worktrees/.gitignore
+  AGENTS.md
+  docs/agents/FRAMEWORK.md
+  docs/agents/framework.json
+  docs/agents/roles/brain.md
+  docs/agents/roles/verifier.md
+  docs/agents/roles/worker.md
+  docs/rounds/002-framework-adoption/brief.md
+  docs/rounds/002-framework-adoption/verifier.md
+  docs/rounds/002-framework-adoption/worker.md
+  docs/rounds/003-product-integration/attachments/verify_sources.py
+  docs/rounds/003-product-integration/brief.md
+  docs/rounds/003-product-integration/worker.md
+  docs/rounds/README.md
+  docs/state.md
+  tests/test_framework.py
+  tools/fw.py
+Framework source/fingerprint match: docs/agents/FRAMEWORK.md
+Framework source/fingerprint match: docs/agents/roles/brain.md
+Framework source/fingerprint match: docs/agents/roles/verifier.md
+Framework source/fingerprint match: docs/agents/roles/worker.md
+Framework source/fingerprint match: tests/test_framework.py
+Framework source/fingerprint match: tools/fw.py
+All adoption manifest paths and the manifest match merged baseline
+Python 3.9 installer syntax valid
+HDFIX_VERSION=4.1.0
+HDFIX_SHA256=413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523
+M2FIX_VERSION=3.6.0
+M2FIX_TAG=v3.6
+M2FIX_SHA256=a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d
+SETTINGS_CAPTURED_FROM=4.1.0
+Configuration schema and capture fixture match reviewed source byte-for-byte
+Install-MGS-Mods.desktop: TAG=v2.3.0 SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5; reviewed bytes and line endings preserved
+Install-MGS-Mods.cmd: TAG=v2.3.0 SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5; reviewed bytes and line endings preserved
+```
+
+`gh run view 37144360063 --log` → exit 0. Relevant actual log lines:
+
+```text
+test-windows	Run the test-suite	2026-10-03T18:29:40.0051198Z 201 passed, 2 skipped in 12.14s
+test (3.9)	Install bsdtar, desktop validator + test tools	2026-10-03T18:29:18.0326195Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.9)	Byte-compile the installer	﻿2026-10-03T18:29:29.8930995Z ##[group]Run python -m py_compile install.py
+test (3.9)	Byte-compile the installer	2026-10-03T18:29:29.8931395Z ^[[36;1mpython -m py_compile install.py^[[0m
+test (3.9)	Run lint	2026-10-03T18:29:30.0012634Z All checks passed!
+test (3.9)	Run the test-suite	2026-10-03T18:29:35.7969731Z 203 passed in 5.51s
+test (3.12)	Install bsdtar, desktop validator + test tools	2026-10-03T18:29:10.7140180Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.12)	Byte-compile the installer	﻿2026-10-03T18:29:23.6851077Z ##[group]Run python -m py_compile install.py
+test (3.12)	Byte-compile the installer	2026-10-03T18:29:23.6851473Z ^[[36;1mpython -m py_compile install.py^[[0m
+test (3.12)	Run lint	2026-10-03T18:29:23.8063423Z All checks passed!
+test (3.12)	Run the test-suite	2026-10-03T18:29:29.1736574Z 203 passed in 5.04s
+test (3.11)	Install bsdtar, desktop validator + test tools	2026-10-03T18:29:12.4972816Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.11)	Byte-compile the installer	﻿2026-10-03T18:29:27.0937106Z ##[group]Run python -m py_compile install.py
+test (3.11)	Byte-compile the installer	2026-10-03T18:29:27.0937501Z ^[[36;1mpython -m py_compile install.py^[[0m
+test (3.11)	Run lint	2026-10-03T18:29:27.2072501Z All checks passed!
+test (3.11)	Run the test-suite	2026-10-03T18:29:32.2238693Z 203 passed in 4.60s
+```
+
+Publication: `gh pr create --base main --head worker/003-product-integration --title "Integrate reviewed installer with adopted framework" --body-file <body-file>` → exit 0.
+
+```text
+https://github.com/cntrl-alt-lenny/mgs-mc-modkit/pull/5
+```
+
+`python3 tools/fw.py report --role worker --round 003-product-integration --push` → exit 0 (first delivery):
+
+```text
+report committed: docs/rounds/003-product-integration/worker.md at 84fbdfd94ef5; it describes 079b9bbfe60c on worker/003-product-integration
+pushed worker/003-product-integration to origin
+end your final reply with: mgs-mc-modkit · ROUND 003 · WORKER · DONE — report pushed at 84fbdfd94ef5
+  (or STOPPED or BLOCKED instead of DONE, with the reason, if you stopped early)
+```
+
+The final invocation restamps this evidence-only update. Subsequent delivery
+freshness and final CI are checked before ending the Worker turn. No product,
+framework or source-check code changed after the locally tested implementation.
+
 ## Not verified
 
-- Native Linux/Windows CI on the pushed delivery will be collected on this
-  round's new PR; this initial report makes no CI success claim.
 - Real Windows and Steam Deck/Proton game boots, native progress GUI interactions,
   Nexus audio payload compatibility, large-audio Steam restoration and concurrent
   installers on real machines were not exercised. They remain the release
