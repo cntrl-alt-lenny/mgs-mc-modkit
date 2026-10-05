@@ -1,5 +1,5 @@
 {
-  "retrieved_utc": "2026-10-05T08:35:58.445389+00:00",
+  "retrieved_utc": "2026-10-05T08:40:40.315078+00:00",
   "rows": [
     {
       "tag": "4.1.0",
@@ -114,5 +114,6 @@
     ],
     "type_changes": [],
     "captured_constraint_changes": []
-  }
+  },
+  "capture_tool_commit": "7ee96a824adf51cc9d65a58a46619dc6bd2bd158"
 }

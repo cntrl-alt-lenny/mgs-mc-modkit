@@ -1,0 +1,100 @@
+[
+  {
+    "command": [
+      "gh",
+      "run",
+      "view",
+      "37284947709",
+      "--json",
+      "status,conclusion,headSha,event,jobs,url"
+    ],
+    "exit": 0,
+    "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284947709",
+    "event": "workflow_dispatch",
+    "head_sha": "7ee96a824adf51cc9d65a58a46619dc6bd2bd158",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "test-windows",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284947709/job/111681518561"
+      },
+      {
+        "name": "test (3.11)",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284947709/job/111681518652"
+      },
+      {
+        "name": "test (3.12)",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284947709/job/111681518879"
+      },
+      {
+        "name": "test (3.9)",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284947709/job/111681518895"
+      }
+    ],
+    "checkout_log_lines": [
+      "test-windows\tRun actions/checkout@v7\t2026-10-05T08:39:15.5331353Z 7ee96a824adf51cc9d65a58a46619dc6bd2bd158",
+      "test (3.11)\tRun actions/checkout@v7\t2026-10-05T08:39:09.5698645Z 7ee96a824adf51cc9d65a58a46619dc6bd2bd158",
+      "test (3.12)\tRun actions/checkout@v7\t2026-10-05T08:39:08.5091822Z 7ee96a824adf51cc9d65a58a46619dc6bd2bd158",
+      "test (3.9)\tRun actions/checkout@v7\t2026-10-05T08:39:09.2008095Z 7ee96a824adf51cc9d65a58a46619dc6bd2bd158"
+    ],
+    "test_summary_log_lines": [
+      "test-windows\tRun the test-suite\t2026-10-05T08:39:52.4525313Z 271 passed, 2 skipped in 26.88s",
+      "test (3.11)\tRun the test-suite\t2026-10-05T08:39:33.5363164Z 273 passed in 6.06s",
+      "test (3.12)\tRun the test-suite\t2026-10-05T08:39:30.7328045Z 273 passed in 8.49s",
+      "test (3.9)\tRun the test-suite\t2026-10-05T08:39:36.0745431Z 273 passed in 5.81s"
+    ]
+  },
+  {
+    "command": [
+      "gh",
+      "run",
+      "view",
+      "37284950677",
+      "--json",
+      "status,conclusion,headSha,event,jobs,url"
+    ],
+    "exit": 0,
+    "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284950677",
+    "event": "pull_request",
+    "head_sha": "7ee96a824adf51cc9d65a58a46619dc6bd2bd158",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "test (3.9)",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284950677/job/111681522959"
+      },
+      {
+        "name": "test (3.11)",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284950677/job/111681523237"
+      },
+      {
+        "name": "test-windows",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284950677/job/111681523263"
+      },
+      {
+        "name": "test (3.12)",
+        "conclusion": "success",
+        "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37284950677/job/111681523292"
+      }
+    ],
+    "checkout_log_lines": [
+      "test (3.9)\tRun actions/checkout@v7\t2026-10-05T08:39:09.5341236Z 11a492504f4f3a85f18162539ee5559e34cb656d",
+      "test (3.11)\tRun actions/checkout@v7\t2026-10-05T08:39:09.4989580Z 11a492504f4f3a85f18162539ee5559e34cb656d",
+      "test-windows\tRun actions/checkout@v7\t2026-10-05T08:39:14.9352663Z 11a492504f4f3a85f18162539ee5559e34cb656d",
+      "test (3.12)\tRun actions/checkout@v7\t2026-10-05T08:39:09.4729524Z 11a492504f4f3a85f18162539ee5559e34cb656d"
+    ],
+    "test_summary_log_lines": [
+      "test (3.9)\tRun the test-suite\t2026-10-05T08:39:36.5552646Z 273 passed in 6.63s",
+      "test (3.11)\tRun the test-suite\t2026-10-05T08:39:29.3540240Z 273 passed in 5.50s",
+      "test-windows\tRun the test-suite\t2026-10-05T08:39:53.5996865Z 271 passed, 2 skipped in 20.92s",
+      "test (3.12)\tRun the test-suite\t2026-10-05T08:39:30.2601657Z 273 passed in 6.48s"
+    ]
+  }
+]
