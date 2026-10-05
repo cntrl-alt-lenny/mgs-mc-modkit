@@ -1,0 +1,72 @@
+{
+  "baseline_fixture_equal": true,
+  "sources": {
+    "4.1.0": {
+      "commit": "f4f662d67a2a033dee0877e436a0fe65eb719e0b",
+      "raw_keys": 128,
+      "reviewed_union_keys": 128,
+      "sections": 27,
+      "source_sha256": {
+        "ConfigTool/tab_data.cpp": "4b7cec4708ae0fa4af6de06ec0244426ba67a826376f6a6d6e37b2aa1a2690c8",
+        "src/resources/config_keys.hpp": "2c06734d5c9ad2abcf7756dc09aa7cc72cce0cb6bc037d7594fbabd9edc40882"
+      },
+      "flag_alias_substitutions": 0
+    },
+    "4.1.1": {
+      "commit": "0120a6b1116913733f4dc21c287813d4cb2bb659",
+      "raw_keys": 128,
+      "reviewed_union_keys": 128,
+      "sections": 27,
+      "source_sha256": {
+        "ConfigTool/tab_data.cpp": "4b7cec4708ae0fa4af6de06ec0244426ba67a826376f6a6d6e37b2aa1a2690c8",
+        "src/resources/config_keys.hpp": "2c06734d5c9ad2abcf7756dc09aa7cc72cce0cb6bc037d7594fbabd9edc40882"
+      },
+      "flag_alias_substitutions": 0
+    },
+    "4.1.2": {
+      "commit": "33e80bf4d2223f6866b0b92e06c3c9b85efab652",
+      "raw_keys": 128,
+      "reviewed_union_keys": 131,
+      "sections": 27,
+      "source_sha256": {
+        "ConfigTool/tab_data.cpp": "4b2575f6075fb7a8534c73a0adc048a7b0515082e89da762ed79bfe441f65e2e",
+        "src/resources/config_keys.hpp": "8e03aa5d90662fcadd0ef729d5dfe36d6045545c1772be2cee6be12f28aa9c94"
+      },
+      "flag_alias_substitutions": 3
+    }
+  },
+  "delta": {
+    "added": [
+      [
+        "Bugfixes",
+        "Fix Dropped Item Toss",
+        "Bool"
+      ],
+      [
+        "Bugfixes",
+        "Fix Emissive Textures",
+        "Bool"
+      ],
+      [
+        "Bugfixes",
+        "Fix Lighting Bounding Boxes",
+        "Bool"
+      ],
+      [
+        "Model Quality && Level of Detail Enhancements",
+        "Blend Particle Effect Sprites",
+        "Bool"
+      ]
+    ],
+    "removed": [
+      [
+        "Model Quality && Level of Detail Enhancements",
+        "Show Soft Particles",
+        "Bool"
+      ]
+    ],
+    "type_changes": [],
+    "captured_constraint_changes": []
+  },
+  "limits": "Not an actual Config Tool export. Union of MGS2/MGS3 declarations. Existing capture handles only explicit choice lists and known integer ranges; dynamic choices and float bounds/defaults are not fully represented."
+}

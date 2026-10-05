@@ -1,0 +1,62 @@
+[
+  {
+    "repository": "ShizCalev/MGSHDFix",
+    "retrieved_utc": "2026-10-03T19:02:22.510747+00:00",
+    "latest_command": "gh api repos/ShizCalev/MGSHDFix/releases/latest",
+    "latest_exit": 0,
+    "latest_tag": "4.1.2",
+    "release_id": 391365737,
+    "commit_command": "gh api repos/ShizCalev/MGSHDFix/commits/4.1.2",
+    "commit_exit": 0,
+    "tag_commit": "33e80bf4d2223f6866b0b92e06c3c9b85efab652",
+    "readme_command": "gh api repos/ShizCalev/MGSHDFix/contents/README.md?ref=33e80bf4d2223f6866b0b92e06c3c9b85efab652",
+    "readme_exit": 0,
+    "readme_source_url": "https://github.com/ShizCalev/MGSHDFix/blob/33e80bf4d2223f6866b0b92e06c3c9b85efab652/README.md",
+    "readme_sha256": "b066e07dca8c21bc282f96796b5ed009fdf197da6df2799c68ed56917dcff8f5"
+  },
+  {
+    "repository": "ShizCalev/MGS2-Community-Bugfix-Compilation",
+    "retrieved_utc": "2026-10-03T19:02:46.293075+00:00",
+    "latest_command": "gh api repos/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/latest",
+    "latest_exit": 0,
+    "latest_tag": "3.0.0",
+    "release_id": 359634137,
+    "commit_command": "gh api repos/ShizCalev/MGS2-Community-Bugfix-Compilation/commits/3.0.0",
+    "commit_exit": 0,
+    "tag_commit": "373bb5dd622148adf33818d1cfcfd913eadec1d9",
+    "readme_command": "gh api repos/ShizCalev/MGS2-Community-Bugfix-Compilation/contents/README.md?ref=373bb5dd622148adf33818d1cfcfd913eadec1d9",
+    "readme_exit": 0,
+    "readme_source_url": "https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/blob/373bb5dd622148adf33818d1cfcfd913eadec1d9/README.md",
+    "readme_sha256": "d3d6b293ce274e0d6be0670210b53552c7a803a835c4cd005139ce82dd364443"
+  },
+  {
+    "repository": "ShizCalev/MGS3-Community-Bugfix-Compilation",
+    "retrieved_utc": "2026-10-03T19:02:51.391230+00:00",
+    "latest_command": "gh api repos/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/latest",
+    "latest_exit": 0,
+    "latest_tag": "2.0.1",
+    "release_id": 360743236,
+    "commit_command": "gh api repos/ShizCalev/MGS3-Community-Bugfix-Compilation/commits/2.0.1",
+    "commit_exit": 0,
+    "tag_commit": "0dbc487bce554fb0b4863ac0f27c4fe21f870a5c",
+    "readme_command": "gh api repos/ShizCalev/MGS3-Community-Bugfix-Compilation/contents/README.md?ref=0dbc487bce554fb0b4863ac0f27c4fe21f870a5c",
+    "readme_exit": 0,
+    "readme_source_url": "https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/blob/0dbc487bce554fb0b4863ac0f27c4fe21f870a5c/README.md",
+    "readme_sha256": "03ce38fc60e8d47a85600187e62766594230d7ce0c29cd039d409c5de30e5257"
+  },
+  {
+    "repository": "nuggslet/MGSM2Fix",
+    "retrieved_utc": "2026-10-03T19:02:54.114843+00:00",
+    "latest_command": "gh api repos/nuggslet/MGSM2Fix/releases/latest",
+    "latest_exit": 0,
+    "latest_tag": "v3.7.3",
+    "release_id": 385854468,
+    "commit_command": "gh api repos/nuggslet/MGSM2Fix/commits/v3.7.3",
+    "commit_exit": 0,
+    "tag_commit": "97172f569dbe518760438c847d0fc5d28e71dcd7",
+    "readme_command": "gh api repos/nuggslet/MGSM2Fix/contents/README.md?ref=97172f569dbe518760438c847d0fc5d28e71dcd7",
+    "readme_exit": 0,
+    "readme_source_url": "https://github.com/nuggslet/MGSM2Fix/blob/97172f569dbe518760438c847d0fc5d28e71dcd7/README.md",
+    "readme_sha256": "31a5cf248da10a65274bb9e270b3079a2def8e36541121a3e6a225b76bb43ea3"
+  }
+]

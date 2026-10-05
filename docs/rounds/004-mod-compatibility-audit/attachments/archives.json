@@ -1,0 +1,239 @@
+{
+  "retrieved_utc": "2026-10-03T18:59:04.904559+00:00",
+  "archives": [
+    {
+      "name": "MGSHDFix_4.1.2.zip",
+      "url": "https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.2/MGSHDFix_4.1.2.zip",
+      "api_digest": "sha256:fbac84acc36bd395ab649beb576cf60e861fb43d3b36c26057fe900f5fa38e1d",
+      "asset_id": 572325025,
+      "release_id": 391365737,
+      "downloaded_bytes": 10195978,
+      "sha256": "fbac84acc36bd395ab649beb576cf60e861fb43d3b36c26057fe900f5fa38e1d",
+      "curl_exit": 0,
+      "listing_command": "bsdtar -tf <cache>/MGSHDFix_4.1.2.zip",
+      "listing_exit": 0,
+      "listing_sha256": "0e4bb7ef4191129fe7edfb77c25789dbab885f0d9427ce152f926178cb416d09",
+      "file_count": 11,
+      "configs": {},
+      "prefixes": {
+        "UltimateASILoader_LICENSE.md": 1,
+        "logs": 2,
+        "plugins": 6,
+        "winhttp.dll": 1,
+        "wininet.dll": 1
+      },
+      "file_names_sha256": "ebb391206b32fa6836f24e43ac3d2a81e96881869bb86a90e8a8ae0926ac8086",
+      "control_files": [
+        "UltimateASILoader_LICENSE.md",
+        "logs/MGSHDFix_Game.log",
+        "logs/MGSHDFix_Launcher.log",
+        "plugins/MGSHDFix Config Tool.exe",
+        "plugins/MGSHDFix.asi",
+        "plugins/MGSHDFix_LICENSE.md",
+        "plugins/MGSHDFix_README.md",
+        "plugins/SMAA.hlsl",
+        "plugins/SMAA_LICENSE.md",
+        "winhttp.dll",
+        "wininet.dll"
+      ]
+    },
+    {
+      "name": "MGSHDFix_4.1.0.zip",
+      "url": "https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.0/MGSHDFix_4.1.0.zip",
+      "api_digest": "sha256:413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523",
+      "asset_id": 530017314,
+      "release_id": 376804029,
+      "downloaded_bytes": 10183473,
+      "sha256": "413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523",
+      "curl_exit": 0,
+      "listing_command": "bsdtar -tf <cache>/MGSHDFix_4.1.0.zip",
+      "listing_exit": 0,
+      "listing_sha256": "0e4bb7ef4191129fe7edfb77c25789dbab885f0d9427ce152f926178cb416d09",
+      "file_count": 11,
+      "configs": {},
+      "prefixes": {
+        "UltimateASILoader_LICENSE.md": 1,
+        "logs": 2,
+        "plugins": 6,
+        "winhttp.dll": 1,
+        "wininet.dll": 1
+      },
+      "file_names_sha256": "ebb391206b32fa6836f24e43ac3d2a81e96881869bb86a90e8a8ae0926ac8086",
+      "control_files": [
+        "UltimateASILoader_LICENSE.md",
+        "logs/MGSHDFix_Game.log",
+        "logs/MGSHDFix_Launcher.log",
+        "plugins/MGSHDFix Config Tool.exe",
+        "plugins/MGSHDFix.asi",
+        "plugins/MGSHDFix_LICENSE.md",
+        "plugins/MGSHDFix_README.md",
+        "plugins/SMAA.hlsl",
+        "plugins/SMAA_LICENSE.md",
+        "winhttp.dll",
+        "wininet.dll"
+      ]
+    },
+    {
+      "name": "MGSM2Fix_3.7.3.zip",
+      "url": "https://github.com/nuggslet/MGSM2Fix/releases/download/v3.7.3/MGSM2Fix_3.7.3.zip",
+      "api_digest": "sha256:0dabbe0b74bd1844d9f03d864949534ca3c29ea7bd9cf109f877963186e4aa80",
+      "asset_id": 553597605,
+      "release_id": 385854468,
+      "downloaded_bytes": 8564890,
+      "sha256": "0dabbe0b74bd1844d9f03d864949534ca3c29ea7bd9cf109f877963186e4aa80",
+      "curl_exit": 0,
+      "listing_command": "bsdtar -tf <cache>/MGSM2Fix_3.7.3.zip",
+      "listing_exit": 0,
+      "listing_sha256": "9aa0a291ddf51352476a9b36c63088667aa2f283b258312502e572e84f95caf3",
+      "file_count": 7,
+      "configs": {
+        "MGSM2Fix.ini": {
+          "sha256": "ba708ee49fcb95ad3c81623088f5f94d3de00bcaf6b533cc60e95aaa4ebd8417"
+        }
+      },
+      "prefixes": {
+        "LICENSES.txt": 1,
+        "MGSM2Fix.ini": 1,
+        "MGSM2Fix32.asi": 1,
+        "MGSM2Fix64.asi": 1,
+        "README.md": 1,
+        "d3d11.dll": 1,
+        "dinput8.dll": 1
+      },
+      "file_names_sha256": "457c939b233239c4f3ffe7aee81ef99aa7aad17977de27e1a3b19291f533b70a",
+      "control_files": [
+        "LICENSES.txt",
+        "MGSM2Fix.ini",
+        "MGSM2Fix32.asi",
+        "MGSM2Fix64.asi",
+        "README.md",
+        "d3d11.dll",
+        "dinput8.dll"
+      ]
+    },
+    {
+      "name": "MGSM2Fix_3.6.0.zip",
+      "url": "https://github.com/nuggslet/MGSM2Fix/releases/download/v3.6/MGSM2Fix_3.6.0.zip",
+      "api_digest": "sha256:a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d",
+      "asset_id": 381645998,
+      "release_id": 301495977,
+      "downloaded_bytes": 3119287,
+      "sha256": "a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d",
+      "curl_exit": 0,
+      "listing_command": "bsdtar -tf <cache>/MGSM2Fix_3.6.0.zip",
+      "listing_exit": 0,
+      "listing_sha256": "9aa0a291ddf51352476a9b36c63088667aa2f283b258312502e572e84f95caf3",
+      "file_count": 7,
+      "configs": {
+        "MGSM2Fix.ini": {
+          "sha256": "ba708ee49fcb95ad3c81623088f5f94d3de00bcaf6b533cc60e95aaa4ebd8417"
+        }
+      },
+      "prefixes": {
+        "LICENSES.txt": 1,
+        "MGSM2Fix.ini": 1,
+        "MGSM2Fix32.asi": 1,
+        "MGSM2Fix64.asi": 1,
+        "README.md": 1,
+        "d3d11.dll": 1,
+        "dinput8.dll": 1
+      },
+      "file_names_sha256": "457c939b233239c4f3ffe7aee81ef99aa7aad17977de27e1a3b19291f533b70a",
+      "control_files": [
+        "LICENSES.txt",
+        "MGSM2Fix.ini",
+        "MGSM2Fix32.asi",
+        "MGSM2Fix64.asi",
+        "README.md",
+        "d3d11.dll",
+        "dinput8.dll"
+      ]
+    },
+    {
+      "name": "MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "url": "https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/download/3.0.0/MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "api_digest": "sha256:a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003",
+      "asset_id": 489049028,
+      "release_id": 359634137,
+      "downloaded_bytes": 280880362,
+      "sha256": "a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003",
+      "curl_exit": 0,
+      "listing_command": "bsdtar -tf <cache>/MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "listing_exit": 0,
+      "listing_sha256": "8694341631407c03ea27c30e04b555174b12bfc8f1906dcd506916defb812563",
+      "file_count": 10348,
+      "configs": {
+        "plugins/MGS2-Community-Bugfix-Compilation.ini": {
+          "sha256": "b2132f080a74281b8498770f66a47ff7fb0ed623068a91c6c460331ef8d60eed"
+        }
+      },
+      "prefixes": {
+        "assets": 116,
+        "eu": 36,
+        "jp": 36,
+        "logs": 3,
+        "plugins": 3,
+        "textures": 10148,
+        "us": 6
+      },
+      "file_names_sha256": "9127a14976df34544ebb85c8f88799f7e203c9f96c0c508229a085c28bd0199b",
+      "control_files": [
+        "logs/MGS2-Community-Bugfix-Compilation_Game.log",
+        "logs/MGS2-Community-Bugfix-Compilation_Launcher.log",
+        "logs/MGS2-Community-Bugfix-Compilation_README.md",
+        "plugins/MGS2-Community-Bugfix-Compilation.asi",
+        "plugins/MGS2-Community-Bugfix-Compilation.ini",
+        "plugins/MGS2-Community-Bugfix-Compilation_LICENSE"
+      ]
+    },
+    {
+      "name": "MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "url": "https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/download/2.0.1/MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "api_digest": "sha256:a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769",
+      "asset_id": 492007354,
+      "release_id": 360743236,
+      "downloaded_bytes": 429265576,
+      "sha256": "a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769",
+      "curl_exit": 0,
+      "listing_command": "bsdtar -tf <cache>/MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "listing_exit": 0,
+      "listing_sha256": "012893264f6de4ae7ddbe7e21938516242f79e895c49283e71c50513c66b315f",
+      "file_count": 4449,
+      "configs": {
+        "plugins/MGS3-Community-Bugfix-Compilation.ini": {
+          "sha256": "367b32a996e341e9e73bbb08c842faf95aa8917daa4ad78c1052b2d6a3913518"
+        }
+      },
+      "prefixes": {
+        "fr": 3,
+        "hqtex": 302,
+        "logs": 3,
+        "plugins": 3,
+        "textures": 4138
+      },
+      "file_names_sha256": "6fd24c5644fb4e5f85cb9bdcb1f33bb97c9a4e86ca8d7af33efc75c9effd4934",
+      "control_files": [
+        "logs/MGS3-Community-Bugfix-Compilation_Game.log",
+        "logs/MGS3-Community-Bugfix-Compilation_Launcher.log",
+        "logs/MGS3-Community-Bugfix-Compilation_README.md",
+        "plugins/MGS3-Community-Bugfix-Compilation.asi",
+        "plugins/MGS3-Community-Bugfix-Compilation.ini",
+        "plugins/MGS3-Community-Bugfix-Compilation_LICENSE"
+      ]
+    }
+  ],
+  "layout_delta": {
+    "MGSHDFix": {
+      "added": [],
+      "removed": []
+    },
+    "MGSM2Fix": {
+      "added": [],
+      "removed": []
+    }
+  },
+  "collisions": {
+    "MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip": [],
+    "MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip": []
+  }
+}

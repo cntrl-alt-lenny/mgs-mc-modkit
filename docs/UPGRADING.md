@@ -67,6 +67,59 @@ On a Windows machine (or the Deck via Proton):
    `SETTINGS_SCHEMA` / `SETTINGS_CONSTRAINTS`. Validate exact section/key names
    and values against the new export; section/key counts alone are insufficient.
 
+#### Static capture boundary
+
+`python3 tools/capture_settings_schema.py <reviewed-checkout> --tag <tag> --tree <literal-commit>`
+prints JSON only after successfully reading the whole reviewed `kTabs` initializer.
+The caller must verify the checkout identity; the supplied tag/tree labels are
+recorded, not authenticated by this tool. `source_sha256` hashes the original
+bytes of both source files, including BOM and line endings. No source is rewritten.
+
+The supported layouts are those reviewed at 4.1.0, 4.1.1 and 4.1.2: braced tab
+and field initializers, canonical `ConfigKeys::*_Section` / `*_Setting` references,
+literal string constants (including concatenation) and string aliases in one
+unconditional `ConfigKeys` namespace. The whole namespace is checked: an
+unrecognized declaration spelling, duplicate name, nested namespace, or
+conditional/preprocessor context around its declarations stops capture rather
+than allowing a referenced section, key, or choice value to disappear. The
+namespace must be at global scope. The complete header context is checked:
+only optional `#pragma once`, the completed `_CRT_SECURE_NO_WARNINGS` guard
+(`#if !defined(...)`, its empty `#define`, then `#endif`), and the ordered
+`<string>` / `<initializer_list>` includes are accepted before it. No other
+includes, macros, enclosing namespaces, aliases or declarations are accepted.
+After it, only an empty tail or the exact reviewed 4.1.0/4.1.1/4.1.2 lexical
+token sequence is accepted. That shared tail contains controller lists,
+language helpers and camera bounds; its SHA-256 fingerprint is in the tool,
+and an offline copy is `tests/fixtures/hdfix-reviewed-header-tail.hpp`.
+Comments and whitespace between tokens can vary; string contents and all
+other tokens must match. Any tail change requires source-format review,
+even if it appears unrelated to canonical keys. This is an explicit bounded
+allowlist, not general C++ namespace or preprocessor support. Spacers and the
+reviewed inline achievement Safety Switch row are outside the canonical schema. Known
+`MG`-only fields are excluded. Unknown game names, computed keys, new field
+types, malformed initializers and unreviewed flag/preprocessor syntax stop
+capture with an offending-construct error requesting source-format review. Do
+not turn an error into a count-based guess.
+
+Game expressions support `MG`, `MGS2`, `MGS3`, parentheses and bitwise OR, plus
+`constexpr int` aliases and alias chains. The reviewed conditional form is
+`#if defined(NAME)` / one alias declaration / `#else` / the same alias declaration
+/ `#endif`. Capture takes the **union of both branches** and records resolved
+`flag_unions` when aliases occur. It does not evaluate macros or assert which
+branch an upstream release binary uses. In particular, 4.1.2's
+`kFirstPersonViewGameFlags` union includes MGS3 through `MGS3_FPS_DEV`; this does
+**not** establish MGS3 FPS support in a release build or a per-game export.
+Nested/other directives and field declarations behind directives are unsupported.
+
+Constraints remain bounded: explicit literal/ConfigKeys choice lists and integer
+bounds written as integers or the two reviewed D3D11 limits are captured. Empty
+choice lists and the reviewed launcher-controller iterator list are dynamic and
+not captured. The reviewed `k3rdPersonMinCameraDistance` /
+`k3rdPersonMaxCameraDistance` bounds remain opaque. Float bounds, defaults,
+dynamic language/button/hotkey choices and actual generated per-game settings
+remain unverified by static capture. Validate them against real Config Tool
+exports before changing the coupled template, schema, constraints or pins.
+
 > Keep CRLF line endings. The Config Tool writes them and the kit reproduces
 > them byte-for-byte.
 

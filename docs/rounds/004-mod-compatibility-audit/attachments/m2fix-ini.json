@@ -1,0 +1,56 @@
+{
+  "shipped_ini_identical": true,
+  "values": {
+    "External Resolution": {
+      "Enabled": "true",
+      "Width": "0",
+      "Height": "0",
+      "Windowed": "false",
+      "Borderless": "true"
+    },
+    "Internal Resolution": {
+      "Widescreen": "false",
+      "Borderless": "false",
+      "Enabled": "false",
+      "Height": "0"
+    },
+    "Input": {
+      "RemoveDeadzone": "true"
+    },
+    "Fixes": {
+      "DisableWindowsFullscreenOptimization": "false"
+    },
+    "Launcher": {
+      "SkipNotice": "true",
+      "StartGame": "false"
+    },
+    "Patches": {
+      "RemoveUnderpants": "true",
+      "EnableMosaic": "true",
+      "RestoreGhosts": "true",
+      "RestoreMedicine": "true",
+      "DisableFont": "false",
+      "DisableRAM": "false",
+      "DisableCDROM": "false"
+    },
+    "Game": {
+      "StageSelect": "false"
+    },
+    "Update Notifications": {
+      "CheckForUpdates": "true",
+      "ConsoleNotifications": "true"
+    },
+    "Squirrel Debugger": {
+      "Enabled": "false",
+      "Port": "27615",
+      "AutoUpdate": "true",
+      "Exclusive": "false"
+    },
+    "Tracing": {
+      "Level": "0",
+      "NativeLevel": "0",
+      "EmulatorLevel": "0",
+      "Console": "false"
+    }
+  }
+}
