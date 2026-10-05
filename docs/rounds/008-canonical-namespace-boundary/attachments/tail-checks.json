@@ -1,0 +1,20 @@
+{
+  "checked_commit": "f4d9b54545dafb37cba7d2af299d10006f0c3dea",
+  "rows": [
+    {
+      "tag": "4.1.0",
+      "exact_reviewed_tail_tokens_equal": true,
+      "sha256": "8ade693eb22bd65377db0fed88492cb132ce0213af49d05d3b49fc00546e39fd"
+    },
+    {
+      "tag": "4.1.1",
+      "exact_reviewed_tail_tokens_equal": true,
+      "sha256": "8ade693eb22bd65377db0fed88492cb132ce0213af49d05d3b49fc00546e39fd"
+    },
+    {
+      "tag": "4.1.2",
+      "exact_reviewed_tail_tokens_equal": true,
+      "sha256": "8ade693eb22bd65377db0fed88492cb132ce0213af49d05d3b49fc00546e39fd"
+    }
+  ]
+}
