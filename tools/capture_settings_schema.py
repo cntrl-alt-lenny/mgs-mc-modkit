@@ -116,13 +116,71 @@ def flag_definitions(prefix):
 
 
 def constant_values(text):
+    """Read only the complete, unconditional, reviewed ConfigKeys namespace."""
+    namespace = re.compile(r'\bnamespace\s+ConfigKeys\s*\{')
+    matches = list(namespace.finditer(text))
+    if len(matches) != 1:
+        fail('ConfigKeys namespace declaration')
+    opening = matches[0]
+
+    # The upstream header has benign include guards and includes before this
+    # namespace, but no preprocessor context around it. Reject conditional
+    # context rather than trying to decide which declaration is active.
+    preamble = text[:opening.start()]
+    conditional_depth = 0
+    for line in preamble.splitlines():
+        directive = re.match(r'^\s*#\s*(\w+)', line)
+        if not directive:
+            continue
+        name = directive.group(1)
+        if name in {'if', 'ifdef', 'ifndef'}:
+            conditional_depth += 1
+        elif name == 'endif':
+            conditional_depth -= 1
+            if conditional_depth < 0:
+                fail('unbalanced ConfigKeys preprocessor context')
+        elif name in {'elif', 'else'} and conditional_depth == 0:
+            fail('unbalanced ConfigKeys preprocessor context')
+    if conditional_depth:
+        fail('conditional context around ConfigKeys namespace')
+
+    depth, closing = 1, None
+    for token in re.finditer(STRING + r'|[{}]', text[opening.end():]):
+        value = token.group()
+        if value.startswith('"'):
+            continue
+        if value == '{':
+            depth += 1
+            if depth > 1:
+                fail('nested ConfigKeys namespace')
+        else:
+            depth -= 1
+            if depth == 0:
+                closing = opening.end() + token.start()
+                break
+    if closing is None:
+        fail('unclosed ConfigKeys namespace')
+    body = text[opening.end():closing]
+    if re.search(r'^\s*#', body, re.M):
+        fail('preprocessor directive in ConfigKeys namespace')
+
     declarations = {}
-    pattern = (r'constexpr\s+const\s+char\*\s+(\w+)\s*=\s*'
-               r'((?:' + STRING + r'\s*)+|\w+)\s*;')
-    for name, expression in re.findall(pattern, text):
+    pattern = re.compile(
+        r'constexpr\s+const\s+char\*\s+(\w+)\s*=\s*'
+        r'((?:' + STRING + r'\s*)+|\w+)\s*;')
+    cursor = 0
+    for match in pattern.finditer(body):
+        if body[cursor:match.start()].strip():
+            fail('unsupported ConfigKeys declaration ' + body[cursor:match.start()].strip())
+        name, expression = match.groups()
         if name in declarations:
             fail('duplicate string constant ' + name)
         declarations[name] = expression.strip()
+        cursor = match.end()
+    if body[cursor:].strip():
+        fail('unsupported ConfigKeys declaration ' + body[cursor:].strip())
+    if not declarations:
+        fail('empty ConfigKeys namespace')
 
     def resolve(name, visiting=()):
         if name not in declarations or name in visiting:

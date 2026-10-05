@@ -77,12 +77,18 @@ bytes of both source files, including BOM and line endings. No source is rewritt
 
 The supported layouts are those reviewed at 4.1.0, 4.1.1 and 4.1.2: braced tab
 and field initializers, canonical `ConfigKeys::*_Section` / `*_Setting` references,
-literal string constants (including concatenation) and string aliases. Spacers
-and the reviewed inline achievement Safety Switch row are outside the canonical
-schema. Known `MG`-only fields are excluded. Unknown game names, computed keys,
-new field types, malformed initializers and unreviewed flag/preprocessor syntax
-stop capture with an offending-construct error requesting source-format review.
-Do not turn an error into a count-based guess.
+literal string constants (including concatenation) and string aliases in one
+unconditional `ConfigKeys` namespace. The whole namespace is checked: an
+unrecognized declaration spelling, duplicate name, nested namespace, or
+conditional/preprocessor context around its declarations stops capture rather
+than allowing a referenced section, key, or choice value to disappear. The
+namespace itself must not be inside a preprocessor conditional. Complete
+include guards and includes before it are permitted. Spacers and the reviewed
+inline achievement Safety Switch row are outside the canonical schema. Known
+`MG`-only fields are excluded. Unknown game names, computed keys, new field
+types, malformed initializers and unreviewed flag/preprocessor syntax stop
+capture with an offending-construct error requesting source-format review. Do
+not turn an error into a count-based guess.
 
 Game expressions support `MG`, `MGS2`, `MGS3`, parentheses and bitwise OR, plus
 `constexpr int` aliases and alias chains. The reviewed conditional form is

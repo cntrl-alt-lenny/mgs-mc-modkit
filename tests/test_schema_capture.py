@@ -145,6 +145,59 @@ def test_missing_canonical_constant_is_actionable(tmp_path):
         capture.capture(source(tmp_path, constants=CONSTANTS.replace('Demo_Setting', 'Changed_Setting')), 'test', 'tree')
 
 
+@pytest.mark.parametrize('declaration', [
+    '#if defined(NEW_FORMAT)\n'
+    'constexpr char const* Demo_Setting = "Replacement Key";\n'
+    '#else\n'
+    'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";\n'
+    '#endif',
+    '#if defined(NEW_FORMAT)\n'
+    'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";\n'
+    '#else\n'
+    'constexpr char const* Demo_Setting = "Replacement Key";\n'
+    '#endif',
+    '#if defined(NEW_FORMAT)\n'
+    'constexpr char const* Demo_Section = "Replacement Section";\n'
+    '#else\n'
+    'constexpr const char* Demo_Section = "First Person Shooter Mode";\n'
+    '#endif',
+    '#if defined(NEW_FORMAT)\n'
+    'constexpr char const* Surround = "Replacement Choice";\n'
+    '#else\n'
+    'constexpr const char* Surround = "Surround Sound (5.1)";\n'
+    '#endif',
+])
+def test_conditional_canonical_strings_fail_through_api(tmp_path, declaration):
+    target = 'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";'
+    if 'Demo_Section' in declaration:
+        target = 'constexpr const char* Demo_Section = "First Person Shooter Mode";'
+    elif 'Surround' in declaration:
+        target = 'constexpr const char* Surround = "Surround Sound (5.1)";'
+    constants = CONSTANTS.replace(target, declaration)
+    with pytest.raises(RuntimeError, match='preprocessor directive.*review.*source.*format'):
+        capture.capture(source(tmp_path, constants=constants), 'test', 'tree')
+
+
+@pytest.mark.parametrize('body', [
+    '#if defined(NEW_FORMAT)\nconstexpr const char* Demo_Setting = "Replacement Key";\n#endif',
+    'namespace Nested { constexpr const char* Demo_Setting = "Replacement Key"; }',
+    'constexpr char const* Demo_Setting = "Replacement Key";',
+    'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";\n'
+    'constexpr const char* Demo_Setting = "Replacement Key";',
+])
+def test_unreviewed_configkeys_context_or_declaration_fails(tmp_path, body):
+    constants = CONSTANTS.replace(
+        'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";', body)
+    with pytest.raises(RuntimeError, match='review.*source.*format'):
+        capture.capture(source(tmp_path, constants=constants), 'test', 'tree')
+
+
+def test_conditional_namespace_wrapper_fails(tmp_path):
+    constants = '#if defined(NEW_FORMAT)\n' + CONSTANTS + '#endif\n'
+    with pytest.raises(RuntimeError, match='conditional context.*review.*source.*format'):
+        capture.capture(source(tmp_path, constants=constants), 'test', 'tree')
+
+
 def test_cli_failure_has_no_json_and_identifies_offending_flag(tmp_path):
     root = source(tmp_path, 'UNKNOWN_FLAGS')
     result = subprocess.run([sys.executable, str(Path(capture.__file__)), str(root), '--tag', 'test', '--tree', 'tree'],
@@ -152,6 +205,24 @@ def test_cli_failure_has_no_json_and_identifies_offending_flag(tmp_path):
     assert result.returncode == 1
     assert result.stdout == ''
     assert 'UNKNOWN_FLAGS' in result.stderr
+    assert 'review the upstream source format' in result.stderr
+
+
+def test_conditional_canonical_string_cli_failure_has_no_partial_json(tmp_path):
+    constants = CONSTANTS.replace(
+        'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";',
+        '#if defined(NEW_FORMAT)\n'
+        'constexpr char const* Demo_Setting = "Replacement Key";\n'
+        '#else\n'
+        'constexpr const char* Demo_Setting = "Enable First Person Shooter Mode";\n'
+        '#endif')
+    result = subprocess.run(
+        [sys.executable, str(Path(capture.__file__)),
+         str(source(tmp_path, constants=constants)), '--tag', 'test', '--tree', 'tree'],
+        capture_output=True, text=True)
+    assert result.returncode == 1
+    assert result.stdout == ''
+    assert 'preprocessor directive in ConfigKeys namespace' in result.stderr
     assert 'review the upstream source format' in result.stderr
 
 
