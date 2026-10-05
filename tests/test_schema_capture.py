@@ -234,3 +234,69 @@ def test_cli_success_is_json_with_identity_and_unmodified_hashes(tmp_path):
     assert data['tag'] == 'test' and data['tree'] == 'tree'
     assert data['fields']['First Person Shooter Mode'] == FPS
     assert data['source_sha256']['ConfigTool/tab_data.cpp'] == hashlib.sha256((root / 'ConfigTool/tab_data.cpp').read_bytes()).hexdigest()
+
+
+REVIEWED_TAIL = (Path(__file__).parent / 'fixtures/hdfix-reviewed-header-tail.hpp').read_text()
+DECOY_ALIAS = ('namespace Decoy {\n' + CONSTANTS + '\n}\n'
+               + CONSTANTS.replace('namespace ConfigKeys {', 'namespace Actual {').replace(
+                   'Enable First Person Shooter Mode', 'Replacement Key')
+               + '\nnamespace ConfigKeys = Actual;\n')
+
+
+@pytest.mark.parametrize('constants', [
+    DECOY_ALIAS,
+    'namespace Decoy {\n' + CONSTANTS + '\n}',
+    'namespace {\n' + CONSTANTS + '\n}',
+    'inline namespace Decoy {\n' + CONSTANTS + '\n}',
+    CONSTANTS.replace('namespace ConfigKeys {', 'namespace Decoy::ConfigKeys {'),
+    CONSTANTS.replace('namespace ConfigKeys {', 'inline namespace ConfigKeys {'),
+    CONSTANTS.replace('namespace ConfigKeys {', 'namespace ConfigKeys [[deprecated]] {'),
+    'namespace ConfigKeys {}\n' + CONSTANTS,
+    'namespace Actual {}\n' + CONSTANTS + 'namespace ConfigKeys = Actual;',
+    CONSTANTS + 'namespace Other { constexpr int Value = 1; }',
+    CONSTANTS + 'using namespace Other;',
+    CONSTANTS + 'constexpr int Extra = 1;',
+    CONSTANTS + '\n#define ConfigKeys Actual\n',
+    '#define ConfigKeys Actual\n' + CONSTANTS,
+    '#include "unreviewed.hpp"\n' + CONSTANTS,
+    '#if defined(TEST)\nnamespace Other {}\n#endif\n' + CONSTANTS,
+    CONSTANTS + REVIEWED_TAIL + 'namespace ConfigKeys = Actual;',
+    CONSTANTS + REVIEWED_TAIL.replace('static bool', 'namespace Other {}\nstatic bool', 1),
+])
+def test_namespace_boundary_rejects_api_and_cli(tmp_path, constants):
+    root = source(tmp_path, constants=constants)
+    with pytest.raises(capture.CaptureError, match='review the upstream source format'):
+        capture.capture(root, 'test', 'tree')
+    result = subprocess.run(
+        [sys.executable, str(Path(capture.__file__)), str(root), '--tag', 'test', '--tree', 'tree'],
+        capture_output=True, text=True)
+    assert result.returncode == 1
+    assert result.stdout == ''
+    assert 'capture failed: Unsupported source construct:' in result.stderr
+    assert 'review the upstream source format' in result.stderr
+
+
+@pytest.mark.parametrize('tail', ['', REVIEWED_TAIL, '\n// harmless comment\n' + REVIEWED_TAIL])
+@pytest.mark.parametrize('preamble', [
+    '', '#pragma once\n',
+    '#pragma once\n#if !defined(_CRT_SECURE_NO_WARNINGS)\n'
+    '#define _CRT_SECURE_NO_WARNINGS\n#endif\n#include <string>\n#include <initializer_list>\n',
+])
+def test_reviewed_header_context_preserves_literals_aliases_and_hashes(tmp_path, preamble, tail):
+    constants = CONSTANTS.replace('"First Person Shooter Mode"', '"First Person " "Shooter Mode"')
+    constants = constants.replace('"Stereo (2.0)"', '"Stereo (2.0)" /* namespace ConfigKeys = Decoy; */')
+    constants += '// namespace Decoy { namespace ConfigKeys {} }\n'
+    root = source(tmp_path, constants=preamble + constants + tail)
+    expected = capture.capture(source(tmp_path / 'baseline'), 'test', 'tree')
+    actual = capture.capture(root, 'test', 'tree')
+    assert actual['fields'] == expected['fields']
+    assert actual['constraints'] == expected['constraints']
+    assert actual['source_sha256']['src/resources/config_keys.hpp'] == hashlib.sha256(
+        (root / 'src/resources/config_keys.hpp').read_bytes()).hexdigest()
+
+
+def test_namespace_spelling_inside_string_is_not_a_declaration(tmp_path):
+    constants = CONSTANTS.replace('"Stereo (2.0)"', '"namespace ConfigKeys { // literal }"')
+    data = capture.capture(source(tmp_path, constants=constants), 'test', 'tree')
+    assert data['constraints']['System Specific Fixes']['Audio Output Mode']['choices'][0] == (
+        'namespace ConfigKeys { // literal }')

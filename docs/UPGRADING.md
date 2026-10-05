@@ -82,8 +82,19 @@ unconditional `ConfigKeys` namespace. The whole namespace is checked: an
 unrecognized declaration spelling, duplicate name, nested namespace, or
 conditional/preprocessor context around its declarations stops capture rather
 than allowing a referenced section, key, or choice value to disappear. The
-namespace itself must not be inside a preprocessor conditional. Complete
-include guards and includes before it are permitted. Spacers and the reviewed
+namespace must be at global scope. The complete header context is checked:
+only optional `#pragma once`, the completed `_CRT_SECURE_NO_WARNINGS` guard
+(`#if !defined(...)`, its empty `#define`, then `#endif`), and the ordered
+`<string>` / `<initializer_list>` includes are accepted before it. No other
+includes, macros, enclosing namespaces, aliases or declarations are accepted.
+After it, only an empty tail or the exact reviewed 4.1.0/4.1.1/4.1.2 lexical
+token sequence is accepted. That shared tail contains controller lists,
+language helpers and camera bounds; its SHA-256 fingerprint is in the tool,
+and an offline copy is `tests/fixtures/hdfix-reviewed-header-tail.hpp`.
+Comments and whitespace between tokens can vary; string contents and all
+other tokens must match. Any tail change requires source-format review,
+even if it appears unrelated to canonical keys. This is an explicit bounded
+allowlist, not general C++ namespace or preprocessor support. Spacers and the reviewed
 inline achievement Safety Switch row are outside the canonical schema. Known
 `MG`-only fields are excluded. Unknown game names, computed keys, new field
 types, malformed initializers and unreviewed flag/preprocessor syntax stop

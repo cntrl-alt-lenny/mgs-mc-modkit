@@ -117,32 +117,25 @@ def flag_definitions(prefix):
 
 def constant_values(text):
     """Read only the complete, unconditional, reviewed ConfigKeys namespace."""
-    namespace = re.compile(r'\bnamespace\s+ConfigKeys\s*\{')
-    matches = list(namespace.finditer(text))
+    namespace = re.compile(STRING + r'|\bnamespace\s+ConfigKeys\s*\{')
+    matches = [m for m in namespace.finditer(text) if not m.group().startswith('"')]
     if len(matches) != 1:
         fail('ConfigKeys namespace declaration')
     opening = matches[0]
 
-    # The upstream header has benign include guards and includes before this
-    # namespace, but no preprocessor context around it. Reject conditional
-    # context rather than trying to decide which declaration is active.
-    preamble = text[:opening.start()]
-    conditional_depth = 0
-    for line in preamble.splitlines():
-        directive = re.match(r'^\s*#\s*(\w+)', line)
-        if not directive:
-            continue
-        name = directive.group(1)
-        if name in {'if', 'ifdef', 'ifndef'}:
-            conditional_depth += 1
-        elif name == 'endif':
-            conditional_depth -= 1
-            if conditional_depth < 0:
-                fail('unbalanced ConfigKeys preprocessor context')
-        elif name in {'elif', 'else'} and conditional_depth == 0:
-            fail('unbalanced ConfigKeys preprocessor context')
-    if conditional_depth:
-        fail('conditional context around ConfigKeys namespace')
+    # Anchor the namespace at global scope. Only the reviewed preamble is
+    # allowed: arbitrary includes/macros/declarations could redirect references.
+    preamble = text[:opening.start()].strip()
+    if re.search(r'^\s*#\s*(?:if|ifdef|ifndef)\b', preamble, re.M):
+        # This is the sole reviewed guard, completed BEFORE the namespace.
+        guard = r'#if !defined\(_CRT_SECURE_NO_WARNINGS\)\s*#define _CRT_SECURE_NO_WARNINGS\s*#endif'
+        preamble = re.sub(guard, '', preamble).strip()
+        if re.search(r'^\s*#\s*(?:if|ifdef|ifndef)\b', preamble, re.M):
+            fail('conditional context around ConfigKeys namespace')
+    wrapper = (r'(?:#pragma once\s*)?'
+               r'(?:#include <string>\s*#include <initializer_list>\s*)?')
+    if not re.fullmatch(wrapper, preamble):
+        fail('header context before ConfigKeys namespace: ' + preamble)
 
     depth, closing = 1, None
     for token in re.finditer(STRING + r'|[{}]', text[opening.end():]):
@@ -160,6 +153,16 @@ def constant_values(text):
                 break
     if closing is None:
         fail('unclosed ConfigKeys namespace')
+    # The reviewed releases share an identical noncanonical tail (controller
+    # lists, language helpers and camera bounds). Accept its exact lexical token
+    # sequence, or an empty tail for minimal headers; never skip other code.
+    # Fingerprint is independently reproduced from all three immutable sources.
+    tail = text[closing + 1:]
+    tokens = re.findall(STRING + r'|[A-Za-z_][A-Za-z_0-9]*|[0-9]+|\S', tail)
+    reviewed_tail = '8ade693eb22bd65377db0fed88492cb132ce0213af49d05d3b49fc00546e39fd'
+    if tokens and hashlib.sha256('\0'.join(tokens).encode()).hexdigest() != reviewed_tail:
+        fail('header context after ConfigKeys namespace: ' + tail.strip())
+
     body = text[opening.end():closing]
     if re.search(r'^\s*#', body, re.M):
         fail('preprocessor directive in ConfigKeys namespace')
