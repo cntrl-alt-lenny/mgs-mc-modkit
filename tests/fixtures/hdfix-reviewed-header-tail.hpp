@@ -18,7 +18,7 @@ inline const std::initializer_list<std::string> kLauncherConfigCtrlTypesInternal
     "XBOX",
     "NX",
     "STMD",
-    "KBD", 
+    "KBD",
     "PS4" //intentional for PS2, we override the ovr_ps4 folder to search for ovr_ps2 instead.
 };
 
@@ -44,7 +44,7 @@ inline constexpr std::array<Game_Language_Pair_View, 9> MGS3_LanguagePairs =
     { "Japan",         "Japanese",  "jp", "jp" }
 } };
 
-//Config Tool -> iTargetGame = TARGET_GAME_MG1 
+//Config Tool -> iTargetGame = TARGET_GAME_MG1
 //Config Tool -> iTargetGame = TARGET_GAME_MGS2
 inline constexpr std::array<Game_Language_Pair_View, 6> MG1_MG2_MGS2_LanguagePairs =
 { {

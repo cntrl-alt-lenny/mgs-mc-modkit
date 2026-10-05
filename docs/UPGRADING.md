@@ -94,8 +94,8 @@ and an offline copy is `tests/fixtures/hdfix-reviewed-header-tail.hpp`.
 Comments and whitespace between tokens can vary; string contents and all
 other tokens must match. Any tail change requires source-format review,
 even if it appears unrelated to canonical keys. This is an explicit bounded
-allowlist, not general C++ namespace or preprocessor support. Spacers and the reviewed
-inline achievement Safety Switch row are outside the canonical schema. Known
+allowlist, not general C++ namespace or preprocessor support. Spacers and the
+reviewed inline achievement Safety Switch row are outside the canonical schema. Known
 `MG`-only fields are excluded. Unknown game names, computed keys, new field
 types, malformed initializers and unreviewed flag/preprocessor syntax stop
 capture with an offending-construct error requesting source-format review. Do
