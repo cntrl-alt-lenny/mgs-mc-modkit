@@ -53,7 +53,7 @@
     {
       "command": [
         "/Library/Developer/CommandLineTools/usr/bin/python3",
-        "/Users/leo/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-008/docs/rounds/008-canonical-namespace-boundary/attachments/reproduce_namespace.py",
+        "<local-checkout>",
         "--source-root",
         "/var/folders/5m/7xrw7wgj3vvf6pbqsbkmptc80000gn/T/tmp0492_05n",
         "--compile-cpp"
@@ -138,7 +138,7 @@
         "status"
       ],
       "exit": 0,
-      "stdout": "Framework\n  pinned to agentic-framework 3.1.0 (https://github.com/cntrl-alt-lenny/agentic-framework)\n  up to date with the latest release (3.1.0)\nMerge rule\n  owner-approves\nRounds\n  in flight: 004-mod-compatibility-audit (Tier 2)\n    worker: stale -- its report no longer describes its branch\n    verifier: stale -- its report no longer describes its branch\n  superseded: 005-schema-capture-safety, by 006-schema-capture-safety -- not in flight\n  superseded: 006-schema-capture-safety, by 007-canonical-capture-guard -- not in flight\n  superseded: 007-canonical-capture-guard, by 008-canonical-namespace-boundary -- not in flight\n  in flight: 008-canonical-namespace-boundary (Tier 2)\n    worker: started on worker/008-canonical-namespace-boundary, no report yet\n    verifier: not started\n  2 round(s) merged under docs/rounds/, latest by name: 003-product-integration\nThis machine\n  on worker/008-canonical-namespace-boundary; 1 uncommitted change(s)\n  not on GitHub yet: worker/008-canonical-namespace-boundary (1 commit(s))\n  finished seat checkouts (clean, and their work is merged) that can be removed: /Users/leo/.codex/worktrees/verify-pr2-round001/mgs-mc-modkit -- git worktree remove <folder>\n  safe to leave this machine: NO -- push or deal with the items above first\nChecks\n  all project checks pass\nCommand form on this machine: python3 tools/fw.py <command>\nnext: ask Brain what to send the Worker of round 004-mod-compatibility-audit: its report is out of date\n",
+      "stdout": "Framework\n  pinned to agentic-framework 3.1.0 (https://github.com/cntrl-alt-lenny/agentic-framework)\n  up to date with the latest release (3.1.0)\nMerge rule\n  owner-approves\nRounds\n  in flight: 004-mod-compatibility-audit (Tier 2)\n    worker: stale -- its report no longer describes its branch\n    verifier: stale -- its report no longer describes its branch\n  superseded: 005-schema-capture-safety, by 006-schema-capture-safety -- not in flight\n  superseded: 006-schema-capture-safety, by 007-canonical-capture-guard -- not in flight\n  superseded: 007-canonical-capture-guard, by 008-canonical-namespace-boundary -- not in flight\n  in flight: 008-canonical-namespace-boundary (Tier 2)\n    worker: started on worker/008-canonical-namespace-boundary, no report yet\n    verifier: not started\n  2 round(s) merged under docs/rounds/, latest by name: 003-product-integration\nThis machine\n  on worker/008-canonical-namespace-boundary; 1 uncommitted change(s)\n  not on GitHub yet: worker/008-canonical-namespace-boundary (1 commit(s))\n  finished seat checkouts (clean, and their work is merged) that can be removed: <local-checkout> -- git worktree remove <folder>\n  safe to leave this machine: NO -- push or deal with the items above first\nChecks\n  all project checks pass\nCommand form on this machine: python3 tools/fw.py <command>\nnext: ask Brain what to send the Worker of round 004-mod-compatibility-audit: its report is out of date\n",
       "stderr": ""
     }
   ]

@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import re
 import subprocess
 import sys
 import tempfile
@@ -67,15 +68,18 @@ def main():
     for name in ['tools/capture_settings_schema.py', 'tests/test_schema_capture.py']:
         ast.parse((ROOT / name).read_text(), feature_version=(3, 9))
     from tools.capture_settings_schema import STRING, without_comments
-    import re
     tail = without_comments((ROOT / 'tests/fixtures/hdfix-reviewed-header-tail.hpp').read_text())
     fingerprint = hashlib.sha256('\0'.join(re.findall(
         STRING + r'|[A-Za-z_][A-Za-z_0-9]*|[0-9]+|\S', tail)).encode()).hexdigest()
     assert fingerprint == '8ade693eb22bd65377db0fed88492cb132ce0213af49d05d3b49fc00546e39fd'
-    args.output.write_text(json.dumps({'checked_commit': head, 'baseline': BASE,
+    evidence = json.dumps({'checked_commit': head, 'baseline': BASE,
                                       'protected_byte_identical': len(protected),
                                       'python39_syntax': True, 'reviewed_tail_sha256': fingerprint,
-                                      'commands': rows}, indent=2) + '\n')
+                                      'commands': rows}, indent=2) + '\n'
+    # Framework evidence is public and portable; redact machine-only paths.
+    evidence = evidence.replace(str(ROOT), '<project>')
+    evidence = re.sub(r'/Users/[^\s"\\]+', '<local-checkout>', evidence)
+    args.output.write_text(evidence)
 
 
 if __name__ == '__main__':
