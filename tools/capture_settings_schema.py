@@ -126,15 +126,13 @@ def constant_values(text):
     # Anchor the namespace at global scope. Only the reviewed preamble is
     # allowed: arbitrary includes/macros/declarations could redirect references.
     preamble = text[:opening.start()].strip()
-    if re.search(r'^\s*#\s*(?:if|ifdef|ifndef)\b', preamble, re.M):
-        # This is the sole reviewed guard, completed BEFORE the namespace.
-        guard = r'#if !defined\(_CRT_SECURE_NO_WARNINGS\)\s*#define _CRT_SECURE_NO_WARNINGS\s*#endif'
-        preamble = re.sub(guard, '', preamble).strip()
-        if re.search(r'^\s*#\s*(?:if|ifdef|ifndef)\b', preamble, re.M):
-            fail('conditional context around ConfigKeys namespace')
+    guard = r'#if !defined\(_CRT_SECURE_NO_WARNINGS\)\s*#define _CRT_SECURE_NO_WARNINGS\s*#endif'
     wrapper = (r'(?:#pragma once\s*)?'
+               r'(?:' + guard + r'\s*)?'
                r'(?:#include <string>\s*#include <initializer_list>\s*)?')
     if not re.fullmatch(wrapper, preamble):
+        if re.search(r'^\s*#\s*(?:if|ifdef|ifndef)\b', preamble, re.M):
+            fail('conditional context around ConfigKeys namespace: ' + preamble)
         fail('header context before ConfigKeys namespace: ' + preamble)
 
     depth, closing = 1, None
