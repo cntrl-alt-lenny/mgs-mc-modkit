@@ -11,10 +11,16 @@ and Steam Deck/Linux, with repair and removal through the same shortcut.
 ## Owner decisions
 
 - Use the pinned agentic framework with Brain, Worker and Verifier seats to
-  make work resumable from committed briefs and reports.
+  make work resumable from committed prompts and batch summaries.
 - Keep owner-approves as the merge rule; only the owner approves merging or release.
 - Codex needs no optional adapter or git hook for this adoption.
 - Preserve existing product work independently of framework adoption.
+
+## Scorecard
+
+Every two weeks, Brain adds one line: dates, product progress, prompts the
+owner relayed, and batches that only fixed an earlier batch. First line due
+2026-10-20 (framework 4.0 adopted 2026-10-06).
 
 ## Parked, and why
 
@@ -31,7 +37,7 @@ and Steam Deck/Linux, with repair and removal through the same shortcut.
 
 - `AGENTS.md` defines project roles, invariants and evidence requirements.
 - `docs/agents/FRAMEWORK.md` and `docs/agents/roles/` define the pinned workflow.
-- `docs/rounds/` holds briefs and stamped reports for framework rounds.
+- `docs/batches/` holds batch summaries; `docs/rounds/` keeps the 3.x rounds as history.
 - README.md defines product scope, optional audio and user restoration steps.
 - docs/UPGRADING.md explains coordinated mod and configuration upgrades.
 - .github/workflows/ defines the existing platform and release checks.

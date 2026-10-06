@@ -2,8 +2,7 @@
 
 Instructions for every agent, in every tool. Read `docs/agents/FRAMEWORK.md`
 and your card in `docs/agents/roles/`; these project rules take precedence.
-Start Brain sessions with `python3 tools/fw.py status`. Start Worker and
-Verifier sessions with `python3 tools/fw.py start --role <role> --round <id>`.
+Every session starts with `python3 tools/fw.py status`.
 On Windows, use `py -3` or `python` if `python3` is unavailable.
 
 Merge rule: owner-approves
@@ -19,13 +18,13 @@ with repair and removal through the same installer (README.md).
 
 | Seat | Card | Scope |
 |---|---|---|
-| Brain | `docs/agents/roles/brain.md` | Plans, writes briefs, independently judges exact commits, and merges only after owner approval. |
-| Worker | `docs/agents/roles/worker.md` | Implements one brief on its seat branch, records actual checks, and pushes a stamped report; never accepts or merges its own work. |
-| Verifier | `docs/agents/roles/verifier.md` | Independently reviews a Tier 2 delivery at one exact commit, makes a blind first pass before reading the Worker report, and writes findings; never writes production code or merges. |
+| Brain | `docs/agents/roles/brain.md` | Plans batches, writes prompts, reviews exact commits, and merges only after owner approval. |
+| Worker | `docs/agents/roles/worker.md` | Does one batch on its `worker/<batch>` branch, runs the checks and commits its summary in `docs/batches/`; never accepts or merges its own work. |
+| Verifier | `docs/agents/roles/verifier.md` | Reviews a Checked batch at one exact commit and writes findings; never writes production code or merges. |
 
 Use isolated seats under `.worktrees/` or separate clones. Preserve unrelated
 checkouts, branches and uncommitted work. Do not reinterpret informal earlier
-conversations as stamped framework rounds (adoption brief).
+conversations as framework batches (adoption brief).
 
 ## Invariants
 
@@ -52,15 +51,21 @@ conversations as stamped framework rounds (adoption brief).
 
 ## Evidence
 
-Keep actual commands, output and exit codes at a stated commit in round reports.
-Run the brief's required checks in addition to the relevant rows below.
+Keep actual commands, output and exit codes at a stated commit in batch summaries.
+Run the prompt's required checks in addition to the relevant rows below.
+
+Checked path (Worker, Verifier, then Brain): changes to install.py's handling
+of saves, originals, backups or removal; mod pins, archive checksums or the
+settings schema; and release tags or shortcut hashes. The offline tests cannot
+catch these mistakes. Everything else is Normal; notes and framework updates
+are Small.
 
 | Changed | Required evidence |
 |---|---|
-| Framework adoption or project guidance | `python3 tools/fw.py check`; `python3 tools/fw.py status`; both `python3 tools/fw.py prompt --role <role> --round <id>` commands; compare copies to pinned source and review the diff. |
+| Framework adoption or project guidance | `python3 tools/fw.py check`; `python3 tools/fw.py status`; compare copies to pinned source and review the diff. |
 | Python or framework adoption | `python3 -m pytest tests/ -q`; `python3 -m ruff check .`; `python3 -m py_compile tools/fw.py install.py`; maintain Python 3.9 syntax. |
 | Installer, settings, archives or pins | Complete offline suite and lint; checks in docs/UPGRADING.md; verify BOTH shortcut tags and SHA-256 against install.py; `desktop-file-validate Install-MGS-Mods.desktop` where available. |
-| Every seat delivery | Commit work, then `python3 tools/fw.py report --role <role> --round <id> --push`; report limitations, not guessed success. |
+| Every batch | Commit work and `docs/batches/<batch>.md` (Done, Checked, Not checked, Failed or blocked), then push; report limitations, not guessed success. |
 
 Framework hygiene cannot prove guidance is accurate; review its sources and
 precedence independently. Installer tests do not prove GUI rendering, real
@@ -69,8 +74,9 @@ are advisory and do not authorize upgrades.
 
 ## What is actually enforced
 
-The installed framework checks document hygiene, report shape, state budget and
-seat/report freshness; its status command identifies changed framework copies.
+The installed framework checks document hygiene, the state budget and the
+length of batch summaries; its status command lists unmerged batches and
+changed framework copies.
 The installed framework test runs those hygiene checks in the offline suite.
 Existing CI runs tests on Linux Python 3.9/3.11/3.12 and Windows Python 3.12;
 Linux also runs Ruff, compilation and desktop validation. Release CI checks both
@@ -81,12 +87,12 @@ Windows shortcuts byte-preserved; the generic adoption sidecar is not applied.
 Owner approval, role separation and scope are rules agents keep, not permission
 locks. Shared GitHub credentials cannot distinguish seats. Repository branch
 protection and required-check settings have not been inspected, and no claim
-about host enforcement is made. The default report command does not run the
-full suite or lint: the seat must run and report them explicitly.
+about host enforcement is made. No framework command runs the full suite or
+lint: the Worker must run and report them explicitly.
 
 ## Where to look
 
 - Decisions and parked work: `docs/state.md`.
-- Briefs and exact-commit reports: `docs/rounds/`.
+- Batch summaries and reviews: `docs/batches/`. Earlier 3.x rounds stay in `docs/rounds/` as history.
 - Product scope and user instructions: README.md.
 - Coupled upgrades and release checks: docs/UPGRADING.md and .github/workflows/.
