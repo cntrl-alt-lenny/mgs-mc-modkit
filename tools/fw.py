@@ -15,9 +15,9 @@ can run git and Python 3.9+. Standard library only.
 Add --cwd DIR to any command to run it against another checkout. If `python3`
 is not found, use `py -3` (Windows) or `python`.
 
-Everything a later session needs travels through git -- every batch summary
-and review is a committed file under docs/batches/ -- so work started on one
-machine or tool can finish on another.
+Everything a later session needs travels through git -- prompts that need
+more than a paragraph and every batch summary are committed files under
+docs/batches/ -- so work started on one machine or tool can finish on another.
 """
 
 from __future__ import annotations
@@ -241,7 +241,7 @@ def framework_lines(root: Path, offline: bool) -> tuple[list[str], str | None]:
         if (root / "docs/agents/CONSTITUTION.md").is_file():
             return [
                 "2.x framework layout with no manifest: this project predates release 3.0.0.",
-                "Brain updates it with the framework's tools/adopt.py <project> --update (Small path).",
+                "Plan an update round (the framework's CHANGELOG, release 3.0.0, says how).",
             ], "3.0.0 or later"
         return ["no framework manifest (docs/agents/framework.json) -- not adopted, or damaged"], None
     info = manifest.get("framework", {})
@@ -510,7 +510,7 @@ def cmd_status(root: Path, *, offline: bool, leaving: bool) -> int:
         print(f"  {level}: {message}")
     print(f"Command form on this machine: {python_hint()} <command>")
     if not action:
-        action = (f"ask Brain to apply framework release {newer} (Small path: adopt.py --update)" if newer
+        action = (f"ask Brain to plan the update to framework release {newer}" if newer
                   else "nothing is waiting on you; ask Brain for the next batch")
     print(f"next: {action}")
     return 1 if (leaving and not safe) else 0
