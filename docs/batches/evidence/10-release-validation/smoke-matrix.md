@@ -19,7 +19,7 @@ be recorded separately. See `discovery-and-release.txt` for release queries.
 
 | ID | Dependency | Current evidence |
 | --- | --- | --- |
-| H | Windows or Steam Deck/Linux validation host, agreed access and preserved baseline | Worker shell is Darwin/macOS, Python 3.9.6; configured SSH file absent. No suitable host or licensed game installation was made available to this seat. Brain is resolving access. |
+| H | Windows or Steam Deck/Linux validation host, agreed access and preserved baseline | Worker shell is Darwin/macOS, Python 3.9.6. Owner identifies a likely Windows PC; Brain's existing Moonlight connection reports it Offline after Wake PC. No Windows session reached. Deck currently unavailable per owner. See access-update.md. |
 | G | Licensed MGS1, MGS2 and MGS3 with recorded Steam build IDs and stock baseline | Unavailable to this seat; game builds, boot behavior and save state unknown. |
 | P | Real upstream mod archives matching candidate checksums | Pins recorded below; archives not downloaded/extracted in this batch. |
 | A | Owner-supplied compatible Nexus audio payload | Unavailable; filename/version/hash and compatibility unknown. Payload must not be redistributed. |
@@ -31,6 +31,10 @@ all three games, network access to official archives, and owner-supplied audio
 for the optional/large-audio scenarios. Record existing mods, saves and recovery
 state first. No licensed stock baseline may be manufactured from synthetic
 fixtures; no unattended Steam verification is authorized by this matrix.
+Owner now authorizes installing missing licensed titles in Steam's default
+library on the Windows PC. Use the existing streaming connection once it
+works; inspect real installation and baseline state before acting. This
+authorization supplies no hardware result and does not waive Deck checks.
 
 ## Scenario matrix
 

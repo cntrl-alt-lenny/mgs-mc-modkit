@@ -1,0 +1,18 @@
+Access update checks: base e3368859c31ef4bde1b68f2eb48aea1b526e3325, staged evidence-only additions present. Candidate unchanged.
+
+$ git rev-parse HEAD
+e3368859c31ef4bde1b68f2eb48aea1b526e3325
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ git diff --cached --check
+exit=0
+
+$ git diff e3368859c31ef4bde1b68f2eb48aea1b526e3325 -- docs/batches/10-release-validation-review.md
+exit=0
+
+$ git diff 15d9277196e7bd1cfbd45fe280a230050b276bed -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop
+exit=0

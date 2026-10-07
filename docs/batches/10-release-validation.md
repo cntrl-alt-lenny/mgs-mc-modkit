@@ -7,6 +7,8 @@ Prepared durable readiness evidence for kit 2.3.0 at candidate
 shortcuts and release version remain unchanged. A read-only shortcut check and
 [resumable smoke matrix](evidence/10-release-validation/smoke-matrix.md) record
 the prerequisites and every real-machine release scenario.
+Added a portable [access update](evidence/10-release-validation/access-update.md)
+after Verifier review, recording owner authorization and Brain's observations.
 
 ## Checked
 
@@ -43,9 +45,12 @@ Resume with the exact candidate's local installer. No release/tag workflow ran.
 
 ## Failed or blocked
 
-**Release readiness is BLOCKED** on suitable validation hosts, licensed
-games, user-supplied audio, agreed access and a preserved baseline. Brain is
-resolving hardware access. No game installation was changed. Two filename
+**Release readiness is BLOCKED** on working host access, licensed games,
+user-supplied audio and a preserved baseline. Owner authorizes installing
+missing licensed titles through Steam's default library on the Windows PC.
+Brain's existing Moonlight connection still reports that PC Offline after
+Wake PC; no Windows/Steam session was reached. Deck is currently unavailable
+per owner. Brain is resolving access. No game installation was changed. Two filename
 discovery probes used absent filenames before correcting to `.cmd` and
 `tests/test_safe_extract.py`; they were not failed candidate checks.
 Framework status also flags unrelated recovery work and linked seats; those
