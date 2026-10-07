@@ -1,67 +1,93 @@
-# 10-release-validation: Verifier review
+# 10-release-validation: Windows Verifier review
 
-Reviewed Worker delivery `9eccfcf4661ce4f916d6cec468724ac1db2d1169`.
-Candidate remains `15d9277196e7bd1cfbd45fe280a230050b276bed`.
-Read the diff before the Worker summary; used an isolated detached checkout.
-Independent checks below ran at the reviewed delivery on Darwin, Python 3.9.6.
+Reviewed literal Worker delivery `decf9fb0cd5c2cbf0dbb98fbabc0a14609583cb7`
+in an isolated detached checkout. Candidate remains
+`15d9277196e7bd1cfbd45fe280a230050b276bed`. Installer, shortcuts, pins,
+schema and version are byte-identical to candidate. Windows 11 Pro
+26300.9550, Ryzen 5800X/RTX2060 and Steam builds 20872173/21578573/22192289
+agree across host, runtime and snapshot records. No game/UI operation ran during this review.
 
-| Goal | Judgment | Evidence |
+Independent Python comparisons reconstructed all seven phase reports, checking
+unique paths and byte/hash pairs rather than helper assertions. The two
+historical cache aliases were identified by their individual hashes. All
+9875/3790 originals match stock backups and restored live paths; full stock
+comparison has no missing files or changed assets/executables. Install and
+immediate repair preserve saves/userdata. Removal preserves common/remote
+save bytes; only MGS1 remotecache changes, cause unknown. Earlier and subsequent
+game writes remain separate. Actual protected copies independently rehash to
+14/16 files with zero mismatches. Settings hashes match phase snapshots;
+1024x768, French 1280x720 and Spanish 1600x900 survive repair independently.
+
+Actual archive verification logs, loaded-module versions, three modded trials,
+post-stock process exits and all 15 screenshots support the limited observations.
+Public text, NUL-normalized logs and six decompressed gzip inventories contain
+no detected personal paths/account IDs; screenshots are clean. No save/game/audio
+payload is distributed. Historical Mac access records are not Windows failures.
+
+## Smoke judgments
+
+Judgments concern complete requirements; verified partial content is identified.
+Windows N/A rows have no Windows observation. Every Deck/Linux row is cannot tell
+because no hardware run exists.
+
+| Rows | Windows | Deck/Linux | Basis |
+| --- | --- | --- | --- |
+| 01 | Cannot tell | Cannot tell | All three content installations verified; final native acknowledgement/normal exit unknown. |
+| 02 | Cannot tell | Cannot tell | Injection/border art, black center through four-minute follow-up; title/playable unproven, abnormal exits. |
+| 03, 04 | Not met independently | Cannot tell | Each launcher/game reports missing MSX settings key. |
+| 05 | Cannot tell | Cannot tell | Saved changes; MGS1 resolution effect observed, other runtime effects blocked. |
+| 06 | Cannot tell | Cannot tell | All three repair contents and preservation verified; native completion exit unproven. |
+| 07 | Cannot tell | Cannot tell | Per-game storage preserved; MGS1 native language remains unproven. |
+| 08 | Cannot tell | Cannot tell | Production terminal removal/preservation met, exit 0; native confirmation unproven. |
+| 09, 10, 11 | Cannot tell independently | Cannot tell | Stock launcher/title boundaries match baseline; controls/save loading unproven; stock MGS3 faults before/after. |
+| 12, 13, 14, 15, 16, 17 | Cannot tell (N/A) | Cannot tell | Proton/audio/cancellation/restored play/progress/log sequence not run. |
+| 18, 19, 20 | Cannot tell | Cannot tell | Compatible audio/Steam-verification/repeat-removal sequence absent. |
+| 21 | Met | Cannot tell | Real second candidate fails GameLock before downloads/InstallTxn while first legitimately repairs; native error acknowledgement unknown. |
+
+## Findings and verdict
+
+**BLOCKER (release):** `install.py:355` omits `MSX Skip Launcher Game`;
+actual 4.1.0 launcher/game readers for both MGS2/MGS3 stop configuration
+initialization and leave error consoles. Content verification cannot establish
+initialization. No production fix belongs in this batch.
+
+**UNPROVEN CLAIM boundary:** `docs/batches/10-release-validation.md:47`
+and `docs/batches/evidence/10-release-validation/windows-modded-observations.md:193` leave playable/control/native completion,
+Deck and audio success unproven; forced own-process cleanup exits 1 cannot prove
+normal acknowledgements. MGS1/stock MGS3 close-fault causality is unknown.
+
+**NOTE:** `docs/batches/evidence/10-release-validation/windows-checks.txt:9` honestly records
+raw-log whitespace exit 2; it is not a required brief check. Newer upstream pins
+are advisory. No evidence BLOCKER or SHOULD FIX found. Verdict: evidence accepted
+as scoped; candidate release readiness remains BLOCKED. PR15 remains draft;
+no approval, merge, tag or publication.
+
+## Actual commands and results at reviewed delivery
+
+Local Windows Python 3.12.10, bsdtar 3.8.8; desktop validator unavailable locally.
+
+| Command | Actual result | Exit |
 | --- | --- | --- |
-| Preserve production, pins, schema and version | Met | Candidate-to-delivery diff contains eight batch documentation/evidence additions only. |
-| Candidate identity and static shortcuts | Met | Independently parsed installer constants and checked shortcut bytes; both v2.3.0 pins match installer SHA, Windows CRLF and Python/desktop LF. Candidate mod versions/checksums match the matrix. |
-| Offline checks and candidate CI | Met | Re-ran local checks; fetched CI metadata and checkout logs independently. Four jobs checked out the literal candidate. |
-| Complete resumable matrix | Met | All 21 checklist scenarios represented; 36 applicable platform cases NOT RUN, six Windows cases N/A. Dependencies and run-record fields retain unknown identities. |
-| Actual hardware release validation | Not met | Every scenario 01–21: cannot tell whether behavior passes. No licensed game, GUI, audio or restoration observations supplied. |
+| `py -3 tools/fw.py status` | Framework 4.0.0; clean detached delivery; project checks pass | 0 |
+| `py -3 -m pytest tests/ -q` | 271 passed, 2 privileged-symlink tests skipped, 14.14s | 0 |
+| `py -3 -m ruff check .` | All checks passed! | 0 |
+| `py -3 -m py_compile tools/fw.py install.py` and seven evidence helpers | No output | 0 |
+| `py -3 tools/fw.py check` | 0 errors, 0 warnings | 0 |
+| `git diff --exit-code 15d9277 -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop tests/fixtures/hdfix-4.1.0-schema.json` | No output | 0 |
+| `py -3 docs/batches/evidence/10-release-validation/verify-pins.py`; independent AST/byte check | v2.3.0; SHA a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5; CMD CRLF, installer/desktop LF | 0 |
+| `py -3 tools/refresh_checksums.py` | Four live primary release assets match pinned SHA256 | 0 |
+| `py -3 tools/check_pins.py` | MGSHDFix 4.1.2/MGSM2Fix v3.7.3 available; no change | 1 |
+| Independent PowerShell here-strings piped to `py -3 -` | Seven metadata report fields agree; all originals/restorations equal; protected 14/16 copies equal; privacy findings [] | 0 after corrected read-only path/probe attempts |
+| `git diff --check origin/main...HEAD` | Actual raw-log whitespace, 545 output lines | 2 |
+| `gh release view --json tagName,url`; `gh release view v2.3.0 --json tagName,url` | Latest v2.2.0; v2.3.0 release not found | 0; 1 |
+| `gh pr view 15 --json isDraft,headRefOid,state,url` | OPEN/draft; literal reviewed delivery head | 0 |
 
-No BLOCKER, SHOULD FIX or UNPROVEN CLAIM findings. NOTE:
-`docs/batches/evidence/10-release-validation/smoke-matrix.md:5` correctly keeps
-release readiness blocked. A missing SSH config alone does not establish
-whether remote hardware exists; the document limits availability to this seat
-and leaves Brain to resolve access. The v2.3.0 asset is unavailable, so testing
-the candidate's local installer is necessary. Publication needs separate
-approval and checks. No archives, audio or game installations were changed.
+Primary GitHub `gh run view <id> --json jobs,headSha,conclusion,event,url`
+and `--log` queries returned 0. These CI results establish no hardware success.
 
-Verdict: evidence is complete for the work possible here; no revision required.
-This review does not establish hardware success or approve a release.
-
-## Commands and actual results
-
-| Command at reviewed delivery | Actual output | Exit |
+| Run | Checkout identity | Actual successful test results |
 | --- | --- | --- |
-| `python3 -m pytest tests/ -q` | `273 passed in 6.04s` | 0 |
-| `python3 -m ruff check .` | `All checks passed!` | 0 |
-| `python3 -m py_compile tools/fw.py install.py` | No output | 0 |
-| `python3 tools/fw.py check` | `0 error(s), 0 warning(s)` | 0 |
-| `git diff --check 15d9277196e7bd1cfbd45fe280a230050b276bed HEAD` | No output | 0 |
-| `git diff --name-only 15d9277196e7bd1cfbd45fe280a230050b276bed HEAD` | Eight paths under `docs/batches/` | 0 |
-| `python3 docs/batches/evidence/10-release-validation/verify-pins.py` | See output below | 0 |
-| `gh release view --json tagName,url` | `tagName: v2.2.0` | 0 |
-| `gh release view v2.3.0 --json tagName,url` | `release not found` | 1 |
+| [37525559856](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37525559856) | All four checkout logs: literal candidate 15d9277196e7bd1cfbd45fe280a230050b276bed | Linux 3.9/3.11/3.12: 273 passed 6.73/5.51/6.30s; Windows 271 passed, 2 skipped, 18.08s |
+| [37647529127](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37647529127) | Metadata head decf9fb0cd5c2cbf0dbb98fbabc0a14609583cb7; Linux logs checkout PR merge a4e88ba2ace6b29c553ce18bc0126c7912ed4a25 into main 90967b9; Windows checkout step successful, its SHA absent from retrieved job logs | Linux 3.9/3.11/3.12: 273 passed 8.19/6.66/5.72s; Windows 271 passed, 2 skipped, 26.13s |
 
-Pin-check output:
-
-```text
-MODKIT_VERSION=2.3.0
-install.py SHA-256=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5
-install.py: LF only
-Install-MGS-Mods.desktop: TAG=v2.3.0, SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5, LF only
-Install-MGS-Mods.cmd: TAG=v2.3.0, SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5, CRLF only
-Versioned release notes exist; both shortcut pins match
-```
-
-CI query: `gh run view 37525559856 --json headSha,conclusion,jobs,url`
-(exit 0): candidate `headSha`, overall and all four job conclusions `success`.
-`gh run view 37525559856 --log` (exit 0) independently confirmed the candidate
-checkout SHA in each job; actual test output follows. CI results concern the
-candidate, not the documentation delivery.
-
-```text
-test (3.12): 273 passed in 6.30s
-test (3.11): 273 passed in 5.51s
-test (3.9): 273 passed in 6.73s
-test-windows: 271 passed, 2 skipped in 18.08s
-```
-
-The two Windows skip decorators in `tests/test_safe_extract.py` concern
-privileged symlink creation. Local desktop validation is unavailable; candidate
-Linux CI supplies it. No hardware result is inferred from these checks.
+BATCH 10-release-validation: Reviewed; evidence accepted, release blocked.
