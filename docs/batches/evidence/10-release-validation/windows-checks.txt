@@ -3,9 +3,11 @@ Previous logging harness attempt: Tee-Object -LiteralPath with -Append rejected 
 $ py -3 --version
 Python 3.12.10
 exit=0
-$ git diff --check (final Worker delivery)
+$ git diff --check (unstaged tracked changes only, before newly collected logs staged)
 exit=0
 Public evidence privacy scan: rg over txt/md/json/py found no local profile/account/host labels, Steam-account IDs or personal-path prefixes (rg exit1 means no matches). Six gzip metadata files independently decompressed/scanned, no matches, assertion exit0. Four actual HDFix logs each retain three NUL bytes; an independent UTF8/NUL-normalized scan also found no personal matches, exit0. Actual log bytes retained; no saves, credentials or licensed payloads committed.
+$ git diff --cached --check (all final newly collected evidence staged)
+exit=2: actual raw logs/events retain whitespace: windows-mgs1-longer.log.txt lines250/374/566/684/692 trailing blanks and2408 blank EOF; windows-mgs1-repaired-launcher.log.txt lines250/374 trailing blanks and532 blank EOF; windows-poststock-mgs3-events.txt lines11/12 empty event-field trailing blanks; windows-removal.txt17 and windows-repair.txt179 blank EOF. Source log/event bytes preserved rather than cosmetically rewritten. The shell continued to commit dd40f22 after this advisory output; this corrected record does not claim a clean full staged whitespace check or a candidate test failure.
 $ py -3 -m pytest tests/ -q
 ........................................................................ [ 26%]
 ........................................................................ [ 52%]
