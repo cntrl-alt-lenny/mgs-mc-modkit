@@ -1,0 +1,104 @@
+Placeholders: $STEAM=observed default Steam library; $PROTECTED=untracked private pre-kit backup under task work/.
+$ Get-Process -Name 'METAL GEAR SOLID','METAL GEAR SOLID2','METAL GEAR SOLID3','launcher' -ErrorAction SilentlyContinue | Select-Object ProcessName,Id,Path
+
+no target processes; command completed exit=0
+$ New-Item -ItemType Directory -Path $PROTECTED -Force
+$ foreach($game in 'MGS1','MGS2','MGS3'){New-Item -ItemType Directory -Path "$PROTECTED/$game" -Force; Get-ChildItem "$STEAM/steamapps/common/$game" -Directory -Filter '*_savedata_win' | ForEach-Object{Copy-Item -LiteralPath $_.FullName -Destination "$PROTECTED/$game" -Recurse -Force}}
+$ foreach($account in Get-ChildItem "$STEAM/userdata" -Directory){foreach($appid in '2131630','2131640','2131650'){$source=Join-Path $account.FullName $appid;if(Test-Path -LiteralPath $source){$destination=Join-Path "$PROTECTED/userdata" $account.Name;New-Item -ItemType Directory -Path $destination -Force;Copy-Item -LiteralPath $source -Destination $destination -Recurse -Force}}}
+copy commands completed exit=0
+$ py -3 docs/batches/evidence/10-release-validation/inventory-preservation.py --steam-root $STEAM --protected-root $PROTECTED > windows-prekit-protected-inventory.json
+comparison exit=0; JSON retained separately
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase pre-kit-after-stock --output docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json
+$ Get-Date -Format o
+$ foreach($item in @(@('MGS1','2131630','METAL GEAR SOLID.exe'),@('MGS2','2131640','METAL GEAR SOLID2.exe'),@('MGS3','2131650','METAL GEAR SOLID3.exe'))){$item[0]; Get-Content "$STEAM/steamapps/appmanifest_$($item[1]).acf" | Select-String '"(appid|name|StateFlags|buildid|installdir)"' | ForEach-Object{$_.Line.Trim()}; (Get-FileHash -Algorithm SHA256 "$STEAM/steamapps/common/$($item[0])/$($item[2])").Hash}
+2026-10-07T15:24:05.9534533+01:00
+MGS1
+"appid"		"2131630"
+"name"		"METAL GEAR SOLID - Master Collection Version"
+"StateFlags"		"4"
+"installdir"		"MGS1"
+"buildid"		"20872173"
+E320062847EC71A52292E9931BCF2EE33EA6586429ECB2A38E567AB37B66C373
+MGS2
+"appid"		"2131640"
+"name"		"METAL GEAR SOLID 2: Sons of Liberty - Master Collection Version"
+"StateFlags"		"4"
+"installdir"		"MGS2"
+"buildid"		"21578573"
+9C8575E6B2D6449636D1A04B63EF8C9E44C3AECF84CADDDC27B4874C62688F2B
+MGS3
+"appid"		"2131650"
+"name"		"METAL GEAR SOLID 3: Snake Eater - Master Collection Version"
+"StateFlags"		"4"
+"installdir"		"MGS3"
+"buildid"		"22192289"
+81596A6A670263DA6EE59C959B65CBF833BE985E64FA0332AD926271AA060BFE
+commands completed exit=0
+MGS1 app2131630 build20872173 StateFlags4: 5 files, 11329670966 bytes
+MGS2 app2131640 build21578573 StateFlags4: 34583 files, 19581063465 bytes
+MGS3 app2131650 build22192289 StateFlags4: 54932 files, 18838524755 bytes
+exit=0
+$ py -3 install.py
+Launched exact candidate installer from Worker checkout (production SHA256 checked in windows-checks.txt); native GUI process pending final exit.
+$ (below Python source) | py -3 -
+from pathlib import Path
+import gzip, hashlib
+source=Path('docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json')
+raw=source.read_bytes()
+encoded=gzip.compress(raw,compresslevel=9,mtime=0)
+archive=source.with_suffix('.json.gz')
+archive.write_bytes(encoded)
+assert gzip.decompress(archive.read_bytes())==raw
+print('uncompressed bytes='+str(len(raw))+' sha256='+hashlib.sha256(raw).hexdigest())
+print('gzip bytes='+str(len(encoded))+' sha256='+hashlib.sha256(encoded).hexdigest())
+print('decompressed bytes equal=True')
+uncompressed bytes=18143343 sha256=f26162fbb51f866bf6dbc2a70706508f479d09fbf3d9cc717f1de3f754a13b36
+gzip bytes=4145507 sha256=23ff3238dfbef82562b060405e41f1f12af3453c234edb6f47e790963e5e5029
+decompressed bytes equal=True
+exit=0
+$ Move-Item -LiteralPath docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json -Destination $WORK/windows-validation-raw/windows-prekit-snapshot.json; original JSON preserved untracked, gzip metadata committed. exit=0
+$ Get-Date -Format o
+$ foreach($folder in 'backups','rollback','staging'){$files=Get-ChildItem -LiteralPath "$STEAM/steamapps/common/MGS2/mgs-modkit/$folder" -Recurse -File -Force;[PSCustomObject]@{Record=$folder;Files=$files.Count;Bytes=($files | Measure-Object Length -Sum).Sum} | ConvertTo-Json -Compress}
+2026-10-07T15:28:19.6421533+01:00
+{"Record":"backups","Files":9874,"Bytes":923474580}
+{"Record":"rollback","Files":9874,"Bytes":923474580}
+{"Record":"staging","Files":8147,"Bytes":602652376}
+commands completed exit=0; live progress sample, not completed manifest or installed verification
+$ Get-Process -Id 65500 -ErrorAction SilentlyContinue | Select-Object Id,CPU,Responding,MainWindowHandle,MainWindowTitle
+15:32:26: PID65500 CPU81.6875 RespondingTrue MainWindowHandle0 MainWindowTitle empty.
+Fresh process remains pending; no final exit value exposed yet. Allthree committed manifests present, journals absent, stagedfilecounts0.
+Sky list_windows/list_apps expose no Python target; prior progress capture and supported activation each returned foreground-window/process-ID error. Final completion dialog unobserved, not a command success/exit0 claim.
+$ Get-Content $LOCALAPPDATA/MGSModKit/logs/20261007T141529Z-2df2c0e9.log -Raw; redact case-insensitive $CHECKOUT,$STEAM,$USERPROFILE and Steam-account IDs; save windows-fresh-install.txt
+Capture/redaction command exit=0. Log snapshot currently ends MGS1 Complete100%, not final process exit.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase installed-before-boots --managed --output docs/batches/evidence/10-release-validation/windows-installed-snapshot.json
+MGS1 app2131630 build20872173 StateFlags4: 9 files, 21010726 bytes
+MGS2 app2131640 build21578573 StateFlags4: 20244 files, 2226361600 bytes
+MGS3 app2131650 build22192289 StateFlags4: 8258 files, 2090672328 bytes
+exit=0
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-installed-snapshot.json --output docs/batches/evidence/10-release-validation/windows-install-comparison.json
+MGS1: 0 original backup hashes compared, 0 mismatch; save changes=[]; userdata changes=[]
+MGS2: 9875 original backup hashes compared, 0 mismatch; save changes=[]; userdata changes=[]
+MGS3: 3790 original backup hashes compared, 0 mismatch; save changes=[]; userdata changes=[]
+exit=0
+15:40-15:43 follow-up: actual final info text All done/all three modded and checked became visible over Steam in a Sky screenshot. Python completion dialog still not enumerated, no acknowledgement or process exit inferred.
+$ Get-Content $STEAM/steamapps/common/MGS1/MGSM2Fix.log -Raw; replace $STEAM,$USERPROFILE,Steam account IDs; Set-Content windows-modded-mgs1.log.txt -Encoding UTF8
+capture/redaction exit=0; full actual runtime log retained
+$ (Get-Process -Id 50816).Modules | Where-Object {$_.ModuleName -match 'MGSM2Fix|dinput8|d3d11'} | ForEach-Object {[pscustomobject]@{ModuleName=$_.ModuleName;FileName=($_.FileName -replace [regex]::Escape($STEAM),'$STEAM');FileVersion=$_.FileVersionInfo.FileVersion}} | ConvertTo-Json
+15:44:26: local d3d11.dll9.7.0; Windows DINPUT8.dll10.0.26100.1; Windows d3d11.dll10.0.26100.9549; local MGSM2Fix64.asi3.6.0. exit=0
+$ Get-WinEvent -FilterHashtable @{LogName='Application';Id=1000;StartTime=(Get-Date).AddMinutes(-5)} | Where-Object {$_.Message -match 'METAL GEAR SOLID.exe'}; replace $STEAM,$USERPROFILE
+TimeCreated15:44:54.067; app METAL GEAR SOLID.exe; module same; exception0xc0000005; offset0x5d42b4; process0xC680. command exit=0 (query, not game result)
+$ Get-Content $STEAM/logs/gameprocess_log.txt -Tail 8; replace $STEAM
+[2026-10-07 15:45:03] AppID 2131630 no longer tracking PID 50816, exit code -1073741819
+query exit=0; game abnormal exit retained
+$ foreach($taskName in 'MGSHDFix_Launcher','MGSHDFix_Game','MGS2-Community-Bugfix-Compilation_Launcher','MGS2-Community-Bugfix-Compilation_Game'){Get-Content -Raw "$STEAM/steamapps/common/MGS2/logs/$taskName.log"; replace $STEAM,$USERPROFILE,Steam account IDs; Set-Content "windows-modded-mgs2-$taskName.txt" -Encoding UTF8}
+capture/redaction exit=0; four actual runtime logs retained
+$ [pscustomobject]@{FileVersion=(Get-Item "$STEAM/steamapps/common/MGS2/plugins/MGSHDFix.asi").VersionInfo.FileVersion;SettingsSHA256=(Get-FileHash "$STEAM/steamapps/common/MGS2/plugins/MGSHDFix.settings").Hash;Time=(Get-Date -Format o)} | ConvertTo-Json
+15:47:36: FileVersion4.1.0.0; SettingsSHA256991C70959DD18E6633F39188E8DE7CD10304BEB8195DF81B943D9F1C057062B7. exit=0
+$ (Get-Process -Id 51636).Modules | Where-Object {$_.ModuleName -match 'Fix|winhttp|wininet'} | ForEach-Object {[pscustomobject]@{Name=$_.ModuleName;Path=($_.FileName -replace [regex]::Escape($STEAM),'$STEAM');Version=$_.FileVersionInfo.FileVersion}} | ConvertTo-Json
+local WININET/WINHTTP9.7.4, MGSHDFix.asi4.1.0.0, MGS2-Community-Bugfix-Compilation.asi3.0.0; system WININET11.00.26100.8875/WINHTTP10.0.26100.8521. exit=0
+$ Get-Process -Id 51636 | Select-Object Id,Responding,CPU,MainWindowTitle; Get-Date -Format o
+15:48:09: PID51636 RespondingTrue CPU0.703125 MainWindowTitle METAL GEAR SOLID2.exe. exit=0
+$ Get-Content $STEAM/logs/gameprocess_log.txt -Tail 5; replace $STEAM
+[2026-10-07 15:48:18] AppID 2131640 no longer tracking PID 51636, exit code -1073741510
+[2026-10-07 15:48:18] AppID 2131640 no longer tracking PID 52152, exit code 0
+query exit=0; actual game-owned console X close requested15:48:16, game exit0xC000013A retained, no force termination

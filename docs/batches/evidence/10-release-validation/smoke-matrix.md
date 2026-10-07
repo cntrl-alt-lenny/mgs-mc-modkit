@@ -1,8 +1,8 @@
 # 2.3.0 real-machine results
 
 Candidate: `15d9277196e7bd1cfbd45fe280a230050b276bed`.
-Checklist: `docs/RELEASING.md` at that commit. No real-machine scenario has
-run. **Release readiness is blocked.** CI and synthetic fixtures are separate
+Checklist: `docs/RELEASING.md` at that commit. Windows trials now have actual
+observations; this is an interim checkpoint. **Release readiness is blocked.** CI and synthetic fixtures are separate
 evidence. NOT RUN means no observation; N/A means this checklist does not
 require that platform. Replace each NOT RUN separately after collecting its
 run record; do not inherit one game's or platform's result for another.
@@ -19,11 +19,11 @@ be recorded separately. See `discovery-and-release.txt` for release queries.
 
 | ID | Dependency | Current evidence |
 | --- | --- | --- |
-| H | Windows or Steam Deck/Linux validation host, agreed access and preserved baseline | Worker shell is Darwin/macOS, Python 3.9.6. Owner identifies a likely Windows PC; Brain's existing Moonlight connection reports it Offline after Wake PC. No Windows session reached. Deck currently unavailable per owner. See access-update.md. |
-| G | Licensed MGS1, MGS2 and MGS3 with recorded Steam build IDs and stock baseline | Unavailable to this seat; game builds, boot behavior and save state unknown. |
-| P | Real upstream mod archives matching candidate checksums | Pins recorded below; archives not downloaded/extracted in this batch. |
+| H | Windows or Steam Deck/Linux validation host, agreed access and preserved baseline | Windows11Pro/build26300.9550 reached; preserved inventories and hardware identity in windows-run.md. Deck remains unavailable. Earlier Mac access limitation remains historical evidence. |
+| G | Licensed MGS1, MGS2 and MGS3 with recorded Steam build IDs and stock baseline | Steam-installed: MGS1 build20872173, MGS2 build21578573, MGS3 build22192289. Stock MGS2/3 title observed; MGS1 launcher only; playable remains unproven. |
+| P | Real upstream mod archives matching candidate checksums | All four actual archives downloaded/checksum-verified by exact candidate; fresh installation verification retained in windows-fresh-install.txt. |
 | A | Owner-supplied compatible Nexus audio payload | Unavailable; filename/version/hash and compatibility unknown. Payload must not be redistributed. |
-| V | Steam verification access and retained recovery records | Requires H/G, original-file hashes and an agreed destructive-test baseline. |
+| V | Steam verification access and retained recovery records | Steam available, original-file hashes retained; large-audio restoration untested without payload. |
 
 Brain must arrange a Windows host and a Steam Deck/Linux host, a supported
 interactive shell/session with native GUI display, licensed installations of
@@ -40,14 +40,14 @@ authorization supplies no hardware result and does not waive Deck checks.
 
 | ID | Action and required observation | Windows | Deck/Linux | Dependencies |
 | --- | --- | --- | --- | --- |
-| 01 | Fresh install completes for all three titles; retain per-game verification and log | NOT RUN | NOT RUN | H/G/P |
-| 02 | MGS1 starts from the installed baseline; record region, menus and playable scene | NOT RUN | NOT RUN | 01 |
-| 03 | MGS2 starts; no missing settings/schema errors; record playable scene | NOT RUN | NOT RUN | 01 |
-| 04 | MGS3 starts; no missing settings/schema errors; record playable scene | NOT RUN | NOT RUN | 01 |
-| 05 | Change an option per game and record saved settings and observed behavior | NOT RUN | NOT RUN | 02–04 |
-| 06 | Repair each title completes without losing saves, originals or recovery records | NOT RUN | NOT RUN | 05 |
-| 07 | Custom language/resolution survives repair independently per game; retain before/after settings | NOT RUN | NOT RUN | 06 |
-| 08 | Removal completes per title, identifies any required Steam verification and preserves saves | NOT RUN | NOT RUN | 06/V if needed |
+| 01 | Fresh install completes for all three titles; retain per-game verification and log | PARTIAL: all3 content verified/committed and completion text observed; final acknowledgement/process exit unobserved | NOT RUN | H/G/P |
+| 02 | MGS1 starts from the installed baseline; record region, menus and playable scene | PARTIAL: injection/border art observed47s, black center; title/playable/settings unproven; abnormal exit | NOT RUN | 01 |
+| 03 | MGS2 starts; no missing settings/schema errors; record playable scene | FAIL: launcher/game missing MSX Skip Launcher Game key; error console, no playable scene | NOT RUN | 01 |
+| 04 | MGS3 starts; no missing settings/schema errors; record playable scene | FAIL: independent launcher/game same missing key; error console, no playable scene | NOT RUN | 01 |
+| 05 | Change an option per game and record saved settings and observed behavior | IN PROGRESS: native ChangeSettings selected; local custom dimensions/languages recorded; visual effects unproven | NOT RUN | 02–04 |
+| 06 | Repair each title completes without losing saves, originals or recovery records | IN PROGRESS: first real all3 repair running | NOT RUN | 05 |
+| 07 | Custom language/resolution survives repair independently per game; retain before/after settings | IN PROGRESS: pre-repair hashes/values retained; MGS1 native language selection unproven | NOT RUN | 06 |
+| 08 | Removal completes per title, identifies any required Steam verification and preserves saves | NOT RUN: queued after repair | NOT RUN | 06/V if needed |
 | 09 | MGS1 starts stock after removal; compare to baseline | NOT RUN | NOT RUN | 08 |
 | 10 | MGS2 starts stock after removal; compare to baseline | NOT RUN | NOT RUN | 08 |
 | 11 | MGS3 starts stock after removal; compare to baseline | NOT RUN | NOT RUN | 08 |
@@ -60,7 +60,7 @@ authorization supplies no hardware result and does not waive Deck checks.
 | 18 | Large-audio removal reports Steam verification needed and retains cleanup/hash records | NOT RUN | NOT RUN | H/G/A/V |
 | 19 | Steam verification restores large originals; record identity and original-hash comparison | NOT RUN | NOT RUN | 18/V |
 | 20 | Repeat removal finishes cleanup; originals/saves retained and applicable stock boots succeed | NOT RUN | NOT RUN | 19 |
-| 21 | Second repair while another process holds the same game's lock refuses without changing files | NOT RUN | NOT RUN | H/G; controlled first process |
+| 21 | Second repair while another process holds the same game's lock refuses without changing files | OBSERVED REFUSAL: actual second candidate stops at GameLock before InstallTxn/download, first continues legitimately; second final exit pending | NOT RUN | H/G; controlled first process |
 
 ## Candidate inputs
 
@@ -72,8 +72,8 @@ authorization supplies no hardware result and does not waive Deck checks.
 | MGS2 Bugfix Base | 3.0.0 | `a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003` |
 | MGS3 Bugfix Base | 2.0.1 | `a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769` |
 
-These are expected candidate inputs, not evidence that real archives or audio
-were tested. Pins/schema remain unchanged. Each actual run must capture its
+These are candidate inputs. Windows actual verified downloads are retained
+in windows-fresh-install.txt; no audio payload was tested. Pins/schema remain unchanged. Each actual run must capture its
 own fetched archive identity and checksum outcome.
 
 ## Run record to copy when resuming

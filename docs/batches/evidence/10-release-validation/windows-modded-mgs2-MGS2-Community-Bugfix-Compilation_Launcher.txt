@@ -1,0 +1,32 @@
+﻿[2026-10-07 15:45:56.833] [info] ---------- Logging initialization started ----------
+[2026-10-07 15:45:56.835] [info] Checking for duplicate intallations of MGS2-Community-Bugfix-Compilation.
+[2026-10-07 15:45:56.835] [info] MGS2-Community-Bugfix-Compilation v3.0.0 loaded.
+[2026-10-07 15:45:56.835] [info] ASI plugin location: $STEAM\steamapps\common\MGS2\plugins\MGS2-Community-Bugfix-Compilation.asi
+[2026-10-07 15:45:56.836] [info] ----------
+[2026-10-07 15:45:56.836] [info] Log file: $STEAM\steamapps\common\MGS2\logs\MGS2-Community-Bugfix-Compilation_Launcher.log
+[2026-10-07 15:45:56.836] [info] ----------
+[2026-10-07 15:45:56.836] [info] Module Name: launcher.exe
+[2026-10-07 15:45:56.836] [info] Module Path: $STEAM\steamapps\common\MGS2\
+[2026-10-07 15:45:56.836] [info] Module Address: 0x7ff60f120000
+[2026-10-07 15:45:56.838] [info] Module Version: 2021.3.16
+[2026-10-07 15:45:56.838] [info] ---------- Logging loaded in: 5 ms ----------
+[2026-10-07 15:45:56.838] [info] ---------- Subsystem initialization started ----------
+[2026-10-07 15:45:56.838] [info] ---------- Loading: g_Logging.LogSysInfo() ----------
+[2026-10-07 15:45:56.838] [info] System Details - CPU: AMD Ryzen 7 5800X 8-Core Processor             
+[2026-10-07 15:45:56.838] [info] System Details - GPU 1: NVIDIA GeForce RTX 2060
+[2026-10-07 15:45:56.839] [info] System Details - GPU 5: Virtual Display Driver
+[2026-10-07 15:45:56.839] [info] System Details - RAM: 15.93 GB (16305 MB)
+[2026-10-07 15:45:56.839] [info] System Details - OS:  Windows 11 Pro (26300.9550)
+[2026-10-07 15:45:56.839] [info] ---------- g_Logging.LogSysInfo() loaded in: 1 ms.	Now loading: DetectGame() ----------
+[2026-10-07 15:45:56.840] [info] Detected launcher for game: Metal Gear Solid 2 MC (app 2131640)
+[2026-10-07 15:45:56.840] [info] ---------- DetectGame() loaded in: 0 ms.	Now loading: Config::Read() ----------
+[2026-10-07 15:45:56.849] [info] Config file: $STEAM\steamapps\common\MGS2\plugins\MGS2-Community-Bugfix-Compilation.ini
+[2026-10-07 15:45:56.849] [info] ---------- Config Parse Results ----------
+[2026-10-07 15:45:56.849] [info] [Update Notifications]
+[2026-10-07 15:45:56.849] [info]     Check For MGS2 Commmunity Bugfix Updates = true
+[2026-10-07 15:45:56.849] [info] ---------- End Config Parse ----------
+[2026-10-07 15:45:56.849] [info] ---------- Config::Read() loaded in: 9 ms.	Now loading: Util::ShutdownSHA1Provider() ----------
+[2026-10-07 15:45:56.850] [info] ---------- Util::ShutdownSHA1Provider() loaded in: 0 ms. ----------
+[2026-10-07 15:45:56.850] [info] ---------- All initial systems completed loading in: 17 ms. ----------
+[2026-10-07 15:45:56.850] [info] All systems initialized. shutting down MGS2-Community-Bugfix-Compilation.
+

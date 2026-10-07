@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 
@@ -23,7 +24,8 @@ for path in sorted(args.protected_root.rglob("*")):
     portable = list(rel.parts)
     if portable[0] == "userdata":
         portable[1] = "<account>"
-    elif len(portable) > 2 and portable[1].endswith("_savedata_win"):
+    elif (len(portable) > 2 and portable[1].endswith("_savedata_win")
+          and re.fullmatch(r"7656119\d{10}", portable[2])):
         portable[2] = "<account>"
     copied_hash = digest(path)
     source_hash = digest(source) if source.is_file() else None
