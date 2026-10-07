@@ -41,7 +41,7 @@
     },
     "tools/fw.py": {
       "kind": "copy",
-      "sha256": "f0662eb91c2f44602ef047b26d1339276e69a20091ba81692591f383393e5d61"
+      "sha256": "e86f6494aa5329c94e17e5df863ebd5f0524d72ce39dd15bfb4dada5d67908c7"
     }
   },
   "framework": {
