@@ -1,0 +1,18 @@
+Discovery/release probes; candidate remains 15d9277196e7bd1cfbd45fe280a230050b276bed.
+Absent filename probes reproduce the earlier discovery mistakes; corrected filenames are Install-MGS-Mods.cmd and tests/test_safe_extract.py.
+
+$ rg -n TAG Install-MGS-Mods.bat
+rg: Install-MGS-Mods.bat: IO error for operation on Install-MGS-Mods.bat: No such file or directory (os error 2)
+exit=2
+
+$ rg -n symlink tests/test_installer.py
+rg: tests/test_installer.py: IO error for operation on tests/test_installer.py: No such file or directory (os error 2)
+exit=2
+
+$ gh release view --json tagName,url
+{"tagName":"v2.2.0","url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/releases/tag/v2.2.0"}
+exit=0
+
+$ gh release view v2.3.0 --json tagName,url
+release not found
+exit=1
