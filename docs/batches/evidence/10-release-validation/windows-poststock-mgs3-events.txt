@@ -1,0 +1,12 @@
+2026-10-07T16:47:27.7109220+01:00
+Faulting application name: METAL GEAR SOLID3.exe, version: 3.0.0.0, time stamp: 0x6980b92f
+Faulting module name: METAL GEAR SOLID3.exe, version: 3.0.0.0, time stamp: 0x6980b92f
+Exception code: 0xc0000005
+Fault offset: 0x0000000000115f64
+Faulting process id: 0xB20C
+Faulting application start time: 0x1DD567243F37603
+Faulting application path: $STEAM\steamapps\common\MGS3\METAL GEAR SOLID3.exe
+Faulting module path: $STEAM\steamapps\common\MGS3\METAL GEAR SOLID3.exe
+Report Id: 280dbf60-a20e-471f-aefd-718070c407c0
+Faulting package full name: 
+Faulting package-relative application ID: 

@@ -131,6 +131,75 @@ not separately exposed and exit remains unobserved at this phase.
 See second review, first progress and full refusal log. No synthetic lock
 holder substituted for these two candidate processes.
 
+## Repair completed and preserved storage
+
+First repair reached all three verified manifests and Complete100% at16:02:44.
+Final All done text was visually observed over Steam16:05:10; the native
+Python dialog was not enumerated, so acknowledgement/exit remained unknown.
+Immediate closed-game post-repair snapshot completed0. Comparison against
+the immediate pre-repair phase has **no common-save or Steam-userdata hash
+changes for any game**, and no mismatch among MGS2's9875/MGS3's3790 originals.
+See windows-repair-comparison.json and windows-repaired-settings.json.
+MGS1 retained1024x768; MGS2 retained French/EU1280x720; MGS3 retained
+Spanish/US1600x900. Supported native changes to Keyboard/Mouse and boot-straight
+off were saved independently. MGS1 language has no selected INI key and native
+selection remains unproven; storage preservation does not establish gameplay.
+
+MGS1 repaired boot PID49464 started16:05:58 and rendered the native launcher
+at1024x768/60FPS, proving the selected external-resolution effect and changed
+boot-straight preference. Return/focus/H did not reach native first-time
+region/quality selections. AltF4 requested16:07:04–16:07:07; Application event
+1000 fault16:07:07.4147536 c0000005/offset5d42b4; Steam exit16:07:12
+-1073741819. No forced termination or close/fault causal claim.
+
+After that process was absent, only the installed MGSM2Fix StartGame setting
+was changed false→true for a separate follow-up (source/pins/schema unchanged).
+INI SHA256 before b8e393c84b8499c05185516f4b1cb82f7c46ab238bc0a9787ef1ecee2a3a4aa8,
+after496743c579abb1d5dd3c6333e79fb17534514e4ce746277b111668ce29d53c84.
+Actual PID53988 launched16:08:34. At16:12:36 (four minutes), the1024x768
+window still rendered border artwork/59FPS with a black center; Return/H had
+not reached a title or playable scene. The intended two-minute bound was
+exceeded during context refresh; the actual longer observation is retained.
+AltF4 requested after that capture. Event1000 fault16:12:46.1174104,
+c0000005/offset5d42b4; Steam16:12:50 exit-1073741819. Process absent16:12:57,
+then immediate pre-removal snapshot began. Actual isolated screenshots and
+MGSM2Fix logs are retained; no further repeat inferred a playable pass.
+
+## Removal and pending-dialog cleanup
+
+Exact local `py -3 install.py --uninstall` PID49176/session40728 rendered its
+all-three checklist. After OK, the native yes/no messagebox had no returned
+Sky window; fresh enumeration/selection recovery could not target it.
+Native process had MainWindowHandle0/RespondingTrue. Its session log contained
+only the header, no transaction. Our pending PID was terminated deliberately;
+actual process exit1, no restoration/confirmation success claimed.
+
+The recorded backend-selection harness runs the unchanged installer main
+with only tkinter unavailable in that process, selecting its existing terminal
+UI. Real inputs were blank=all3, then y after the immediate pre-removal snapshot.
+Production restoration completed actual exit0: MGS2 removed486/restored9875;
+MGS3 removed672/restored3790; MGS1 removed7. All kit recovery folders removed.
+Full session log and terminal completion text/input sequence are retained.
+There was no required-Steam-verification note. Read-only audit found candidate
+loaders/configs/kit records absent, stock executables/builds unchanged and
+MGS1 runtime log retained. Full closed-game stock hashing started16:17:54
+before any post-removal stock boots. This fallback proves observed production
+removal behavior, not successful native GUI confirmation.
+
+At16:18:20, fresh65500/repair62488/refusal47032 were still our python.exe
+install.py processes, RespondingTrue, MainWindowHandle0/title empty. Fresh
+Sky enumeration again returned no targetable native dialog. With operations
+finished/locks released, controlled cleanup terminated only those PIDs.
+All three actual sessions returned exit1. These termination codes are kept
+separate from verified content/completion/refusal outcomes; normal native
+acknowledgement and successful natural process exits remain unproven.
+
+Protected initial14/pre-kit16 file copies were independently rehashed after
+removal: zero differences from their retained original protected hashes.
+Current game-written source files differ from those older snapshots, so
+source/copy inventory commands correctly return1; that is not damaged backup
+or installer-induced save loss. Immediate mutation comparisons remain separate.
+
 ## UI access failures retained
 
 After context refresh a `var` state binding was undefined; an attempted Play

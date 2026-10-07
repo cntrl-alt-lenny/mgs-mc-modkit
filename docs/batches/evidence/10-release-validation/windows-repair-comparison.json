@@ -1,6 +1,6 @@
 {
-  "before_phase": "installed-before-boots",
-  "after_phase": "custom-before-repair",
+  "before_phase": "custom-before-repair",
+  "after_phase": "repaired-before-boots",
   "before_scope": "managed + saves + executables",
   "after_scope": "managed + saves + executables",
   "games": [
@@ -11,67 +11,51 @@
       "original_backups": 0,
       "backup_mismatches_against_before": [],
       "save_changes": [],
-      "userdata_changes": [
-        "userdata/<account>/2131630/remote/data_008_0000.bin",
-        "userdata/<account>/2131630/remotecache.vdf"
-      ],
+      "userdata_changes": [],
       "shared_file_changes": [
-        "MGSM2Fix.ini"
+        "MGSM2Fix.ini",
+        "mgs-modkit/manifest.json"
       ],
       "before_only_snapshot_files": [],
       "added_files": []
     },
     {
       "game": "MGS2",
-      "before_files": 20244,
+      "before_files": 20245,
       "after_files": 20245,
       "original_backups": 9875,
       "backup_mismatches_against_before": [],
-      "save_changes": [
-        "mgs2_savedata_win/<account>/launcher/usersv",
-        "mgs2_savedata_win/MGS2-Community-Bugfix-Compilation_version_check.txt"
-      ],
-      "userdata_changes": [
-        "userdata/<account>/2131640/remotecache.vdf"
-      ],
+      "save_changes": [],
+      "userdata_changes": [],
       "shared_file_changes": [
         "logs/MGS2-Community-Bugfix-Compilation_Game.log",
         "logs/MGS2-Community-Bugfix-Compilation_Launcher.log",
         "logs/MGSHDFix_Game.log",
         "logs/MGSHDFix_Launcher.log",
-        "mgs2_savedata_win/<account>/launcher/usersv",
+        "mgs-modkit/manifest.json",
         "plugins/MGSHDFix.settings"
       ],
       "before_only_snapshot_files": [],
-      "added_files": [
-        "mgs2_savedata_win/MGS2-Community-Bugfix-Compilation_version_check.txt"
-      ]
+      "added_files": []
     },
     {
       "game": "MGS3",
-      "before_files": 8258,
+      "before_files": 8259,
       "after_files": 8259,
       "original_backups": 3790,
       "backup_mismatches_against_before": [],
-      "save_changes": [
-        "mgs3_savedata_win/<account>/launcher/usersv",
-        "mgs3_savedata_win/MGS3-Community-Bugfix-Compilation_version_check.txt"
-      ],
-      "userdata_changes": [
-        "userdata/<account>/2131650/remotecache.vdf"
-      ],
+      "save_changes": [],
+      "userdata_changes": [],
       "shared_file_changes": [
         "logs/MGS3-Community-Bugfix-Compilation_Game.log",
         "logs/MGS3-Community-Bugfix-Compilation_Launcher.log",
         "logs/MGSHDFix_Game.log",
         "logs/MGSHDFix_Launcher.log",
-        "mgs3_savedata_win/<account>/launcher/usersv",
+        "mgs-modkit/manifest.json",
         "plugins/MGSHDFix.settings"
       ],
       "before_only_snapshot_files": [],
-      "added_files": [
-        "mgs3_savedata_win/MGS3-Community-Bugfix-Compilation_version_check.txt"
-      ]
+      "added_files": []
     }
   ]
 }

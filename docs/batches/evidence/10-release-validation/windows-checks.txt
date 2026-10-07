@@ -3,6 +3,9 @@ Previous logging harness attempt: Tee-Object -LiteralPath with -Append rejected 
 $ py -3 --version
 Python 3.12.10
 exit=0
+$ git diff --check (final Worker delivery)
+exit=0
+Public evidence privacy scan: rg over txt/md/json/py found no local profile/account/host labels, Steam-account IDs or personal-path prefixes (rg exit1 means no matches). Six gzip metadata files independently decompressed/scanned, no matches, assertion exit0. Four actual HDFix logs each retain three NUL bytes; an independent UTF8/NUL-normalized scan also found no personal matches, exit0. Actual log bytes retained; no saves, credentials or licensed payloads committed.
 $ py -3 -m pytest tests/ -q
 ........................................................................ [ 26%]
 ........................................................................ [ 52%]
@@ -39,3 +42,28 @@ $ py -3 tools/check_pins.py (advisory only, no changes authorized)
 
 2 update(s) available. These are NOT drop-in bumps — read docs/UPGRADING.md before changing anything.
 exit=1
+$ py -3 -m pytest tests/ -q (final Windows evidence delivery)
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+..........ss............................................................ [ 79%]
+.........................................................                [100%]
+271 passed, 2 skipped in 15.65s
+exit=0
+$ py -3 -m ruff check .
+All checks passed!
+exit=0
+$ py -3 -m py_compile tools/fw.py install.py docs/batches/evidence/10-release-validation/*.py (expanded literal evidence helper files)
+exit=0
+$ py -3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+$ py -3 docs/batches/evidence/10-release-validation/verify-pins.py
+MODKIT_VERSION=2.3.0
+install.py SHA-256=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5
+install.py: LF only
+Install-MGS-Mods.desktop: TAG=v2.3.0, SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5, LF only
+Install-MGS-Mods.cmd: TAG=v2.3.0, SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5, CRLF only
+Versioned release notes exist; both shortcut pins match
+exit=0
+$ git diff --exit-code 15d9277196e7bd1cfbd45fe280a230050b276bed -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop tests/fixtures/hdfix-4.1.0-schema.json
+exit=0

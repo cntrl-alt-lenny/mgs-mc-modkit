@@ -46,9 +46,17 @@ for old_game, new_game in zip(before["games"], after["games"]):
                for key, value in new.items() if key.startswith("mgs-modkit/backups/")}
     backup_mismatches = [key for key, value in backups.items()
                          if old.get("mgs-modkit/backups/" + key, old.get(key)) != value]
+    restored = {key.removeprefix("mgs-modkit/backups/"): value
+                for key, value in old.items() if key.startswith("mgs-modkit/backups/")}
+    # Only compare backup bytes to live originals after the kit records vanish.
+    removal_phase = bool(restored) and not any(key.startswith("mgs-modkit/") for key in new)
     result = {"game": old_game["game"], "before_files": len(old),
               "after_files": len(new), "original_backups": len(backups),
               "backup_mismatches_against_before": backup_mismatches,
+              "restored_originals_compared": len(restored) if removal_phase else None,
+              "restored_original_mismatches": [key for key, value in restored.items()
+                                                 if new.get(key) != value]
+              if removal_phase else None,
               "save_changes": [key for key in sorted(old_saves.keys() | new_saves.keys())
                                if old_saves.get(key) != new_saves.get(key)],
               "userdata_changes": [key for key in sorted(old_userdata.keys() | new_userdata.keys())
@@ -58,7 +66,9 @@ for old_game, new_game in zip(before["games"], after["games"]):
               "before_only_snapshot_files": sorted(old.keys() - new.keys())
               if before.get("scope", "all common files + userdata")
               == after.get("scope", "all common files + userdata") else None,
-              "added_files": sorted(new.keys() - old.keys())}
+              "added_files": sorted(new.keys() - old.keys())
+              if before.get("scope") != "managed + saves + executables"
+              or after.get("scope") == "managed + saves + executables" else None}
     results.append(result)
 report = {"before_phase": before["phase"], "after_phase": after["phase"],
           "before_scope": before.get("scope", "all common files + userdata"),
@@ -69,3 +79,6 @@ for row in results:
     print(f"{row['game']}: {row['original_backups']} original backup hashes compared, "
           f"{len(row['backup_mismatches_against_before'])} mismatch; "
           f"save changes={row['save_changes']}; userdata changes={row['userdata_changes']}")
+    if row["restored_originals_compared"] is not None:
+        print(f"  restored original hashes compared={row['restored_originals_compared']}; "
+              f"mismatches={len(row['restored_original_mismatches'])}")

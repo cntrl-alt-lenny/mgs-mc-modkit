@@ -1,4 +1,4 @@
-# Windows validation run (in progress)
+# Windows validation run
 
 Worker, 2026-10-07. Candidate production is
 `15d9277196e7bd1cfbd45fe280a230050b276bed`; local installer SHA-256 is
@@ -125,11 +125,14 @@ changes are distinct from installer preservation comparisons.
 
 ## Failed discovery/logging attempts retained
 
-Windows interim runtime evidence is now in `windows-modded-observations.md`:
-fresh install content verified, baseline save hashes preserved through
-installation, MGS2/MGS3 real configuration failures observed, and actual
-second-installer refusal recorded. Repair/removal/post-removal trials remain
-IN PROGRESS at this checkpoint. It is not final Verifier delivery.
+Completed Windows runtime evidence is in `windows-modded-observations.md`
+and `windows-poststock-observations.md`: actual fresh install/repair content,
+save/original preservation, modded failures, real concurrent refusal,
+production removal and post-removal stock trials. Normal native installer
+acknowledgements and full gameplay remain unproven. Final machine is restored
+with loaders/configs/kit recovery folders absent, all games closed, Steam
+downloads idle and protected copies retained. Historical discovery failures
+below remain separate from candidate failures. PR15 remains draft.
 
 - Brain's first status attempt ran from the generated chat directory without
   `tools/fw.py`; second ran at a stale repository checkout before main update.

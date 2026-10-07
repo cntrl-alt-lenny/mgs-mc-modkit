@@ -2,53 +2,63 @@
 
 ## Done
 
-Resumed on Windows under the Checked path. Safely merged main's framework
-provenance correction; candidate production files, pins, schema and version
-remain unchanged. Installed three licensed games in Steam's default library
-after preserving saves/settings. Recorded hardware, Steam builds/executable
-hashes and protected-copy inventories in
+Resumed Windows validation under the Checked path. Safely merged main's
+framework provenance correction; installer, pins, schema and version remain
+equal to candidate `15d9277`. Installed three licensed games in Steam's default
+library after preserving saves/settings. Hardware, Steam builds/executable
+hashes, commands, outputs and protected-copy inventories are in
 [Windows run](evidence/10-release-validation/windows-run.md).
 
-Executed exact candidate local `install.py`, verified pinned archives and all
-three committed manifests, and observed final completion text. Captured real
-modded trials and second-installer refusal in
-[runtime observations](evidence/10-release-validation/windows-modded-observations.md).
-**Interim checkpoint: repair/removal/post-removal trials remain in progress;
-this is not final Verifier delivery.**
+Executed exact local `install.py`: verified all four pinned archives and all
+three manifests. Ran all three modded trials, settings changes, actual repair,
+two-process concurrent refusal, removal and post-removal stock trials.
+[Runtime evidence](evidence/10-release-validation/windows-modded-observations.md)
+and [stock observations](evidence/10-release-validation/windows-poststock-observations.md)
+distinguish content outcomes from UI/gameplay limits.
 
 ## Checked
 
-Windows Python3.12.10:271 tests passed/two privileged symlink tests skipped;
-Ruff, compilation, framework hygiene and shortcut pin/line-ending checks
+Windows Python 3.12.10: 271 tests passed/two privileged symlink tests skipped;
+Ruff, compilation, framework hygiene and both shortcut pin/line-ending checks
 passed. [Exact checks](evidence/10-release-validation/windows-checks.txt).
-Prior macOS/CI evidence remains separately retained. Installer SHA256 remains
+Installer SHA256 remains
 `a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5`.
 
-Before modded boots, common saves/target Steam userdata were byte equal
-through installation. MGS2's9875 and MGS3's3790 original backup hashes match
-stock. Actual modules/logs prove MGSM2Fix3.6.0, MGSHDFix4.1.0 and Bugfix3.0.0/
-2.0.1 injection; this does not prove successful initialization. Second real
-candidate refused at GameLock before InstallTxn while the first MGS2 repair
-continued. No synthetic lock holder was substituted.
+Install and immediate repair preserved common saves/target userdata. All
+9875 MGS2/3790 MGS3 original backups matched stock; after removal each matched
+its restored live path. All common/remote save bytes survived removal;
+MGS1's remotecache alone changed, cause unproven. Full stock comparison found
+zero missing files or changed original assets/executables. Earlier launcher
+preferences/game-generated cache/log changes are identified separately.
+
+Repair preserved MGS1's 1024x768 resolution, MGS2 French/1280x720 and MGS3
+Spanish/1600x900 independently. MGS1's native launcher rendered 1024x768.
+Second real candidate refused at GameLock before download/InstallTxn while
+the first legitimately repaired; no synthetic lock holder substituted.
+
+Unchanged main's terminal-backend selection harness removed all three mods
+and restored originals, actual exit 0. Native confirmation was unreachable.
+Final machine has no candidate loaders/configs/recovery folders, unchanged
+game builds/executable hashes, no active games/downloads and intact private
+14/16-file protected copies. Permitted generated leftovers are documented.
 
 ## Not checked
 
-Repair preservation, removal and post-removal stock comparisons remain in
-progress. Full playable Windows observations remain unproven. Deck/Proton,
-cancellation, optional audio and large-audio Steam restoration remain NOT RUN;
-no compatible owner-supplied audio is available. Latest published shortcuts
-still target2.2.0; static2.3.0 matching does not establish unpublished asset
-runtime behavior. No tag/publication ran.
+Full playable/save-loading observations, MGS1 native language/first-time
+settings and normal native installer acknowledgements remain unproven.
+Deck/Proton, cancellation, optional/large-audio restoration remain NOT RUN;
+no suitable user-supplied audio payload was identified in this run.
+Published shortcuts still target 2.2.0; static 2.3.0 pins do not prove
+unpublished release-asset runtime behavior. No tag/publication ran.
 
 ## Failed or blocked
 
-**Release readiness remains BLOCKED.** Actual MGS2/MGS3 launcher/game logs
-report missing `MSX Skip Launcher Game` in `Launcher and Splashscreens`;
-games remain at error consoles. No migration/fix was made. MGS1 rendered
-border artwork/black center during47seconds then exited abnormally;
-title/playable and native first-time settings are unproven. Stock MGS3 also
-exited abnormally before kit installation. Exact times and UI access failures
-are retained; close/fault causality is unproven. Unenumerated native final
-dialogs leave process exit outcomes pending. Earlier Mac access failure was
-an access limitation, not a Windows test failure. Missing required evidence
-and observed runtime errors preclude release approval. PR15 stays draft.
+**Release readiness remains BLOCKED.** MGS2/MGS3 actual launcher/game logs
+report missing `MSX Skip Launcher Game` in `Launcher and Splashscreens`,
+leaving error consoles. No migration/fix was made. MGS1 showed border art/
+black center with abnormal exits, including a separate four-minute follow-up.
+Stock MGS1 remained launcher-only; stock MGS2/MGS3 titles rendered, playable
+unproven. Stock MGS3 faulted before and after kit removal. Close/fault
+causality is unproven. Untargetable native installer final dialogs required
+controlled own-process cleanup, actual exit 1, separate from verified content.
+Earlier Mac access failure was an access limitation. PR15 stays draft.
