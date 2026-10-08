@@ -32,6 +32,7 @@ preservation/reset, oldest backups, rollback/recovery, locks, cancellation,
 mixed outcomes and removal. [Commands/output/exits](evidence/14-mgs4-patriotfix/checks.txt)
 state checked implementation/evidence commits. Actual source capture equals the
 committed fixture; two independent hashes match the official downloaded archive.
+All five live archive checksums match.
 Actual PatriotFix ZIP extraction/transaction/removal passes in a disposable
 unlicensed game fixture; no Windows binaries were run.
 
@@ -42,8 +43,6 @@ licensed boots/gameplay, DS3, flashback behavior and real repair/removal are
 **NOT RUN**. [Native handoff](evidence/14-mgs4-patriotfix/native-handoff.md) records
 fresh install, settings/export/boot, repair, cancellation/recovery, mixed games,
 locks and removal. Desktop validation is unavailable on this Mac.
-The full live checksum audit of the unchanged MGS1–3 archives is still running
-at this initial draft push; its result will be recorded before final delivery.
 Independent Verifier/Brain disposition and owner-approved release remain separate.
 
 ## Failed or blocked
@@ -51,6 +50,8 @@ Independent Verifier/Brain disposition and owner-approved release remain separat
 Initial test expectations miscounted fields and misread uninstall's success flag;
 corrected. Independent evidence helper initially mishandled existing URL
 f-strings; corrected. Saved status/traceback account paths failed document hygiene;
-normalized portable evidence, preserving commands/results/exits. Reruns pass;
+normalized portable evidence, preserving commands/results/exits. Initial Windows
+CI found backslash/POSIX mismatch in the capture inventory; fixed with as_posix.
+Reruns pass;
 [attempts](evidence/14-mgs4-patriotfix/attempts.txt) and logs retain failures.
 No approval, merge, tag or publication performed.

@@ -1,0 +1,63 @@
+$ gh run view 37791777935 --log-failed
+test-windows	Run the test-suite	﻿2026-10-08T14:21:41.5844918Z ##[group]Run python -m pip install --upgrade pip pytest
+test-windows	Run the test-suite	2026-10-08T14:21:41.5845468Z ^[[36;1mpython -m pip install --upgrade pip pytest^[[0m
+test-windows	Run the test-suite	2026-10-08T14:21:41.5845785Z ^[[36;1mpython -m pytest tests/ -q^[[0m
+test-windows	Run the test-suite	2026-10-08T14:21:41.5922821Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+test-windows	Run the test-suite	2026-10-08T14:21:41.5923177Z env:
+test-windows	Run the test-suite	2026-10-08T14:21:41.5923434Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.12.10\x64
+test-windows	Run the test-suite	2026-10-08T14:21:41.5923868Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.12.10\x64/lib/pkgconfig
+test-windows	Run the test-suite	2026-10-08T14:21:41.5924325Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+test-windows	Run the test-suite	2026-10-08T14:21:41.5924731Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+test-windows	Run the test-suite	2026-10-08T14:21:41.5925118Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+test-windows	Run the test-suite	2026-10-08T14:21:41.5925424Z ##[endgroup]
+test-windows	Run the test-suite	2026-10-08T14:21:46.2157666Z Requirement already satisfied: pip in C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\site-packages (26.2.1)
+test-windows	Run the test-suite	2026-10-08T14:21:46.7374459Z Collecting pytest
+test-windows	Run the test-suite	2026-10-08T14:21:46.9610658Z   Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:46.9970874Z Requirement already satisfied: colorama>=0.4 in C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\site-packages (from pytest) (0.4.6)
+test-windows	Run the test-suite	2026-10-08T14:21:47.0211815Z Collecting iniconfig>=1.0.1 (from pytest)
+test-windows	Run the test-suite	2026-10-08T14:21:47.0259412Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.0447679Z Requirement already satisfied: packaging>=22 in C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\site-packages (from pytest) (26.3)
+test-windows	Run the test-suite	2026-10-08T14:21:47.0783824Z Collecting pluggy<2,>=1.5 (from pytest)
+test-windows	Run the test-suite	2026-10-08T14:21:47.0834930Z   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.1339411Z Collecting pygments>=2.7.2 (from pytest)
+test-windows	Run the test-suite	2026-10-08T14:21:47.1385257Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.1954158Z Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.3222540Z Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.3456217Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.3712273Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+test-windows	Run the test-suite	2026-10-08T14:21:47.4084497Z    ---------------------------------------- 1.3/1.3 MB 31.9 MB/s  0:00:00
+test-windows	Run the test-suite	2026-10-08T14:21:47.6824929Z Installing collected packages: pygments, pluggy, iniconfig, pytest
+test-windows	Run the test-suite	2026-10-08T14:21:50.0237046Z 
+test-windows	Run the test-suite	2026-10-08T14:21:50.0256868Z Successfully installed iniconfig-2.3.1 pluggy-1.6.0 pygments-2.21.0 pytest-9.1.1
+test-windows	Run the test-suite	2026-10-08T14:21:54.0274870Z ........................................................................ [ 22%]
+test-windows	Run the test-suite	2026-10-08T14:21:57.4758347Z ..................................................................F..... [ 45%]
+test-windows	Run the test-suite	2026-10-08T14:22:00.9277142Z .........................................ss............................. [ 68%]
+test-windows	Run the test-suite	2026-10-08T14:22:10.7150282Z ........................................................................ [ 91%]
+test-windows	Run the test-suite	2026-10-08T14:22:20.5205536Z ..........................                                               [100%]
+test-windows	Run the test-suite	2026-10-08T14:22:20.5207324Z ================================== FAILURES ===================================
+test-windows	Run the test-suite	2026-10-08T14:22:20.5208056Z ____________ test_capture_refuses_modified_source_and_added_reader ____________
+test-windows	Run the test-suite	2026-10-08T14:22:20.5208536Z 
+test-windows	Run the test-suite	2026-10-08T14:22:20.5209545Z tmp_path = WindowsPath('<WindowsTemp>/AppData/Local/Temp/pytest-of-runneradmin/pytest-0/test_capture_refuses_modified_0')
+test-windows	Run the test-suite	2026-10-08T14:22:20.5211227Z monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000026CEDF5AC30>
+test-windows	Run the test-suite	2026-10-08T14:22:20.5211984Z 
+test-windows	Run the test-suite	2026-10-08T14:22:20.5212489Z     def test_capture_refuses_modified_source_and_added_reader(tmp_path, monkeypatch):
+test-windows	Run the test-suite	2026-10-08T14:22:20.5213489Z         import tools.capture_patriot_schema as tool
+test-windows	Run the test-suite	2026-10-08T14:22:20.5214685Z         monkeypatch.setattr(tool.subprocess, 'check_output', lambda *a, **k: tool.TREE)
+test-windows	Run the test-suite	2026-10-08T14:22:20.5215603Z         for name in tool.REVIEWED:
+test-windows	Run the test-suite	2026-10-08T14:22:20.5218815Z             path = tmp_path / name
+test-windows	Run the test-suite	2026-10-08T14:22:20.5219393Z             path.parent.mkdir(parents=True, exist_ok=True)
+test-windows	Run the test-suite	2026-10-08T14:22:20.5220056Z             path.write_bytes(b'unreviewed')
+test-windows	Run the test-suite	2026-10-08T14:22:20.5220796Z >       with pytest.raises(ValueError, match='Unreviewed source bytes'):
+test-windows	Run the test-suite	2026-10-08T14:22:20.5221575Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test-windows	Run the test-suite	2026-10-08T14:22:20.5222229Z E       AssertionError: Regex pattern did not match.
+test-windows	Run the test-suite	2026-10-08T14:22:20.5222887Z E         Expected regex: 'Unreviewed source bytes'
+test-windows	Run the test-suite	2026-10-08T14:22:20.5223676Z E         Actual message: 'Source inventory changed; source-format review required'
+test-windows	Run the test-suite	2026-10-08T14:22:20.5224215Z 
+test-windows	Run the test-suite	2026-10-08T14:22:20.5224383Z tests\test_patriot.py:280: AssertionError
+test-windows	Run the test-suite	2026-10-08T14:22:20.5224894Z =========================== short test summary info ===========================
+test-windows	Run the test-suite	2026-10-08T14:22:20.5225969Z FAILED tests/test_patriot.py::test_capture_refuses_modified_source_and_added_reader - AssertionError: Regex pattern did not match.
+test-windows	Run the test-suite	2026-10-08T14:22:20.5227223Z   Expected regex: 'Unreviewed source bytes'
+test-windows	Run the test-suite	2026-10-08T14:22:20.5227837Z   Actual message: 'Source inventory changed; source-format review required'
+test-windows	Run the test-suite	2026-10-08T14:22:20.5228536Z 1 failed, 311 passed, 2 skipped in 29.74s
+test-windows	Run the test-suite	2026-10-08T14:22:20.6526097Z ##[error]Process completed with exit code 1.
+exit 0

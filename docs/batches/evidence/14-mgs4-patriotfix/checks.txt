@@ -232,3 +232,33 @@ $ python3 docs/batches/evidence/14-mgs4-patriotfix/real-archive-smoke.py /tmp/mg
     ✓ MGSPatriotFix.settings (complete pinned schema validated)
 Actual pinned archive extraction/verification/removal passed; native exports/boots NOT RUN
 exit 0
+
+$ python3 tools/refresh_checksums.py
+
+PATRIOT_SHA256
+  https://github.com/ShizCalev/MGSPatriotFix/releases/download/0.2.2/MGS4_MGSPatriotFix_0.2.2.zip
+  pinned: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+  actual: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1   ✓ match
+
+HDFIX_SHA256
+  https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.0/MGSHDFix_4.1.0.zip
+  pinned: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523
+  actual: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523   ✓ match
+
+M2FIX_SHA256
+  https://github.com/nuggslet/MGSM2Fix/releases/download/v3.6/MGSM2Fix_3.6.0.zip
+  pinned: a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d
+  actual: a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d   ✓ match
+
+GAMES['mgs2']['bugfix_sha256']
+  https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/download/3.0.0/MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip
+  pinned: a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003
+  actual: a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003   ✓ match
+
+GAMES['mgs3']['bugfix_sha256']
+  https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/download/2.0.1/MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip
+  pinned: a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769
+  actual: a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769   ✓ match
+
+All pinned checksums match the live release assets.
+exit 0

@@ -30,3 +30,9 @@ GAMES remains a literal dictionary comparison. No production file changed.
 The failed output remains in checks.txt; the subsequent check is appended.
 
 Evidence hygiene rerun at 4566bf1: 313 tests passed, framework test failed because captured status/traceback output contained local account paths. Normalized those paths in the portable evidence log without changing commands/results/exits. Production code remained unchanged.
+
+CI run 37791777935 at 8d5ac03: Linux Python 3.9/3.11/3.12 passed, Windows
+Python 3.12 failed one capture-refusal test (311 passed, 2 skipped). The capture
+tool converted relative paths with str(), producing Windows backslashes that
+did not match its POSIX source inventory. Changed to Path.as_posix(); the exact
+same Windows test now checks the correction. Failure output is in ci-first-run.txt.

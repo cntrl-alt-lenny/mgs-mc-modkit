@@ -84,7 +84,7 @@ def capture(root):
     head = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
     if head != TREE:
         raise ValueError("Unreviewed PatriotFix tree; source-format review required")
-    actual = {str(p.relative_to(root)) for base in ("src", "ConfigTool")
+    actual = {p.relative_to(root).as_posix() for base in ("src", "ConfigTool")
               for p in (root / base).rglob("*") if p.suffix in (".cpp", ".hpp")}
     if actual != set(REVIEWED):
         raise ValueError("Source inventory changed; source-format review required")
