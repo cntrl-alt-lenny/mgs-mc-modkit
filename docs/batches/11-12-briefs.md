@@ -9,8 +9,8 @@ MGSHDFix settings defect, then a queued installation-plan/executor foundation.
 The owner agrees with the proposed direction. This is planning authorization,
 not approval to merge future production changes or release the kit.
 
-The current repair keeps pinned versions fixed. Later batches cover the desktop
-interface, coordinated upstream upgrades and MGS4 integration. Native exports,
+The current repair keeps pinned versions fixed. A concrete MGS4 integration brief now precedes the installation engine;
+later batches cover the desktop interface and coordinated upstream upgrades. Native exports,
 game boots and audio observations remain distinct from Mac/offline checks.
 Production files, standing scope and framework copies are unchanged.
 
@@ -39,6 +39,7 @@ Small update, not part of either production batch.
 
 ## Failed or blocked
 
-No planning blocker. Batch 12 is intentionally queued until batch 11 is
-reviewed and its merge approved. Verifier dispatches require literal delivery
+No planning blocker. Batch 12 now waits for batch 14 MGS4 integration
+to be independently reviewed and merged, after batch 11. This supersedes the
+earlier sequencing at the immutable original planning commit. Verifier dispatches require literal delivery
 SHAs from Brain, never a moving branch reference.
