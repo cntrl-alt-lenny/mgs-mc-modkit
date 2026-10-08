@@ -32,7 +32,8 @@ preservation/reset, oldest backups, rollback/recovery, locks, cancellation,
 mixed outcomes and removal. [Commands/output/exits](evidence/14-mgs4-patriotfix/checks.txt)
 state checked implementation/evidence commits. Actual source capture equals the
 committed fixture; two independent hashes match the official downloaded archive.
-All five live archive checksums match.
+All five live archive checksums match. Linux 3.9/3.11/3.12 and Windows 3.12
+CI pass at `c2d2302` (run 37792113349).
 Actual PatriotFix ZIP extraction/transaction/removal passes in a disposable
 unlicensed game fixture; no Windows binaries were run.
 
@@ -52,6 +53,6 @@ corrected. Independent evidence helper initially mishandled existing URL
 f-strings; corrected. Saved status/traceback account paths failed document hygiene;
 normalized portable evidence, preserving commands/results/exits. Initial Windows
 CI found backslash/POSIX mismatch in the capture inventory; fixed with as_posix.
-Reruns pass;
+Captured log whitespace was normalized. Reruns pass;
 [attempts](evidence/14-mgs4-patriotfix/attempts.txt) and logs retain failures.
 No approval, merge, tag or publication performed.

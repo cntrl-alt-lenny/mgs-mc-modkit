@@ -381,3 +381,5 @@ $ git -c core.whitespace=cr-at-eol diff --check 67d1406
 docs/batches/evidence/14-mgs4-patriotfix/checks.txt:379: new blank line at EOF.
 exit 2
 
+
+Final diff check: removed blank lines at EOF introduced by log appending; see subsequent git diff --check result.
