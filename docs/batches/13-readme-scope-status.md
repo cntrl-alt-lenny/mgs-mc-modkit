@@ -4,8 +4,8 @@ Path: Small (Brain; documentation only).
 
 ## Done
 
-Clarified the README's implemented Volume 1 scope, explicitly identifying MGS4
-and Peace Walker as not integrated. Replaced the unsupported Steam Deck verified
+Clarified the README's implemented Volume 1 scope, identifying MGS4 as planned
+and Peace Walker as unsupported. Replaced the unsupported Steam Deck verified
 badge with validation pending and linked native release requirements. No product,
 mod pin, framework or standing scope change.
 
@@ -16,6 +16,10 @@ finding identified; source/offline correction is acceptable for owner-approved
 merge. Native validation and publication remain separate outstanding gates.
 The [Brain disposition](evidence/13-readme-scope-status/brain-disposition.md)
 records actual checks and limits.
+
+Following the owner's clarification, supplied the missing concrete MGS4 Worker
+and Verifier brief. MGS4 follows batch 11; the launcher foundation follows MGS4
+and covers all four implemented games. Planning does not claim implementation.
 
 ## Checked
 
@@ -43,6 +47,6 @@ implementation outside the fetched repository was reviewed. No merge or release.
 
 No technical check failure. One documentation patch used a nonmatching context
 and was refused without writes; corrected context succeeded. Owner approval is
-required before merging. A clarification
-about the user's reference to implemented MGS4 support was requested; the
-README draft reports only the repository evidence available here.
+required before merging. The owner confirmed MGS4 was an integration request;
+the earlier Brain handoff had omitted its implementation prompt. That planning
+gap is corrected by the new brief; code integration remains future Worker work.

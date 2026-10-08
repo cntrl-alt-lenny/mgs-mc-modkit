@@ -69,3 +69,27 @@ Checked documentation commit `3538f49e79e1dafcf832b0aba0f3154ad7fd4b51`.
 No production/framework file changed. An initial follow-up documentation patch
 used a nonmatching context; apply_patch refused without writes. Corrected context
 recorded these checks. The follow-up changes only documentation evidence.
+
+## Owner clarification and MGS4 handoff correction
+
+The owner confirmed MGS4 integration was already requested. Brain's earlier
+handoff named MGSPatriotFix but supplied only settings-repair and engine prompts;
+MGS4 remained unspecified future work. The missing concrete Worker/Verifier brief
+is now batch 14. It follows merged batch 11 and precedes batch 12; the updated
+engine brief covers MGS1–4 and supersedes the original three-game sequencing.
+README now says MGS4 integration is planned, without implying it is implemented.
+
+| Planning check | Actual result | Exit |
+| --- | --- | --- |
+| `gh api repos/ShizCalev/MGSPatriotFix/releases/latest` | Stable 0.2.2, not prerelease; published 2026-09-11; MGS4_MGSPatriotFix_0.2.2.zip and separate PW archive | 0 |
+| `gh api repos/ShizCalev/MGSPatriotFix/git/ref/tags/0.2.2` | Commit c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de | 0 |
+| `git clone --depth 1 --branch 0.2.2 https://github.com/ShizCalev/MGSPatriotFix.git /tmp/mgs-brain14-patriotfix-0.2.2` | Same literal tag commit | 0 |
+| `python3 tools/fw.py check` after new brief | 0 error(s), 0 warning(s) | 0 |
+| `git diff --check` after new brief | No output | 0 |
+| Python word count of new prompt fences | Worker 390; Verifier 182; both below 500 | 0 |
+
+Read the official upstream README and releases for game-specific archives,
+Config Tool generation and the documented winmm Proton override. This is planning
+evidence, not a complete archive/schema/defaults audit; the Worker and Verifier
+must independently establish that coupled set. A source search named nonexistent
+src/helper.hpp while matching other files; that path error establishes nothing.

@@ -17,7 +17,7 @@ Steam Deck · Linux · Windows — vanilla-faithful fixes and restorations.
 
 </div>
 
-The installer currently covers **Master Collection Volume 1: MGS1, MGS2 and MGS3**. MGS4 and Peace Walker are not integrated yet.
+The installer currently covers **Master Collection Volume 1: MGS1, MGS2 and MGS3**. MGS4 integration with [MGSPatriotFix](https://github.com/ShizCalev/MGSPatriotFix) is planned but is not available in the installer yet. Peace Walker is not currently supported.
 
 **Development validation is pending.** Automated tests do not establish successful Windows or Steam Deck game boots, audio compatibility, or complete restoration. See the [native release validation requirements](docs/RELEASING.md).
 
