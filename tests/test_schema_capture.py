@@ -97,10 +97,10 @@ def test_alias_chain_and_parenthesized_union(tmp_path):
     assert data['flag_unions']['Target'] == ['MG', 'MGS2', 'MGS3']
 
 
-def test_known_unrelated_game_is_excluded(tmp_path):
+def test_hidden_game_fields_are_saved_too(tmp_path):
     data = capture.capture(source(tmp_path, 'MG'), 'test', 'tree')
-    assert 'First Person Shooter Mode' not in data['fields']
-    assert len(data['fields']) == 2
+    assert data['fields']['First Person Shooter Mode'] == FPS
+    assert len(data['fields']) == 3
 
 
 @pytest.mark.parametrize('flags', ['UNKNOWN', 'MGS2_NEW', 'MGS2 & MGS3', 'MGS2 |',

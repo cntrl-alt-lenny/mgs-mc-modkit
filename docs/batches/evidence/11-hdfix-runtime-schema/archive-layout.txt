@@ -1,0 +1,21 @@
+Implementation commit: 099ae5231a0a99c14db2de727ea1a780e3f61194
+$ Python urllib.request: official pinned HDFIX_URL download; SHA256 comparison
+URL: https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.0/MGSHDFix_4.1.0.zip
+SHA256: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523; match; exit: 0
+$ bsdtar -tf /tmp/mgs-hdfix-batch11.zip
+logs/
+logs/MGSHDFix_Game.log
+logs/MGSHDFix_Launcher.log
+plugins/
+plugins/MGSHDFix Config Tool.exe
+plugins/MGSHDFix.asi
+plugins/MGSHDFix_LICENSE.md
+plugins/MGSHDFix_README.md
+plugins/SMAA.hlsl
+plugins/SMAA_LICENSE.md
+UltimateASILoader_LICENSE.md
+winhttp.dll
+wininet.dll
+
+exit: 0
+Required layout present; exit: 0

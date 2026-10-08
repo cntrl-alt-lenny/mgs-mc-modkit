@@ -6,7 +6,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/cntrl-alt-lenny/mgs-mc-modkit?style=for-the-badge&color=4ade80&label=release)](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/cntrl-alt-lenny/mgs-mc-modkit/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/workflows/ci.yml)
-![Steam Deck](https://img.shields.io/badge/Steam_Deck-verified-1A9FFF?style=for-the-badge&logo=steamdeck&logoColor=white)
+![Steam Deck](https://img.shields.io/badge/Steam_Deck-validation_pending-1A9FFF?style=for-the-badge&logo=steamdeck&logoColor=white)
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D4?style=for-the-badge&logoColor=white)
 ![Python](https://img.shields.io/badge/python3-no_deps-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Licence](https://img.shields.io/badge/licence-MIT-green?style=for-the-badge)

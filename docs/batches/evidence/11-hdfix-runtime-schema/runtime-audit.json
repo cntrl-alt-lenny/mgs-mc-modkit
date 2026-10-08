@@ -1,0 +1,199 @@
+{
+  "source_sha256": {
+    "ConfigTool/main.cpp": "99a7051819fb4e6a5c5d623e718fbb8a97548c41a2ac0043f86094955fc0eabc",
+    "ConfigTool/tab_data.cpp": "f96e385ad00e144d838466a28cad5ccaf447b4312900d27121ba115f49241561",
+    "src/resources/config.cpp": "18581108db3ced5866d00bb31d6300abed2d5f5ec4db5dc1a156e9560add1f73",
+    "src/resources/config_keys.hpp": "67f699e684014a56aedb8b0a4d12c64022f46d1d49807a5d6d3b41f790f6a3df"
+  },
+  "calls": 133,
+  "runtime": {
+    "tree": "f4f662d67a2a033dee0877e436a0fe65eb719e0b",
+    "reads": {
+      "Bugfixes": [
+        "Boost Reverb Volume",
+        "Depth of Field Blur Strength",
+        "Fix  High  CPU  Usage",
+        "Fix Achievement Stat Tracking",
+        "Fix Aiming After Equip",
+        "Fix Aiming On Full Tilt",
+        "Fix Alt-Tab Loading Bugs",
+        "Fix Broken PS2 Visual Effects",
+        "Fix Depth of Field",
+        "Fix Film Grain",
+        "Fix M92 Laser Origin in FPV",
+        "Fix Motion Trails",
+        "Fix Mouse Cursor Showing",
+        "Reverb Volume Multiplier"
+      ],
+      "CAUTION - THIS WILL RESET ALL ACHIEVEMENTS": [
+        "Reset All Achievements"
+      ],
+      "Camera Positioning": [
+        "Disable HD Collection Camera Positioning",
+        "HD Collection Camera Toggle"
+      ],
+      "Caption Settings": [
+        "Caption Opacity (%)",
+        "Caption Outline Opacity (%)",
+        "Caption Size (%)"
+      ],
+      "Controller Settings": [
+        "Button Icons",
+        "DualShock Rumble Strength (%)",
+        "Dualshock 2 && 3 Controller Support",
+        "Restore PS2 Pressure Sensitive Binds",
+        "Set Menu OK && Cancel Button"
+      ],
+      "DISABLE STEAM ACHIEVEMENTS": [
+        "Disable Unlocking Steam Achievements"
+      ],
+      "Damaged Steam Cloud Save Data Fix": [
+        "Enable Console Notification When Fixed",
+        "Fix Mode"
+      ],
+      "Debugging": [
+        "Debug Logging",
+        "Start Game in Developer Menu"
+      ],
+      "Difficulty Restoration": [
+        "Enable Grenade Cooking",
+        "Restore PS2 Solidus Choking Difficulty",
+        "Toggle Grenade Cooking"
+      ],
+      "Enable Game Warnings": [
+        "Warn When FSR Upscaling is Enabled",
+        "Warn When Game is Muted",
+        "Warn When Missing Major Bugfix Mods",
+        "Warn When Save Files Are Read-Only",
+        "Warn When Save Folders Not Writable",
+        "Warn When Windows Slideshow Enabled"
+      ],
+      "Enhancements and Tweaks": [
+        "Anisotropic Filtering Level",
+        "Correct Aspect Ratio to 4:3",
+        "Correct Gamma Levels",
+        "Crop Overscan Area",
+        "Enable SMAA Anti-Aliasing",
+        "Nearest Neighbor Texture Filtering",
+        "Reduce Photosensitive Effects"
+      ],
+      "First Person Shooter Mode": [
+        "Enable First Person Shooter Mode",
+        "First Person Shooter - Movement Enabled By Default",
+        "Keep First Person View Across Rooms",
+        "Tap to Keep First Person View Active",
+        "Toggle First Person Shooter Mode",
+        "Toggle First Person Shooter Movement",
+        "Toggle Tap for First Person View"
+      ],
+      "Hotkeys": [
+        "Capture Hotkeys While Alt Tabbed",
+        "Cycle Wireframe Mode",
+        "Return to Developer Menu",
+        "Toggle Vector Line Fixes"
+      ],
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": [
+        "Render Height",
+        "Render Width"
+      ],
+      "Keep Aiming After Firing": [
+        "Always Keep Aiming",
+        "While Holding Lock On",
+        "While in FPS Mode",
+        "While in First Person"
+      ],
+      "Language Settings": [
+        "Game Language",
+        "Game Region"
+      ],
+      "Launcher and Splashscreens": [
+        "MSX Skip Launcher Game",
+        "Skip In-Game Splashscreens",
+        "Skip Launcher",
+        "Skip Launcher Splashscreens"
+      ],
+      "MGS2 Community Bugfix Compilation Integration": [
+        "Restore Title Screen 2 Color Swapping",
+        "Retro MSX Colonel Sprite"
+      ],
+      "Model Quality && Level of Detail Enhancements": [
+        "Always Show Grass",
+        "Always Show Weapon Shell Casings",
+        "Custom Grass Distance Multiplier",
+        "Force High Quality Characters",
+        "Increase Shadow Resolution",
+        "Make Snake's Bandana Heavier",
+        "Show Soft Particles",
+        "Toggle Always Show Grass"
+      ],
+      "Mouse Sensitivity": [
+        "Override Mouse Sensitivity",
+        "X Multiplier",
+        "Y Multiplier"
+      ],
+      "Speedrunner Settings": [
+        "Fix In-Game Timer Loading Pause",
+        "Force RTC Hostage Type",
+        "Gameplay Stats Overlay",
+        "Restore SoL Elevator Glitch",
+        "Show Pressure Level Overlay"
+      ],
+      "System Specific Fixes": [
+        "Audio Output Mode",
+        "Disable Windows Fullscreen Optimization",
+        "Force Dedicated GPU",
+        "Limit Game to 2 CPU Cores"
+      ],
+      "Third Person Freecam": [
+        "Camera - Zoom In Hotkey",
+        "Camera - Zoom Out Hotkey",
+        "Camera - Zoom Reset Hotkey",
+        "Camera - Zoom Speed",
+        "Camera - Zoom Step Amount",
+        "Enable Third Person Freecam",
+        "Horizontal Camera Sensitivity",
+        "Inherit Camera Rotation",
+        "Inherit Camera Rotation Toggle",
+        "Max Camera Distance",
+        "Third Person View Toggle",
+        "Vertical Camera Sensitivity"
+      ],
+      "Ultra-Wide / 16:10+": [
+        "Fix Aspect Ratio",
+        "Fix FOV",
+        "Fix Framebuffer",
+        "Lock HUD && Movies to 16:9"
+      ],
+      "Update Notifications": [
+        "Check For MGSHDFix Updates",
+        "In-Game Update Notifications"
+      ],
+      "Various": [
+        "Camera Triggers Steam Screenshot",
+        "Custom Lifebar Name",
+        "Enable Radar in Snake Tales",
+        "Fix Vamp Punch Damage Type",
+        "Force Sunglasses",
+        "High Frequency Blade Anywhere",
+        "Pause On Focus Loss",
+        "Restore Japanese Phone Ringtone",
+        "Restore Main Menu Voiceovers",
+        "Restore Node DoB && Bloodtype Entry",
+        "Restore Original Dogtag Names",
+        "Restore PS2 Memory Card Strings",
+        "Restore SoL Radar Rotation",
+        "T.Goggle Color Cycle Hotkey",
+        "Thermal Goggle Default Palette",
+        "Thermal Goggle Palette Swapping",
+        "Use Character Names for Lifebar",
+        "Use Custom Lifebar Name"
+      ],
+      "Window Settings": [
+        "Enable Resolution Overrides",
+        "Fullscreen, Borderless, and Windowed",
+        "Window Height",
+        "Window Width"
+      ]
+    }
+  }
+}

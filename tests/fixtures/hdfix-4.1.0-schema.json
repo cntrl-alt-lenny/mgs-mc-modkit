@@ -68,7 +68,9 @@
     },
     "Enhancements and Tweaks": {
       "Anisotropic Filtering Level": "Int",
+      "Correct Aspect Ratio to 4:3": "Bool",
       "Correct Gamma Levels": "Bool",
+      "Crop Overscan Area": "Bool",
       "Enable SMAA Anti-Aliasing": "Bool",
       "Nearest Neighbor Texture Filtering": "Bool",
       "Reduce Photosensitive Effects": "Bool"
@@ -103,6 +105,7 @@
       "Game Region": "Choice"
     },
     "Launcher and Splashscreens": {
+      "MSX Skip Launcher Game": "Choice",
       "Skip In-Game Splashscreens": "Bool",
       "Skip Launcher": "Bool",
       "Skip Launcher Splashscreens": "Bool"
@@ -283,6 +286,14 @@
         ]
       }
     },
+    "Launcher and Splashscreens": {
+      "MSX Skip Launcher Game": {
+        "choices": [
+          "Metal Gear (MSX)",
+          "Metal Gear 2: Solid Snake"
+        ]
+      }
+    },
     "Various": {
       "Force Sunglasses": {
         "choices": [
@@ -383,7 +394,7 @@
     }
   },
   "source_sha256": {
-    "ConfigTool/tab_data.cpp": "4b7cec4708ae0fa4af6de06ec0244426ba67a826376f6a6d6e37b2aa1a2690c8",
-    "src/resources/config_keys.hpp": "2c06734d5c9ad2abcf7756dc09aa7cc72cce0cb6bc037d7594fbabd9edc40882"
+    "ConfigTool/tab_data.cpp": "f96e385ad00e144d838466a28cad5ccaf447b4312900d27121ba115f49241561",
+    "src/resources/config_keys.hpp": "67f699e684014a56aedb8b0a4d12c64022f46d1d49807a5d6d3b41f790f6a3df"
   }
 }
