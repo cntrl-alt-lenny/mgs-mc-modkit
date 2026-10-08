@@ -27,7 +27,7 @@ print('All candidate Python files: LF and Python 3.9 grammar OK')
 
 
 def constants(body):
-    return {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(body).body
+    return {n.targets[0].id: (ast.literal_eval(n.value) if n.targets[0].id == "GAMES" else ast.dump(n.value)) for n in ast.parse(body).body
             if isinstance(n, ast.Assign) and isinstance(n.targets[0], ast.Name)
             and n.targets[0].id in {'MODKIT_VERSION', 'GAMES', 'HDFIX_VERSION', 'HDFIX_URL', 'HDFIX_SHA256',
                                    'M2FIX_VERSION', 'M2FIX_TAG', 'M2FIX_URL', 'M2FIX_SHA256'}}

@@ -21,3 +21,10 @@ Incidental inspection attempted absent helper/feature paths (exit 1/2).
 Used actual paths from rg --files instead: fixes/various_tweaks.cpp,
 resources/common.hpp and batch 09's source comparison attachment. No guessed
 settings or external changes resulted. Desktop validation remains unavailable.
+
+First exact-commit evidence run at e5075fb: tests (314), lint, compilation,
+framework check/status and shortcut bytes passed. The independent evidence
+script then failed (exit 1) evaluating an existing f-string URL with
+ast.literal_eval. Corrected its comparison to AST dumps for non-GAMES constants;
+GAMES remains a literal dictionary comparison. No production file changed.
+The failed output remains in checks.txt; the subsequent check is appended.
