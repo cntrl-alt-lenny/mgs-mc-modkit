@@ -24,8 +24,12 @@ both shortcut hashes regenerated. Framework copies remain unchanged.
 
 ## Checked
 
-Mac arm64 / Python 3.9.6 offline checks and exact commands, outputs, exits and
-checked implementation SHA are in [checks](evidence/11-hdfix-runtime-schema/checks.txt).
+Mac arm64 / Python 3.9.6: all 283 tests, lint, compilation and framework checks
+passed. Exact commands, outputs, exits and final implementation SHA are in
+[final checks](evidence/11-hdfix-runtime-schema/final-checks.txt); source and
+archive checks are in [initial checks](evidence/11-hdfix-runtime-schema/checks.txt)
+and [archive layout](evidence/11-hdfix-runtime-schema/archive-layout.txt).
+All four live archive checksums match; pinned MGSHDFix layout passed.
 Independent byte checks cover both shortcut tags/hashes, CRLF/LF, unchanged
 pins and Python 3.9 grammar. Source capture refusal regressions remain intact.
 

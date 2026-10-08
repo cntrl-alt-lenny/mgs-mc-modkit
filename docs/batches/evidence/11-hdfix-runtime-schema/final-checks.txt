@@ -1,0 +1,63 @@
+Final implementation commit: 1e264afc443ca0067ab6be40086ee77517d5c6a1
+Mac arm64, Python 3.9.6. Local home paths redacted.
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 76%]
+...................................................................      [100%]
+283 passed in 5.82s
+
+exit: 0
+
+$ python3 -m ruff check .
+All checks passed!
+
+exit: 0
+
+$ python3 -m py_compile tools/fw.py install.py
+
+exit: 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+
+exit: 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/11-hdfix-runtime-schema: 2 commit(s), last 2026-10-08; batch 11-hdfix-runtime-schema: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 2 commit(s), last 2026-10-08; batch 11-12-briefs: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/11-hdfix-runtime-schema; 3 uncommitted change(s)
+  not on GitHub yet: worker/11-hdfix-runtime-schema (2 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <HOME>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 11-hdfix-runtime-schema
+
+exit: 0
+
+$ python3 docs/batches/evidence/11-hdfix-runtime-schema/verify-pins.py
+Install-MGS-Mods.cmd v2.3.0 e3732996b09db0ffd7b38597b1d3e08552701aa0d6078ce7e4093816ba9c308a line endings OK
+Install-MGS-Mods.desktop v2.3.0 e3732996b09db0ffd7b38597b1d3e08552701aa0d6078ce7e4093816ba9c308a line endings OK
+All tracked Python LF / Python 3.9 grammar OK
+All mod pins/checksums/URLs, kit version and framework copies unchanged from 90967b9
+
+exit: 0
+
+$ git diff 90967b9 --check -- . :!Install-MGS-Mods.cmd
+
+exit: 0
+
+$ Compare AST-literal main SETTINGS_SCHEMA with new schema minus only migration keys
+Exact old 128-key schema matches; exit: 0

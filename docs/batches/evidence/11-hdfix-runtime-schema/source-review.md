@@ -49,3 +49,11 @@ still use InstallTxn and its rollback/recovery behavior.
 Native per-game Config Tool exports, initialization/gameplay and Deck behavior
 are NOT RUN. Static source evidence supports these three defaults and schema
 corrections; it does not validate dynamic choices or platform runtime behavior.
+
+Other attempts retained: the web page reader could not fetch the official tag
+page (restricted URL); the official HTTPS git clone and remote tag comparison
+succeeded. During compatibility-comment editing, an intermediate unpushed
+header edit removed/misplaced unrelated documentation; diff review caught it,
+the full original usage/transaction prose was restored, and final compilation,
+lint and all 283 tests passed. Those local comment-only edits were consolidated
+before pushing; the functional implementation commit remains separately stated.
