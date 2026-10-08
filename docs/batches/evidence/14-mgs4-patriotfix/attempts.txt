@@ -28,3 +28,5 @@ script then failed (exit 1) evaluating an existing f-string URL with
 ast.literal_eval. Corrected its comparison to AST dumps for non-GAMES constants;
 GAMES remains a literal dictionary comparison. No production file changed.
 The failed output remains in checks.txt; the subsequent check is appended.
+
+Evidence hygiene rerun at 4566bf1: 313 tests passed, framework test failed because captured status/traceback output contained local account paths. Normalized those paths in the portable evidence log without changing commands/results/exits. Production code remained unchanged.
