@@ -177,7 +177,154 @@ M2FIX_URL = (
 )
 M2FIX_SHA256 = "a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d"
 
+# Independently audited PatriotFix archive/schema set; MGS1–3 pins stay fixed.
+PATRIOT_VERSION = "0.2.2"
+PATRIOT_TREE = "c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de"
+PATRIOT_URL = ("https://github.com/ShizCalev/MGSPatriotFix/releases/download/"
+               "0.2.2/MGS4_MGSPatriotFix_0.2.2.zip")
+PATRIOT_SHA256 = "4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1"
+PATRIOT_PAYLOAD = ('Launcher/d3d11.dll',
+ 'Launcher/scripts/MGSPatriotFix.asi',
+ 'logs/MGSPatriotFix_Game.log',
+ 'logs/MGSPatriotFix_Launcher.log',
+ 'logs/UltimateASILoader_LICENSE.md',
+ 'MGS4/scripts/MGSPatriotFix.asi',
+ 'MGS4/scripts/MGSPatriotFix_LICENSE.md',
+ 'MGS4/winmm.dll',
+ 'MGSPatriotFix Config Tool.exe',
+ 'MGSPatriotFix_README.md')
+PATRIOT_FIELDS = {'Controller Settings': {'Button Icons': {'choices': ['AUTO',
+                                                      'Xbox',
+                                                      'PlayStation 4',
+                                                      'PlayStation 5',
+                                                      'Nintendo Switch'],
+                                          'default': 'AUTO',
+                                          'flags': '(MGS4)',
+                                          'type': 'Choice'},
+                         'Button Icons (PW)': {'choices': ['Keyboard',
+                                                           'Xbox',
+                                                           'PlayStation 4',
+                                                           'PlayStation 5',
+                                                           'Nintendo Switch'],
+                                               'default': 'Keyboard',
+                                               'flags': '(MGSPW)',
+                                               'type': 'Choice'},
+                         'Enable DualShock 3 Support': {'default': 0,
+                                                        'flags': '(MGS4)',
+                                                        'type': 'Bool'},
+                         'Set Menu OK && Cancel Button': {'choices': ['Default',
+                                                                      'East for OK',
+                                                                      'South for OK'],
+                                                          'default': 'Default',
+                                                          'flags': '(MGS4)',
+                                                          'type': 'Choice'}},
+ 'Debugging': {'Debug Logging': {'default': 0, 'flags': '(MGS4|MGSPW)', 'type': 'Bool'},
+               'Log Create Results': {'default': 0, 'flags': '(MGS4)', 'type': 'Bool'},
+               'Log Framebuffers': {'default': 0, 'flags': '(MGS4)', 'type': 'Bool'},
+               'MSAA Log Targets': {'default': 0, 'flags': '(MGS4)', 'type': 'Bool'}},
+ 'Enhancements && Tweaks': {'Anisotropic Filtering Level': {'default': 16,
+                                                            'flags': '(MGS4)',
+                                                            'range': [1, 16],
+                                                            'type': 'Int'},
+                            'Custom Shadow Resolution': {'choices': ['0',
+                                                                     '512',
+                                                                     '1024',
+                                                                     '2048',
+                                                                     '4096'],
+                                                         'default': '0',
+                                                         'flags': '(MGS4)',
+                                                         'type': 'Choice'},
+                            'Disable Dynamic Resolution': {'default': 0,
+                                                           'flags': '(MGS4)',
+                                                           'type': 'Bool'},
+                            'Disable Motion Blur': {'default': 0,
+                                                    'flags': '(MGS4)',
+                                                    'type': 'Bool'},
+                            'Pause On Focus Loss': {'default': 0,
+                                                    'flags': '(MGS4)',
+                                                    'type': 'Bool'}},
+ 'Language Settings': {'Game Language': {'choices': ['en', 'fr', 'gr', 'it', 'jp', 'pt', 'sp'],
+                                         'default': 'en',
+                                         'flags': '(MGS4|MGSPW)',
+                                         'type': 'Choice'},
+                       'Game Region': {'choices': ['eu', 'jp'],
+                                       'default': 'eu',
+                                       'flags': '(MGS4|MGSPW)',
+                                       'type': 'Choice'}},
+ 'Launcher and Splashscreens': {'Cutscenes (PW)': {'choices': ['Original', 'High-Resolution'],
+                                                   'default': 'Original',
+                                                   'flags': '(MGSPW)',
+                                                   'type': 'Choice'},
+                                'Internal Resolution (PW)': {'choices': ['Original', 'FHD'],
+                                                             'default': 'Original',
+                                                             'flags': '(MGSPW)',
+                                                             'type': 'Choice'},
+                                'Internal Upscaling (PW)': {'choices': ['Original',
+                                                                        'FHD',
+                                                                        'WQHD',
+                                                                        '4K'],
+                                                            'default': 'Original',
+                                                            'flags': '(MGSPW)',
+                                                            'type': 'Choice'},
+                                'Skip In-Game Splashscreens': {'default': 0,
+                                                               'flags': '(MGS4)',
+                                                               'type': 'Bool'},
+                                'Skip Launcher': {'default': 0,
+                                                  'flags': '(MGS4 | MGSPW)',
+                                                  'type': 'Bool'},
+                                'Skip Launcher Splashscreens': {'choices': ['Disabled',
+                                                                            'Game Start',
+                                                                            'Main Menu'],
+                                                                'default': 'Disabled',
+                                                                'flags': '(MGS4)',
+                                                                'type': 'Choice'},
+                                'Skip Launcher Splashscreens (PW)': {'choices': ['Disabled',
+                                                                                 'Game Start'],
+                                                                     'default': 'Disabled',
+                                                                     'flags': '(MGSPW)',
+                                                                     'type': 'Choice'}},
+ 'Mouse Settings': {'Mouse Horizontal Sensitivity': {'default': 1.0,
+                                                     'flags': '(MGS4)',
+                                                     'range': [0.05, 10.0],
+                                                     'type': 'Float'},
+                    'Mouse Vertical Sensitivity': {'default': 1.0,
+                                                   'flags': '(MGS4)',
+                                                   'range': [0.05, 10.0],
+                                                   'type': 'Float'},
+                    'Use Raw Mouse Input': {'default': 0, 'flags': '(MGS4)', 'type': 'Bool'}},
+ 'System Specific Fixes': {'Disable Windows Fullscreen Optimization': {'default': 0,
+                                                                       'flags': '(MGS4|MGSPW)',
+                                                                       'type': 'Bool'}},
+ 'Update Notifications': {'Check For MGSPatriotFix Updates': {'default': 1,
+                                                              'flags': '(MGS4|MGSPW)',
+                                                              'type': 'Bool'},
+                          'In-Game Update Notifications': {'default': 1,
+                                                           'flags': '(MGS4|MGSPW)',
+                                                           'type': 'Bool'}}}
+PATRIOT_LANGUAGES = (('eu', 'en'), ('eu', 'fr'), ('eu', 'it'), ('eu', 'gr'), ('eu', 'sp'), ('eu', 'pt'), ('jp', 'jp'))
+# Options use their own names so an MGS2/3 button choice cannot leak into MGS4.
+PATRIOT_OPTIONS = {
+    "skip_launcher": ("Launcher and Splashscreens", "Skip Launcher"),
+    "patriot_skip_splash": ("Launcher and Splashscreens", "Skip In-Game Splashscreens"),
+    "patriot_launcher_splash": ("Launcher and Splashscreens", "Skip Launcher Splashscreens"),
+    "patriot_icons": ("Controller Settings", "Button Icons"),
+    "patriot_ds3": ("Controller Settings", "Enable DualShock 3 Support"),
+    "patriot_menu": ("Controller Settings", "Set Menu OK && Cancel Button"),
+    "patriot_raw_mouse": ("Mouse Settings", "Use Raw Mouse Input"),
+    "patriot_motion_blur_off": ("Enhancements && Tweaks", "Disable Motion Blur"),
+    "patriot_dynamic_res_off": ("Enhancements && Tweaks", "Disable Dynamic Resolution"),
+    "patriot_shadows": ("Enhancements && Tweaks", "Custom Shadow Resolution"),
+    "patriot_filtering": ("Enhancements && Tweaks", "Anisotropic Filtering Level"),
+}
+
 GAMES = {
+    "mgs4": {
+        "key": "mgs4", "kind": "patriot", "short": "MGS4",
+        "name": "Metal Gear Solid 4: Guns of the Patriots",
+        "appid": "2492670", "dirname": "METAL GEAR SOLID 4",
+        "exe": "MGS4/mgs4.exe",
+        "launch": 'WINEDLLOVERRIDES="winmm=n,b" %command%',
+    },
     "mgs2": {
         "key": "mgs2",
         "name": "Metal Gear Solid 2: Sons of Liberty",
@@ -1277,6 +1424,21 @@ def library_paths(steam_root: Path) -> list[Path]:
     return out
 
 
+def validate_game_destination(key: str, game_dir: Path) -> None:
+    if key != "mgs4":
+        return
+    if game_dir.is_symlink() or any((game_dir / name).is_symlink() for name in ("MGS4", "Launcher")):
+        raise RuntimeError("MGS4 destination uses a linked root/game/launcher folder.")
+    for rel in ("MGS4/mgs4.exe", "Launcher/launcher.exe"):
+        path = _safe_game_path(game_dir, rel)
+        if path.is_symlink() or not path.is_file():
+            raise RuntimeError("Select the MGS4 Steam root containing MGS4/mgs4.exe and Launcher/launcher.exe.")
+    other = ("mgspw/METAL GEAR SOLID PEACE WALKER.exe", "mgs4.exe",
+             "METAL GEAR SOLID.exe", "METAL GEAR SOLID2.exe", "METAL GEAR SOLID3.exe")
+    if any((game_dir / rel).exists() for rel in other):
+        raise RuntimeError("Ambiguous MGS4 destination contains another game's executable/layout.")
+
+
 def find_games() -> dict[str, tuple[Path, Path]]:
     """Return {game_key: (game_dir, steam_root)} for whatever is installed."""
     found: dict[str, tuple[Path, Path]] = {}
@@ -1287,6 +1449,11 @@ def find_games() -> dict[str, tuple[Path, Path]]:
                     continue
                 d = lib / "steamapps/common" / g["dirname"]
                 if (d / g["exe"]).is_file():
+                    if key == "mgs4":
+                        try:
+                            validate_game_destination(key, d)
+                        except RuntimeError:
+                            continue
                     found[key] = (d, root)
     return found
 
@@ -1545,13 +1712,19 @@ def staged_files(archive: Path, staging: Path, on_progress=None) -> list[str]:
 # shutil.disk_usage works on every platform; os.statvfs is Unix-only.
 def validate_payload_paths(rels: list[str], game_key: str,
                            component: str | None, log) -> list[str]:
+    if component == "patriot":
+        if game_key != "mgs4" or set(rels) != set(PATRIOT_PAYLOAD) or len(rels) != len(PATRIOT_PAYLOAD):
+            raise UnsafeArchiveError("PatriotFix payload does not match the reviewed MGS4 archive.")
+        # Upstream ships README placeholders as logs. Preserve runtime diagnostics.
+        rels = [r for r in rels if not r.endswith(".log")]
     out, seen = [], set()
     for rel in rels:
         norm = rel.replace("\\", "/").lower()
         parts = norm.split("/")
         if (_rel_is_unsafe(rel) or MODKIT_DIRNAME in parts
                 or any(p.endswith("_savedata_win") for p in parts)
-                or parts[-1] in {g["exe"].lower() for g in GAMES.values()}):
+                or norm in {g["exe"].lower() for g in GAMES.values()}
+                or parts[-1] in {Path(g["exe"]).name.lower() for g in GAMES.values()}):
             raise UnsafeArchiveError(f"Archive cannot write protected destination {rel!r}.")
         if norm in seen:
             raise UnsafeArchiveError(f"Archive has conflicting paths: {rel!r}.")
@@ -1831,6 +2004,8 @@ def recover_interrupted(game_dir: Path, log) -> tuple[list[str], bool]:
             if not isinstance(entry, dict) or type(entry.get("existed")) is not bool:
                 raise ValueError("invalid recovery entry")
             rel = entry.get("path")
+            if (game_dir / "MGS4/mgs4.exe").is_file() and rel not in set(PATRIOT_PAYLOAD) | {"MGSPatriotFix.settings"}:
+                raise ValueError("MGS4 recovery points outside reviewed mod files")
             folded = rel.replace("\\", "/").casefold() if isinstance(rel, str) else None
             if folded in seen:
                 raise ValueError("duplicate recovery path")
@@ -1846,6 +2021,8 @@ def recover_interrupted(game_dir: Path, log) -> tuple[list[str], bool]:
         if not isinstance(new_backups, list):
             raise ValueError("invalid backup list")
         for rel in new_backups:
+            if (game_dir / "MGS4/mgs4.exe").is_file() and rel not in set(PATRIOT_PAYLOAD) | {"MGSPatriotFix.settings"}:
+                raise ValueError("MGS4 recovery backup points outside reviewed mod files")
             _safe_game_path(root / "backups", rel)
     except (ValueError, TypeError, RuntimeError, AttributeError) as e:
         raise CorruptManifestError("Unsafe recovery record; files and backups were kept.") from e
@@ -1960,6 +2137,8 @@ class InstallTxn:
                 raise CorruptManifestError("A backup is a link; nothing was changed.")
             for name in names:
                 rel = (Path(dirpath) / name).relative_to(self.backups).as_posix()
+                if self.game_key == "mgs4" and rel not in set(PATRIOT_PAYLOAD) | {"MGSPatriotFix.settings"}:
+                    raise CorruptManifestError("MGS4 orphan backup is outside reviewed mod files; backups were kept.")
                 if rel not in self._backed_up:
                     self.overwritten.append({"path": rel, "backup": "backups/" + rel})
                     self._backed_up.add(rel)
@@ -2138,6 +2317,95 @@ def install_hdfix(tx: InstallTxn, tmp: Path, log) -> None:
             "MGSHDFix extraction failed (missing: "
             f"{', '.join(missing) or 'plugins/MGSHDFix.asi'})")
     log("    ✓ winhttp.dll + wininet.dll + plugins/MGSHDFix.asi")
+
+
+def install_patriot(tx: InstallTxn, tmp: Path, opts: dict, log) -> None:
+    validate_game_destination(tx.game_key, tx.game_dir)
+    if tx.game_key != "mgs4":
+        raise RuntimeError("PatriotFix requires MGS4")
+    # A previous kit manifest proves ownership, not compatibility of other loaders.
+    managed = set(tx._prior_added) | set(tx._backed_up)
+    expected = set(PATRIOT_PAYLOAD)
+    for folder in (tx.game_dir / "MGS4", tx.game_dir / "Launcher"):
+        for name in ("dinput8.dll", "dxgi.dll", "d3d11.dll", "winmm.dll", "winhttp.dll", "wininet.dll", "version.dll", "dsound.dll", "d3d9.dll"):
+            rel = (folder / name).relative_to(tx.game_dir).as_posix()
+            if (folder / name).exists() and (rel not in expected or rel not in managed):
+                raise RuntimeError("Unmanaged or conflicting ASI loader: " + rel + "; remove it manually before installing.")
+    for folder in (tx.game_dir / "MGS4", tx.game_dir / "Launcher"):
+        for path in folder.rglob("MGSPatriotFix.asi"):
+            if path.relative_to(tx.game_dir).as_posix() not in expected:
+                raise RuntimeError("Duplicate PatriotFix ASI outside its reviewed location: " + str(path.relative_to(tx.game_dir)))
+    archive = tmp / f"MGS4_MGSPatriotFix_{PATRIOT_VERSION}.zip"
+    fetch(PATRIOT_URL, archive, log, sha256=PATRIOT_SHA256)
+    tx.install_archive(archive, component="patriot")
+    write_patriot_settings(tx, opts, log)
+    tx.note_mod("MGSPatriotFix", PATRIOT_VERSION)
+
+
+def patriot_defaults() -> configparser.ConfigParser:
+    parser = parse_ini("")
+    for section, keys in PATRIOT_FIELDS.items():
+        parser.add_section(section)
+        for key, field in keys.items():
+            value = field["default"]
+            parser[section][key] = json.dumps(value) if field["type"] == "Choice" else str(value)
+    # Source hooks only alter samplers whose MaxAnisotropy is 8. Write 8 back.
+    parser["Enhancements && Tweaks"]["Anisotropic Filtering Level"] = "8"
+    parser["Enhancements && Tweaks"]["Pause On Focus Loss"] = "1"
+    parser["Launcher and Splashscreens"]["Skip Launcher"] = "1"
+    parser["Launcher and Splashscreens"]["Skip In-Game Splashscreens"] = "1"
+    parser["Update Notifications"]["Check For MGSPatriotFix Updates"] = "0"
+    return parser
+
+
+def validate_patriot_settings(body: str) -> configparser.ConfigParser:
+    try:
+        parser = parse_ini(body)
+        if parser.defaults() or set(parser.sections()) != set(PATRIOT_FIELDS):
+            raise ValueError("section names do not match PatriotFix 0.2.2")
+        for section, keys in PATRIOT_FIELDS.items():
+            if set(parser[section]) != set(keys):
+                raise ValueError("keys do not match PatriotFix 0.2.2: " + section)
+            for key, field in keys.items():
+                value = parser[section][key]
+                kind = field["type"]
+                if kind == "Choice":
+                    if value not in [json.dumps(v) for v in field["choices"]]:
+                        raise ValueError("Unsupported choice: " + key)
+                elif kind == "Bool":
+                    if value not in ("0", "1"):
+                        raise ValueError("Expected 0/1: " + key)
+                else:
+                    number = int(value) if kind == "Int" else float(value)
+                    low, high = field["range"]
+                    if not math.isfinite(number) or not low <= number <= high:
+                        raise ValueError("Out of range: " + key)
+        lang = parser["Language Settings"]
+        if (lang["Game Region"].strip('"'), lang["Game Language"].strip('"')) not in PATRIOT_LANGUAGES:
+            raise ValueError("Unsupported region/language pair")
+        return parser
+    except (configparser.Error, ValueError) as e:
+        raise RuntimeError("PatriotFix settings validation failed: " + str(e)) from e
+
+
+def write_patriot_settings(tx: InstallTxn, opts: dict, log) -> None:
+    parser = patriot_defaults()
+    existing = opts.get("_existing_patriot")
+    if existing and not opts.get("_reset"):
+        parser = validate_patriot_settings(existing)
+        changed = opts.get("_changed", set())
+    else:
+        changed = set(PATRIOT_OPTIONS)
+    for option, (section, key) in PATRIOT_OPTIONS.items():
+        if option in changed and option in opts:
+            value = opts[option]
+            kind = PATRIOT_FIELDS[section][key]["type"]
+            parser[section][key] = json.dumps(value) if kind == "Choice" else str(int(value))
+    parser["Update Notifications"]["Check For MGSPatriotFix Updates"] = "0"
+    body = render_ini(parser)
+    validate_patriot_settings(body)
+    tx.write_bytes("MGSPatriotFix.settings", body.replace("\n", "\r\n").encode("utf-8"))
+    log("    ✓ MGSPatriotFix.settings (complete pinned schema validated)")
 
 
 def install_better_audio(tx: InstallTxn, components: list[dict], log,
@@ -2462,6 +2730,9 @@ def set_launcher_options(tx: InstallTxn, g: dict, steam_root: Path,
 
 def verify_install(g: dict, game_dir: Path) -> list[str]:
     """Return a list of human-readable problems (empty == all good)."""
+    if g.get("kind") == "patriot":
+        rels = [r for r in PATRIOT_PAYLOAD if not r.endswith(".log")] + ["MGSPatriotFix.settings"]
+        return [f"missing {rel}" for rel in rels if not (game_dir / rel).is_file()]
     if g.get("kind", "hdfix") == "m2fix":
         return [f"missing {rel}" for rel in
                 ("d3d11.dll", "dinput8.dll", "MGSM2Fix64.asi", "MGSM2Fix.ini")
@@ -2491,6 +2762,13 @@ def _validate_manifest(data: object, game_dir: Path, root: Path
     if not isinstance(overwritten, list):
         raise ValueError("manifest has an invalid overwritten-file list")
 
+    if (game_dir / "MGS4/mgs4.exe").is_file() and data.get("game") != "mgs4":
+        raise ValueError("MGS4 install record belongs to a different or unknown game")
+    if data.get("game") == "mgs4":
+        allowed = set(PATRIOT_PAYLOAD) | {"MGSPatriotFix.settings"}
+        recorded = added + [entry.get("path") for entry in overwritten if isinstance(entry, dict)]
+        if any(rel not in allowed for rel in recorded):
+            raise ValueError("MGS4 record points outside its reviewed mod files; saves and originals were kept")
     for rel in added:
         _safe_game_path(game_dir, rel)
         if rel.replace("\\", "/").split("/")[0].casefold() == MODKIT_DIRNAME:
@@ -2590,6 +2868,8 @@ def _uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                         if src.is_symlink():
                             raise RuntimeError(
                                 f"backup source {rel} is a symbolic link")
+                        if (game_dir / "MGS4/mgs4.exe").is_file() and rel not in set(PATRIOT_PAYLOAD) | {"MGSPatriotFix.settings"}:
+                            raise RuntimeError("MGS4 orphan backup is outside reviewed mod files")
                         dst = _safe_game_path(game_dir, rel)
                         dst.parent.mkdir(parents=True, exist_ok=True)
                         atomic_copy(src, dst)
@@ -3203,7 +3483,7 @@ def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
 # ---------------------------------------------------------------------------
 def launch_option_for(key: str) -> str:
     g = GAMES[key]
-    return g["launch"] if g.get("kind") == "m2fix" else LAUNCH_OPTIONS
+    return g.get("launch", LAUNCH_OPTIONS)
 
 
 def build_launch_options_text(found_keys) -> str:
@@ -3216,7 +3496,7 @@ def build_launch_options_text(found_keys) -> str:
         "Properties → General → Launch Options",
         "",
     ]
-    for key in ("mgs1", "mgs2", "mgs3"):        # stable, game-number order
+    for key in ("mgs1", "mgs2", "mgs3", "mgs4"):        # stable, game-number order
         if key not in found_keys:
             continue
         short = GAMES[key]["short"]
@@ -3614,7 +3894,8 @@ def run_uninstall(ui: UI, log) -> int:
 def has_untracked_mods(game_dir: Path) -> bool:
     return any((game_dir / rel).exists() for rel in (
         "winhttp.dll", "wininet.dll", "plugins/MGSHDFix.asi",
-        "d3d11.dll", "dinput8.dll", "MGSM2Fix64.asi", *LEGACY_M2FIX_FILES))
+        "d3d11.dll", "dinput8.dll", "MGSM2Fix64.asi",
+        "MGS4/winmm.dll", "Launcher/d3d11.dll", "MGS4/scripts/MGSPatriotFix.asi", *LEGACY_M2FIX_FILES))
 
 
 def start_session_log():
@@ -3701,7 +3982,20 @@ def options_for_game(key: str, location: tuple, defaults: dict, log) -> dict:
     if (game_dir / MODKIT_DIRNAME / JOURNAL_NAME).exists():
         # The worker recovers under the lock before reading potentially interrupted files.
         return opts
-    if GAMES[key].get("kind", "hdfix") == "hdfix":
+    if GAMES[key].get("kind") == "patriot":
+        parser = patriot_defaults()
+        path = game_dir / "MGSPatriotFix.settings"
+        if path.exists():
+            if path.is_symlink() or not path.is_file():
+                raise RuntimeError("PatriotFix settings must be a regular file")
+            text = path.read_text(encoding="utf-8-sig")
+            parser = validate_patriot_settings(text)
+            opts["_existing_patriot"] = text
+        for option, (section, field) in PATRIOT_OPTIONS.items():
+            value = parser[section][field]
+            kind = PATRIOT_FIELDS[section][field]["type"]
+            opts[option] = json.loads(value) if kind == "Choice" else (value == "1" if kind == "Bool" else int(value))
+    elif GAMES[key].get("kind", "hdfix") == "hdfix":
         path = game_dir / "plugins/MGSHDFix.settings"
         if path.is_file():
             text = path.read_text(encoding="utf-8-sig")
@@ -3774,17 +4068,23 @@ def _main(log, log_path=None) -> int:
     found = find_games()
     if not found:
         ui.info("Couldn't auto-detect any Master Collection game "
-                "(MGS1, MGS2 or MGS3).\n\n"
+                "(MGS1, MGS2, MGS3 or MGS4).\n\n"
                 "Next you'll be asked to point at a game folder manually "
                 "(the one containing 'METAL GEAR SOLID.exe', "
-                "'METAL GEAR SOLID2.exe' or 'METAL GEAR SOLID3.exe').")
-        manual = ui.pick_dir("Select your MGS1, MGS2 or MGS3 folder")
+                "'METAL GEAR SOLID2.exe', 'METAL GEAR SOLID3.exe', or for MGS4 "
+                "the root containing MGS4/mgs4.exe and Launcher/launcher.exe).")
+        manual = ui.pick_dir("Select your Master Collection game root")
         if not manual:
             ui.error("No install selected. Aborting.")
             return 1
         d = Path(manual)
         for key, g in GAMES.items():
             if (d / g["exe"]).is_file():
+                try:
+                    validate_game_destination(key, d)
+                except RuntimeError as e:
+                    ui.error(str(e))
+                    return 1
                 found[key] = (d, next(iter(steam_roots()),
                                       Path.home() / ".local/share/Steam"))
         if not found:
@@ -3820,6 +4120,7 @@ def _main(log, log_path=None) -> int:
     # MGS1-only install must not silently inherit the defaults with no say.
     hdfix_sel = [k for k in found if GAMES[k].get("kind", "hdfix") == "hdfix"]
     m2fix_sel = [k for k in found if GAMES[k].get("kind") == "m2fix"]
+    patriot_sel = [k for k in found if GAMES[k].get("kind") == "patriot"]
     device = detect_device()
     opts = {
         "device": device,
@@ -3835,6 +4136,14 @@ def _main(log, log_path=None) -> int:
     # A previous run's choices win over the generic defaults, so someone who
     # picked 5.1 sound or PS2 buttons doesn't have to set them again.
     defaults = dict(opts)
+    pp = patriot_defaults()
+    for option, (section, field) in PATRIOT_OPTIONS.items():
+        if option == "skip_launcher":
+            continue
+        value = pp[section][field]
+        kind = PATRIOT_FIELDS[section][field]["type"]
+        defaults[option] = json.loads(value) if kind == "Choice" else (value == "1" if kind == "Bool" else int(value))
+    opts.update({k: v for k, v in defaults.items() if k.startswith("patriot_")})
     try:
         per_game = {key: options_for_game(key, location, defaults, log)
                     for key, location in found.items()}
@@ -3844,6 +4153,8 @@ def _main(log, log_path=None) -> int:
         return 1
     if len(found) == 1:
         opts.update(per_game[next(iter(found))])
+    for key in patriot_sel:
+        opts.update({k: v for k, v in per_game[key].items() if k.startswith("patriot_")})
     opts["_changed"] = set()
     notice = kit_update_notice(log)
 
@@ -3856,7 +4167,9 @@ def _main(log, log_path=None) -> int:
         plan = []
         for key in found:
             g, (d, _) = GAMES[key], found[key]
-            if g.get("kind", "hdfix") == "m2fix":
+            if g.get("kind") == "patriot":
+                bits = ["MGSPatriotFix 0.2.2", "settings reviewed below"]
+            elif g.get("kind", "hdfix") == "m2fix":
                 bits = ["MGSM2Fix"]
             else:
                 bits = ["MGSHDFix", "Community Bugfix pack", "tuned settings"]
@@ -3875,6 +4188,11 @@ def _main(log, log_path=None) -> int:
                 settings.append(f"  Buttons: {game_opts['button_icons']} · Sound: {game_opts['audio_mode']} · "
                                 f"HQ movies: {'on' if game_opts['hq_movies'] else 'off'} · "
                                 f"Skip logos: {'yes' if game_opts['skip_splash'] else 'no'}")
+            if key in patriot_sel:
+                settings.append(f"  Buttons: {game_opts['patriot_icons']} · DS3: {game_opts['patriot_ds3']} · "
+                                f"Disable blur: {game_opts['patriot_motion_blur_off']} · "
+                                f"Disable dynamic resolution: {game_opts['patriot_dynamic_res_off']} · "
+                                f"Shadows: {game_opts['patriot_shadows']} · Filtering: {game_opts['patriot_filtering']}×")
         settings.append("Recommended defaults will replace custom settings." if any(
             o.get("_reset") for o in per_game.values()) else
             "Existing custom settings are preserved per game; reset is optional.")
@@ -3904,7 +4222,7 @@ def _main(log, log_path=None) -> int:
                 per_game[key].update(defaults)
                 per_game[key]["_reset"] = True
         else:
-            ask_options(ui, opts, hdfix_sel, m2fix_sel)
+            ask_options(ui, opts, hdfix_sel, m2fix_sel, patriot_sel)
             for game_opts in per_game.values():
                 for option in opts["_changed"]:
                     game_opts[option] = opts[option]
@@ -3954,7 +4272,10 @@ def _main(log, log_path=None) -> int:
                         tx.settings = {k: game_opts[k] for k in SAVED_OPT_KEYS if k in game_opts}
                         try:
                             stage("Preparing", 0.05)
-                            if g.get("kind", "hdfix") == "m2fix":
+                            if g.get("kind") == "patriot":
+                                stage("Installing MGSPatriotFix", 0.4)
+                                install_patriot(tx, tmp, game_opts, log)
+                            elif g.get("kind", "hdfix") == "m2fix":
                                 stage("Installing MGSM2Fix", 0.4)
                                 install_m2fix(tx, tmp, game_opts, log)
                             else:
@@ -3979,6 +4300,8 @@ def _main(log, log_path=None) -> int:
                                 raise RuntimeError("Verification failed: " + ", ".join(problems))
                             if key in hdfix_sel:
                                 validate_settings((game_dir / "plugins/MGSHDFix.settings").read_text(encoding="utf-8-sig"))
+                            if key in patriot_sel:
+                                validate_patriot_settings((game_dir / "MGSPatriotFix.settings").read_text(encoding="utf-8-sig"))
                             check_cancelled()
                             tx.commit()
                             outcomes[key] = "installed and verified"
@@ -4042,7 +4365,7 @@ def _main(log, log_path=None) -> int:
     # Linux/Steam Deck: Proton needs per-game launch options, and Steam
     # reverts config edits made while it runs — so this one step stays manual.
     lo_lines = [f"   {GAMES[key]['short']}:  {launch_option_for(key)}"
-                for key in ("mgs1", "mgs2", "mgs3") if key in found]
+                for key in ("mgs1", "mgs2", "mgs3", "mgs4") if key in found]
     # Always write the reference file — it's tiny, it's the one step we can't
     # do for the user, and the old "save it? (recommended: yes)" prompt was a
     # question whose answer was never in doubt.
@@ -4090,7 +4413,7 @@ def main() -> int:
             stream.close()
 
 
-def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
+def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel, patriot_sel=()) -> None:
     """The 'Change settings' branch — only reached if the user asks for it.
 
     Every option here already defaults to the recommended answer, which is why
@@ -4131,10 +4454,31 @@ def ask_options(ui: UI, opts: dict, hdfix_sel, m2fix_sel) -> None:
             ("hq_movies", "High-quality cutscenes", opts["hq_movies"]),
             ("skip_splash", "Skip the KONAMI intro logos", opts["skip_splash"]),
         ]
-    if hdfix_sel or m2fix_sel:
+    if hdfix_sel or m2fix_sel or patriot_sel:
         extra_items.append(
             ("skip_launcher", "Boot straight into the games",
              opts["skip_launcher"]))
+    if patriot_sel:
+        for option, title in (("patriot_icons", "MGS4 button prompts"),
+                              ("patriot_menu", "MGS4 menu confirm/cancel"),
+                              ("patriot_shadows", "MGS4 shadow resolution (0 keeps original)")):
+            section, key = PATRIOT_OPTIONS[option]
+            choices = PATRIOT_FIELDS[section][key]["choices"]
+            picked = ui.menu(title, "Choose a setting before installation:", [(c, c) for c in choices])
+            if picked is not None:
+                opts[option] = picked
+                opts["_changed"].add(option)
+        picked = ui.menu("MGS4 texture filtering", "8× preserves original sampler values.",
+                         [(str(v), str(v) + "×") for v in (8, 1, 2, 4, 16)])
+        if picked is not None:
+            opts["patriot_filtering"] = int(picked)
+            opts["_changed"].add("patriot_filtering")
+        for option, label in (("patriot_skip_splash", "MGS4: skip in-game logos"),
+                              ("patriot_ds3", "MGS4: DS3 support (drivers are user-managed)"),
+                              ("patriot_raw_mouse", "MGS4: raw mouse input"),
+                              ("patriot_motion_blur_off", "MGS4: disable motion blur (visual override)"),
+                              ("patriot_dynamic_res_off", "MGS4: disable dynamic resolution (visual override)")):
+            extra_items.append((option, label, opts[option]))
     # NOTE: there is deliberately no "check for mod updates" option. The mod
     # versions here are pinned to match the settings file this kit writes, so a
     # mod updating itself can rename a settings key and make the game refuse to
@@ -4155,7 +4499,7 @@ def offer_clipboard_copy(ui: UI, found_keys) -> None:
     Skipped silently when the clipboard isn't reachable (non-KDE session, no
     klipper), because the .txt file and the dialog already carry the text.
     """
-    keys = [k for k in ("mgs1", "mgs2", "mgs3") if k in found_keys]
+    keys = [k for k in ("mgs1", "mgs2", "mgs3", "mgs4") if k in found_keys]
     if not keys or ui.kind == "term" or not find_qdbus():
         return
     while True:

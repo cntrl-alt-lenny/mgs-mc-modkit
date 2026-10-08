@@ -1,0 +1,23 @@
+First MGS4 test run (working tree before implementation commit):
+$ python3 -m pytest tests/test_patriot.py -q
+FAILED test_source_schema_runtime_and_conservative_defaults
+  assert sum(len(parser[s]) for s in parser.sections()) == 29
+  E assert 28 == 29
+FAILED test_install_repair_preserve_custom_settings_oldest_backup_and_remove
+  assert not needs and not notes
+  E assert (not True)
+2 failed, 23 passed in 0.69s
+exit 1
+
+Both were test expectation mistakes: source contains 28 fields, and uninstall
+returns (notes, ok), not (notes, needs_verification). Corrected the count and
+asserted ok with notes retained as diagnostics; no production repair was needed.
+$ python3 -m pytest tests/test_patriot.py -q
+25 passed in 0.67s
+exit 0
+Later added corrupted-record/recovery and source-inventory coverage: 31 tests.
+
+Incidental inspection attempted absent helper/feature paths (exit 1/2).
+Used actual paths from rg --files instead: fixes/various_tweaks.cpp,
+resources/common.hpp and batch 09's source comparison attachment. No guessed
+settings or external changes resulted. Desktop validation remains unavailable.

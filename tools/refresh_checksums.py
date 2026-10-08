@@ -36,6 +36,7 @@ def sha256_url(url: str) -> str:
 
 def main() -> int:
     targets = [
+        ("PATRIOT_SHA256", install.PATRIOT_URL, install.PATRIOT_SHA256),
         ("HDFIX_SHA256", install.HDFIX_URL, install.HDFIX_SHA256),
         ("M2FIX_SHA256", install.M2FIX_URL, install.M2FIX_SHA256),
         ("GAMES['mgs2']['bugfix_sha256']", install.GAMES["mgs2"]["bugfix_url"],

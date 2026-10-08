@@ -2,7 +2,8 @@
 
 > **Read this before changing any version number in `install.py`.**
 
-The four pinned mod versions are **a set, not four independent choices**. They
+The four MGS1–3 pinned mod versions are **a set, not four independent choices**.
+MGS4 has its own separately coupled PatriotFix archive/settings set below. They
 are pinned together because they depend on each other, and because MGSHDFix requires all runtime-read settings. The kit ships a
 `MGSHDFix.settings` file matched to one
 specific version of its Config Tool, and the mod **aborts initialization on a single
@@ -179,3 +180,28 @@ are corrected by batch 11, subject to independent review and native retesting.
 Any future version change must update the
 whole coupled set, regenerate the settings template, and pass a real install →
 launch → repair → uninstall check.
+
+## MGS4's separate pinned set
+
+MGSPatriotFix stable **0.2.2**, tree
+`c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de`, uses the official
+`MGS4_MGSPatriotFix_0.2.2.zip` (not the PW archive), SHA-256
+`4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1`.
+Review version, official archive layout/checksum, runtime readers, Config Tool
+saving, embedded fields/constraints/defaults and capture fixture together.
+Do not change the MGS1–3 pins as part of a PatriotFix upgrade.
+
+Authenticate the upstream tag, then use `tools/capture_patriot_schema.py` on that
+exact source tree. Its whole-source byte allowlist/inventory deliberately refuses
+other versions or local edits; audit a changed source before extending it.
+Inspect `MGS4/winmm.dll`, `MGS4/scripts/MGSPatriotFix.asi`,
+`Launcher/d3d11.dll`, `Launcher/scripts/MGSPatriotFix.asi` and root Config Tool.
+The installer requires the exact reviewed file inventory and skips upstream's
+placeholder `.log` files to preserve existing runtime diagnostics. An unknown
+archive member, missing member or PW path stops before live payload writes.
+
+`tools/refresh_checksums.py` includes PatriotFix; `tools/check_pins.py` remains
+advisory. Regenerate both shortcuts, run complete offline checks, then follow
+[native handoff](batches/evidence/14-mgs4-patriotfix/native-handoff.md) for fresh
+install → export/boot/gameplay → repair → removal on Windows and Deck. Never
+infer native compatibility from source capture, synthetic fixtures or CI.
