@@ -36,3 +36,8 @@ Python 3.12 failed one capture-refusal test (311 passed, 2 skipped). The capture
 tool converted relative paths with str(), producing Windows backslashes that
 did not match its POSIX source inventory. Changed to Path.as_posix(); the exact
 same Windows test now checks the correction. Failure output is in ci-first-run.txt.
+
+Final diff hygiene at c2d2302 reported trailing spaces inherited from captured
+pytest/CI output (exit 2). Trimmed trailing whitespace in evidence logs only;
+meaningful command output and exits are preserved. CI run 37792113349 at c2d2302
+passed all Linux and Windows jobs after the source-path correction.
