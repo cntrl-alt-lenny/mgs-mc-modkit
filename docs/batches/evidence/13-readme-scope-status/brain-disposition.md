@@ -53,3 +53,19 @@ integration. `gh release list --limit 3 --json tagName,name,isLatest,publishedAt
 returned v2.2.0 as latest, published 2026-08-28. Current README claims of a
 verified Deck badge are unsupported; batch 11 independently corrects that badge
 to the same pending value. This documentation draft does not expand product scope.
+
+## Documentation checks
+
+Checked documentation commit `3538f49e79e1dafcf832b0aba0f3154ad7fd4b51`.
+
+| Command/check | Actual result | Exit |
+| --- | --- | --- |
+| `python3 tools/fw.py check` | 0 error(s), 0 warning(s) | 0 |
+| `git diff --check` | No output | 0 |
+| `git status --short` | No output; clean checkout | 0 |
+| `git clone --depth 1 --branch v4.0.0 https://github.com/cntrl-alt-lenny/agentic-framework.git /tmp/mgs-brain13-framework-4.0.0` | b036c761ac2af2d47e61a1b473c708f094bd4295 | 0 |
+| Python source/manifest byte comparison before documentation commit | All six copied files match immutable pinned source and SHA256 manifest; existing tracked diff only README; native-validation link exists | 0 |
+
+No production/framework file changed. An initial follow-up documentation patch
+used a nonmatching context; apply_patch refused without writes. Corrected context
+recorded these checks. The follow-up changes only documentation evidence.

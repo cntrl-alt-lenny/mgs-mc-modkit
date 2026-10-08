@@ -29,6 +29,10 @@ remote branch; all contain only mgs1, mgs2 and mgs3. Latest published release is
 v2.2.0; development 2.3.0 has not been published. Reviewed the README changes
 against those facts, framework/Brain guidance and native release requirements.
 
+At `3538f49e79e1dafcf832b0aba0f3154ad7fd4b51`, framework check and diff checks
+passed. All six framework copies match immutable 4.0.0 source and manifest;
+production remains byte-identical to main. Commands/results are in the disposition.
+
 ## Not checked
 
 Native exports, corrected-candidate Windows/Deck initialization, gameplay,
@@ -37,6 +41,8 @@ implementation outside the fetched repository was reviewed. No merge or release.
 
 ## Failed or blocked
 
-No new check failure. Owner approval is required before merging. A clarification
+No technical check failure. One documentation patch used a nonmatching context
+and was refused without writes; corrected context succeeded. Owner approval is
+required before merging. A clarification
 about the user's reference to implemented MGS4 support was requested; the
 README draft reports only the repository evidence available here.
