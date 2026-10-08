@@ -25,12 +25,11 @@ It will:
   7. MGS1: install MGSM2Fix (M2-emulator fix: analog deadzone removal,
      censored-texture restorations, skippable notices, custom resolution).
 
-Steps 5 and 6 are the whole reason this kit exists. MGSHDFix has no runtime defaults:
-without a complete settings file it refuses to boot, and it hard-aborts on any
-single missing section or key. That file can only be produced by its Windows
-Config Tool, and its ini section names are NOT the names shown in that tool's
-UI, so hand-writing one does not work. This kit ships a canonical file matched
-to the pinned Config Tool definitions, so you never have to run it under Proton.
+Steps 5 and 6 provide the runtime configuration MGSHDFix requires. A missing
+section or key aborts mod initialization. The kit reconstructs its template
+from the pinned Config Tool definitions and runtime readers; INI section names
+are not the UI tab names. Native Config Tool exports and game boots remain
+separate validation requirements.
 
 Mods are downloaded live from their official GitHub releases — nothing is
 rehosted here. Every auto-downloaded archive is checked against a pinned
@@ -152,8 +151,8 @@ BACKUP_MAX_BYTES = 64 * 1024 * 1024
 #
 # These versions are pinned ON PURPOSE. The bundled MGSHDFix.settings
 # below matches MGSHDFix 4.1.0's Config Tool schema, and a future MGSHDFix
-# release may rename ini sections/keys — which would make the game hard-abort
-# on launch. Pinning guarantees a tested, working combination.
+# release may rename ini sections/keys and abort mod initialization.
+# Pinning prevents silent upgrades; it does not prove runtime compatibility.
 # To move to a newer MGSHDFix, bump HDFIX_VERSION and regenerate the settings
 # file with the Config Tool (see README).
 # ---------------------------------------------------------------------------
@@ -254,7 +253,7 @@ NEXUS_SUFFIX = re.compile(r"-(\d+)-(\d+)-(\d+)-(\d{9,11})\.(?:zip|7z|rar)$",
 # Written with CRLF line endings, as the Config Tool writes it.
 #
 # The section names are the INI schema, not the tab labels shown in the Config
-# Tool's UI. Getting these wrong makes the game refuse to start.
+# Tool's UI. Getting these wrong aborts the mod's configuration initialization.
 # ---------------------------------------------------------------------------
 SETTINGS_TEMPLATE = """\
 [Bugfixes]
@@ -444,10 +443,10 @@ Window Width=0
 
 """
 
-# The MGSHDFix release whose Config Tool produced SETTINGS_TEMPLATE above.
-# MGSHDFix hard-aborts on a missing key and its schema changes between major
+# The MGSHDFix release whose Config Tool source defines the template above.
+# MGSHDFix aborts mod initialization on a missing key; schema changes between major
 # releases, so this MUST equal HDFIX_VERSION. A test enforces that — which is
-# what stops a version bump shipping a settings file the mod can't read.
+# a guard against an isolated version bump, not proof of a native game boot.
 SETTINGS_CAPTURED_FROM = "4.1.0"
 
 SETTINGS_EXPECTED_SECTIONS = 27

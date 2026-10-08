@@ -3,10 +3,10 @@
 > **Read this before changing any version number in `install.py`.**
 
 The four pinned mod versions are **a set, not four independent choices**. They
-are pinned together because they depend on each other, and because MGSHDFix has
-no runtime defaults — the kit ships a `MGSHDFix.settings` file matched to one
-specific version of its Config Tool, and the game **hard-aborts on a single
-missing key**.
+are pinned together because they depend on each other, and because MGSHDFix requires all runtime-read settings. The kit ships a
+`MGSHDFix.settings` file matched to one
+specific version of its Config Tool, and the mod **aborts initialization on a single
+missing key**. C++ initial values do not provide missing-key fallback.
 
 `tools/check_pins.py` (and the weekly `check-mod-versions` workflow) tells you
 when something newer exists. It deliberately never edits anything.
