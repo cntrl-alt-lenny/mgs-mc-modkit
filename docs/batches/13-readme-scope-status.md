@@ -9,6 +9,10 @@ and Peace Walker as unsupported. Replaced the unsupported Steam Deck verified
 badge with validation pending and linked native release requirements. No product,
 mod pin, framework or standing scope change.
 
+Added dated, official release links for latest stable QoL versions alongside
+actual installer pins. MGSHDFix 4.1.2 and MGSM2Fix 3.7.3 are newer; both Bugfix
+pins remain current. MGS4's MGSPatriotFix 0.2.2 is explicitly pending integration.
+
 Completed Brain review of batch 11 at Verifier delivery
 `84e6737aa26c5f24e49312637cf49e76cc0bedb2`, whose only addition to reviewed Worker
 `fc831e9538bffd4c8ac5aebb9e9a3c44c082cf1c` is its review document. No blocking
@@ -38,6 +42,10 @@ At `3538f49e79e1dafcf832b0aba0f3154ad7fd4b51`, framework check and diff checks
 passed. All six framework copies match immutable 4.0.0 source and manifest;
 production is unchanged from that documentation commit's main base `90967b9`.
 Commands/results are in the disposition and [merge record](evidence/13-readme-scope-status/merge-completion-11.md).
+
+Rechecked all five official latest-release endpoints on 2026-10-08, cross-checked
+their release pages and reviewed README versions against current main pins.
+Results are in the [upstream version snapshot](evidence/13-readme-scope-status/upstream-version-check-2026-10-08.md).
 
 ## Not checked
 
