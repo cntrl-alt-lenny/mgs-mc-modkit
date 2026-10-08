@@ -60,6 +60,16 @@ MGSM2FIX_INI = (
 ).encode("utf-8")
 
 MOD_LAYOUTS = {
+    "MGSPatriotFix": {'Launcher/d3d11.dll': b'stub',
+ 'Launcher/scripts/MGSPatriotFix.asi': b'stub',
+ 'MGS4/scripts/MGSPatriotFix.asi': b'stub',
+ 'MGS4/scripts/MGSPatriotFix_LICENSE.md': b'stub',
+ 'MGS4/winmm.dll': b'stub',
+ 'MGSPatriotFix Config Tool.exe': b'stub',
+ 'MGSPatriotFix_README.md': b'stub',
+ 'logs/MGSPatriotFix_Game.log': b'stub',
+ 'logs/MGSPatriotFix_Launcher.log': b'stub',
+ 'logs/UltimateASILoader_LICENSE.md': b'stub'},
     "MGSHDFix": {
         "winhttp.dll": b"stub",
         "wininet.dll": b"stub",

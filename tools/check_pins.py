@@ -27,6 +27,9 @@ import install  # noqa: E402
 def pinned() -> list[dict]:
     """What install.py currently pins, read from the module itself."""
     return [
+        {"what": "MGSPatriotFix (MGS4)",
+         "repo": "ShizCalev/MGSPatriotFix",
+         "pin": install.PATRIOT_VERSION},
         {"what": "MGSHDFix (MGS2/MGS3)",
          "repo": "ShizCalev/MGSHDFix",
          "pin": install.HDFIX_VERSION},

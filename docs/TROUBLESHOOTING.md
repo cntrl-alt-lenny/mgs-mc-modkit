@@ -64,3 +64,29 @@ can press Ctrl+C. Do not kill the process while it is recovering if you can avoi
 
 For **Failed to read config key**, repair with this kit's pinned Config Tool and
 see [SETTINGS.md](SETTINGS.md). On Linux, check the exact Steam launch options.
+
+## MGS4 destination, loaders and settings
+
+Select Steam's `METAL GEAR SOLID 4` root, containing `MGS4/mgs4.exe` and
+`Launcher/launcher.exe`. Do not select the executable's subfolder. Mixed game
+layouts, missing executables or linked game/launcher folders refuse.
+The kit installs only the official MGS4 PatriotFix payload. PW is unsupported.
+
+Unmanaged `MGS4/winmm.dll`, `Launcher/d3d11.dll` or other competing loader DLLs
+stop installation. Preserve the old mod installation and settings, identify its
+files using the author archive, then remove its loader manually before retrying.
+The kit cannot authenticate an unknown manual loader's compatibility. A tracked
+repair retains the oldest original backups and snapshots the current setup.
+
+Settings live at root `MGSPatriotFix.settings`, not under plugins. Keep a copy;
+use the **0.2.2** Config Tool to fix unsupported/missing keys. Repair refuses bad
+edits and preserves supported custom values. Windows registry compatibility
+flags made by the Config Tool are user-managed and are not removed by this kit.
+
+For missing records, inspect both `MGS4/scripts/MGSPatriotFix.asi` and
+`Launcher/scripts/MGSPatriotFix.asi`, their loaders and the root Config Tool;
+Steam verification alone does not remove added files. Never delete
+`mgs4_savedata_win`, executables or recovery records. Runtime-generated logs stay
+in `logs/`; installation does not overwrite them and removal leaves them alone.
+Proton needs `WINEDLLOVERRIDES="winmm=n,b" %command%`. DS3 driver/Proton setup is
+optional, as described in upstream's README. Native compatibility is pending.
