@@ -249,7 +249,7 @@ NEXUS_SUFFIX = re.compile(r"-(\d+)-(\d+)-(\d+)-(\d{9,11})\.(?:zip|7z|rar)$",
 # ---------------------------------------------------------------------------
 # Canonical MGSHDFix.settings (MGSHDFix 4.1.0).
 #
-# Reconstructed from the pinned release's Config Tool field definitions — 128
+# Reconstructed from the pinned release's Config Tool field definitions — 131
 # keys across 27 sections. Placeholders (@NAME@) are substituted at write time.
 # Written with CRLF line endings, as the Config Tool writes it.
 #
@@ -318,7 +318,9 @@ Warn When Windows Slideshow Enabled=1
 
 [Enhancements and Tweaks]
 Anisotropic Filtering Level=16
+Correct Aspect Ratio to 4:3=1
 Correct Gamma Levels=1
+Crop Overscan Area=1
 Enable SMAA Anti-Aliasing=1
 Nearest Neighbor Texture Filtering=0
 Reduce Photosensitive Effects=0
@@ -353,6 +355,7 @@ Game Language="en"
 Game Region="@REGION@"
 
 [Launcher and Splashscreens]
+MSX Skip Launcher Game="Metal Gear (MSX)"
 Skip In-Game Splashscreens=@SKIP_SPLASH@
 Skip Launcher=@SKIP_LAUNCHER@
 Skip Launcher Splashscreens=@SKIP_SPLASH@
@@ -448,7 +451,7 @@ Window Width=0
 SETTINGS_CAPTURED_FROM = "4.1.0"
 
 SETTINGS_EXPECTED_SECTIONS = 27
-SETTINGS_EXPECTED_KEYS = 128
+SETTINGS_EXPECTED_KEYS = 131
 
 # Derived independently from the pinned upstream Config Tool field definitions.
 SETTINGS_SCHEMA = {'Bugfixes': {'Boost Reverb Volume': 'Bool',
@@ -490,7 +493,9 @@ SETTINGS_SCHEMA = {'Bugfixes': {'Boost Reverb Volume': 'Bool',
                           'Warn When Save Folders Not Writable': 'Bool',
                           'Warn When Windows Slideshow Enabled': 'Bool'},
  'Enhancements and Tweaks': {'Anisotropic Filtering Level': 'Int',
+                             'Correct Aspect Ratio to 4:3': 'Bool',
                              'Correct Gamma Levels': 'Bool',
+                             'Crop Overscan Area': 'Bool',
                              'Enable SMAA Anti-Aliasing': 'Bool',
                              'Nearest Neighbor Texture Filtering': 'Bool',
                              'Reduce Photosensitive Effects': 'Bool'},
@@ -512,7 +517,8 @@ SETTINGS_SCHEMA = {'Bugfixes': {'Boost Reverb Volume': 'Bool',
                               'While in FPS Mode': 'Bool',
                               'While in First Person': 'Bool'},
  'Language Settings': {'Game Language': 'Choice', 'Game Region': 'Choice'},
- 'Launcher and Splashscreens': {'Skip In-Game Splashscreens': 'Bool',
+ 'Launcher and Splashscreens': {'MSX Skip Launcher Game': 'Choice',
+                                'Skip In-Game Splashscreens': 'Bool',
                                 'Skip Launcher': 'Bool',
                                 'Skip Launcher Splashscreens': 'Bool'},
  'MGS2 Community Bugfix Compilation Integration': {'Restore Title Screen 2 Color Swapping': 'Bool',
@@ -553,7 +559,8 @@ SETTINGS_SCHEMA = {'Bugfixes': {'Boost Reverb Volume': 'Bool',
                          'Fix FOV': 'Bool',
                          'Fix Framebuffer': 'Bool',
                          'Lock HUD && Movies to 16:9': 'Bool'},
- 'Update Notifications': {'Check For MGSHDFix Updates': 'Bool', 'In-Game Update Notifications': 'Bool'},
+ 'Update Notifications': {'Check For MGSHDFix Updates': 'Bool',
+                          'In-Game Update Notifications': 'Bool'},
  'Various': {'Camera Triggers Steam Screenshot': 'Bool',
              'Custom Lifebar Name': 'Str',
              'Enable Radar in Snake Tales': 'Bool',
@@ -580,6 +587,8 @@ SETTINGS_CONSTRAINTS = {'Bugfixes': {'Fix  High  CPU  Usage': {'choices': ['Full
               'Fix Motion Trails': {'choices': ['Full (Gameplay + Cutscenes)',
                                                 'Cutscenes Only',
                                                 'Disabled']}},
+ 'Launcher and Splashscreens': {'MSX Skip Launcher Game': {'choices': ['Metal Gear (MSX)',
+                                                                       'Metal Gear 2: Solid Snake']}},
  'System Specific Fixes': {'Audio Output Mode': {'choices': ['Stereo (2.0)', 'Surround Sound (5.1)']}},
  'Damaged Steam Cloud Save Data Fix': {'Fix Mode': {'choices': ['Move Outdated Save Data to Backup '
                                                                 'Folder',
@@ -2275,6 +2284,32 @@ def render_ini(parser: configparser.ConfigParser, spaced=False) -> str:
     return stream.getvalue()
 
 
+# Only the complete historical kit schema may be migrated. Partial omissions
+# remain errors. Defaults come from pinned 4.1.0 tab_data.cpp (150, 158, 226).
+SETTINGS_MIGRATION_DEFAULTS = {
+    "Enhancements and Tweaks": {"Correct Aspect Ratio to 4:3": "1", "Crop Overscan Area": "1"},
+    "Launcher and Splashscreens": {"MSX Skip Launcher Game": '"Metal Gear (MSX)"'},
+}
+
+
+def migrate_settings(body: str) -> str:
+    """Validate the old complete shape before adding only known missing fields."""
+    body = body.replace('Show Pressure Level Overlay="Disabled"', 'Show Pressure Level Overlay=0')
+    try:
+        parser = parse_ini(body)
+        legacy = {section: set(keys) - set(SETTINGS_MIGRATION_DEFAULTS.get(section, {}))
+                  for section, keys in SETTINGS_SCHEMA.items()}
+        if ({section: set(parser[section]) for section in parser.sections()} == legacy):
+            for section, keys in SETTINGS_MIGRATION_DEFAULTS.items():
+                for key, value in keys.items():
+                    parser[section][key] = value
+            body = render_ini(parser)
+        validate_settings(body)
+        return body
+    except (configparser.Error, ValueError) as error:
+        raise RuntimeError(f"Settings validation failed: {error}") from error
+
+
 def write_settings(tx: InstallTxn, g: dict, opts: dict, log) -> None:
     body = SETTINGS_TEMPLATE
     for ph, val in (
@@ -2288,8 +2323,7 @@ def write_settings(tx: InstallTxn, g: dict, opts: dict, log) -> None:
     existing = opts.get("_existing_settings")
     if existing and not opts.get("_reset"):
         # Refuse unsupported edits instead of silently discarding custom settings.
-        existing = existing.replace('Show Pressure Level Overlay="Disabled"', 'Show Pressure Level Overlay=0')
-        old = validate_settings(existing)
+        old = validate_settings(migrate_settings(existing))
         for section in old.sections():
             for key, value in old[section].items():
                 parser[section][key] = value
@@ -3672,7 +3706,7 @@ def options_for_game(key: str, location: tuple, defaults: dict, log) -> dict:
         path = game_dir / "plugins/MGSHDFix.settings"
         if path.is_file():
             text = path.read_text(encoding="utf-8-sig")
-            text = text.replace('Show Pressure Level Overlay="Disabled"', 'Show Pressure Level Overlay=0')
+            text = migrate_settings(text)
             parser = validate_settings(text)
             opts["_existing_settings"] = text
             opts["button_icons"] = parser["Controller Settings"]["Button Icons"].strip('"')
