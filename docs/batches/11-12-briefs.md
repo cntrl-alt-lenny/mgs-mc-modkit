@@ -14,6 +14,13 @@ interface, coordinated upstream upgrades and MGS4 integration. Native exports,
 game boots and audio observations remain distinct from Mac/offline checks.
 Production files, standing scope and framework copies are unchanged.
 
+Reviewed batch 11's delivered code and CI, reran its offline checks, authenticated
+upstream source and probed migration against the actual main template. No
+blocking code finding identified; a separate Verifier is still required.
+The [Brain precheck](evidence/11-12-briefs/brain-precheck-11.md) records the exact
+SHA, outputs, failed attempts and limits. Prepared an
+[exact-commit dispatch](11-hdfix-runtime-schema-verifier-dispatch.md).
+
 ## Checked
 
 At `0d951db48ab7a89c075788780715f7f63371f4c3`, framework check/status,
@@ -26,7 +33,7 @@ are in [checks.txt](evidence/11-12-briefs/checks.txt).
 
 ## Not checked
 
-No repair, launcher implementation, new mod integration or hardware test ran.
+No live repair, launcher implementation, new mod integration or hardware test ran.
 The briefs establish no release readiness. Framework 4.0.1 remains a separate
 Small update, not part of either production batch.
 
