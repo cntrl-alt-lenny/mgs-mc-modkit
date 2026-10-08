@@ -1,0 +1,45 @@
+Checked commit: 0d951db48ab7a89c075788780715f7f63371f4c3
+
+$ git rev-parse HEAD
+0d951db48ab7a89c075788780715f7f63371f4c3
+exit=0
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/11-12-briefs: 1 commit(s), last 2026-10-08; batch 11-12-briefs: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/11-12-briefs; no uncommitted changes
+  not on GitHub yet: brain/11-12-briefs (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <user-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 11-12-briefs
+exit=0
+$ git diff --check origin/main...HEAD
+(no output)
+exit=0
+$ git diff --exit-code origin/main HEAD -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop tools/fw.py docs/agents tests/test_framework.py
+(no output)
+exit=0
+$ python3 docs/batches/09-framework-pin/attachments/verify_source.py <clean-v4.0.0-checkout>
+docs/agents/FRAMEWORK.md matches immutable release and manifest
+docs/agents/roles/brain.md matches immutable release and manifest
+docs/agents/roles/worker.md matches immutable release and manifest
+docs/agents/roles/verifier.md matches immutable release and manifest
+tools/fw.py matches immutable release and manifest
+tests/test_framework.py matches immutable release and manifest
+Python 3.9 syntax valid
+Installer and both shortcuts unchanged
+Checked commit: 0d951db48ab7a89c075788780715f7f63371f4c3
+exit=0

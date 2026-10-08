@@ -16,8 +16,13 @@ Production files, standing scope and framework copies are unchanged.
 
 ## Checked
 
-Pending local document hygiene, source comparison and diff review; results
-will be recorded at a stated commit before delivery.
+At `0d951db48ab7a89c075788780715f7f63371f4c3`, framework check/status,
+diff whitespace check, and production/framework equality checks all exited 0.
+Compared all six framework copies against clean immutable 4.0.0 source
+`b036c761ac2af2d47e61a1b473c708f094bd4295`; all match the source and manifest.
+Reviewed both briefs, role boundaries, sequencing and the complete docs-only
+diff. Each individual prompt is below 500 words. Actual commands/output/exits
+are in [checks.txt](evidence/11-12-briefs/checks.txt).
 
 ## Not checked
 
