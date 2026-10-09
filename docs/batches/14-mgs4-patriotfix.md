@@ -2,57 +2,58 @@
 
 ## Done
 
-Built from main `67d1406` after Brain confirmed batch 11 merged; followed brief
-`a1c9264b2ba803a0f05774bd3bc60dcdcbe013d2`. Implemented MGS4 discovery/manual
-root selection, game choice, upfront settings, official pinned PatriotFix 0.2.2,
-repair, removal and individual game outcomes. Authenticated Steam app 2492670,
-root/executable/save layout, tagged source and independently hashed archive.
-[Source review](evidence/14-mgs4-patriotfix/source-review.md) records derivation.
+Implemented MGS4 discovery, upfront settings, official PatriotFix 0.2.2 install,
+repair/removal and individual outcomes from batch 14's original brief. Retained
+all 28 settings, 24 runtime reads, hidden PW controls, conservative rendering
+defaults and disabled update checks; custom values survive supported repairs.
 
-One transactional settings writer validates all 28 fields, hidden PW controls,
-choices, types, numeric bounds and language pairs. Capture checks exact Git tree,
-58 source-file hashes/inventory and all runtime readers independently of kit
-settings. Conservative defaults preserve rendering/frame-rate behavior; explicit
-visual changes are optional. Supported custom values survive; updates stay off.
+Continued by fast-forwarding to pushed Verifier head `38ef1b6`; its review and
+original evidence remain unchanged. Followed correction brief at `fbc360f`.
+Legacy MGSM2Fix cleanup now requires an unambiguous MGS1 executable layout and,
+when present, a validated matching record. Orphan/malformed/unknown records and
+non-MGS1 roots cannot authorize legacy deletion. Tracked files use normal
+restoration/removal, retaining oldest originals.
 
-Wrong payloads/destinations, unmanaged competing loaders, duplicate ASIs and
-unsafe records refuse. Saves/game executables are protected; oldest backups,
-pre-run snapshots, locks, cancellation and per-game commits remain intact.
-Runtime log placeholders are skipped. MGS1–3 definitions/pins/behavior remain
-unchanged; no PW/audio/FPS/ClarityFix/flashback component added. Guidance and
-AGENTS scope updated; unpublished version stays 2.3.0, both shortcuts regenerated.
+Authenticated inventory now includes `ConfigTool/pch.h`, `src/resources/stdafx.h`
+and `src/resources/version.h`: 61 `.cpp`/`.hpp`/`.h` files under `src/` and
+`ConfigTool/`. Fresh official checkout blobs plus upstream CRLF attributes were
+independently compared against every hash; capture independently reproduces the
+fixture. Only three hashes changed; archive/version, fields/runtime reads,
+constraints and MGS1–3 pins/definitions remain unchanged. Build projects,
+resources, external dependencies and binaries are outside this bounded capture.
+Both shortcut hashes regenerated at unpublished 2.3.0.
 
 ## Checked
 
-Mac arm64 / Python 3.9.6: **314 tests**, Ruff, compilation, framework check/status,
-Python 3.9 grammar, both shortcut hashes/tags/line endings, unchanged MGS1–3 pins
-and comparison with immutable framework 4.0.0 pass. 31 MGS4 tests exercise source
-completeness/refusal, destination/payload refusal, malformed settings,
-preservation/reset, oldest backups, rollback/recovery, locks, cancellation,
-mixed outcomes and removal. [Commands/output/exits](evidence/14-mgs4-patriotfix/checks.txt)
-state checked implementation/evidence commits. Actual source capture equals the
-committed fixture; two independent hashes match the official downloaded archive.
-All five live archive checksums match. Linux 3.9/3.11/3.12 and Windows 3.12
-CI pass at `c2d2302` (run 37792113349).
-Actual PatriotFix ZIP extraction/transaction/removal passes in a disposable
-unlicensed game fixture; no Windows binaries were run.
+Correction implementation `1aebf38b82680cefe777b474921a19670a2d774a`:
+**320 tests**, Ruff, compilation, framework check/status, Python 3.9 grammar,
+shortcut tags/SHA-256/CRLF/LF, immutable framework comparison and unchanged
+MGS1–3 definitions/pins pass. New regressions cover non-MGS1/ambiguous/no-record
+removal, corrupt/unknown/orphan records, tracked removal/oldest restoration, and
+header mutations, omissions and additions.
+[Correction commands/output/exits](evidence/14-mgs4-patriotfix-correction/checks.txt)
+and [source audit](evidence/14-mgs4-patriotfix-correction/source-audit.py) retain
+literal commit/check results. All five live archive checksums match. The adapted independent actual-archive probe uses
+a freshly downloaded official ZIP and disposable fixtures: unowned legacy bytes,
+oldest settings/save bytes, interrupted repair, unsafe journal/linked settings
+refusal and mixed cancellation verified. Original Verifier probes remain intact. Four exact-production CI jobs pass at
+`1aebf38` ([run 37928302625](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625));
+final delivery CI is linked from PR #19.
 
 ## Not checked
 
 Native Windows/Deck Config Tool exports, GUI rendering, ASI initialization,
-licensed boots/gameplay, DS3, flashback behavior and real repair/removal are
-**NOT RUN**. [Native handoff](evidence/14-mgs4-patriotfix/native-handoff.md) records
-fresh install, settings/export/boot, repair, cancellation/recovery, mixed games,
-locks and removal. Desktop validation is unavailable on this Mac.
-Independent Verifier/Brain disposition and owner-approved release remain separate.
+licensed boots/gameplay, DS3, flashback behavior and real repair/removal remain
+**NOT RUN**. [Native handoff](evidence/14-mgs4-patriotfix/native-handoff.md) remains
+applicable. Desktop validation is unavailable locally; Linux CI supplies it.
+Separate Verifier re-review at the delivery SHA and Brain disposition remain
+required. No approval, merge, tag, release or publication performed.
 
 ## Failed or blocked
 
-Initial test expectations miscounted fields and misread uninstall's success flag;
-corrected. Independent evidence helper initially mishandled existing URL
-f-strings; corrected. Saved status/traceback account paths failed document hygiene;
-normalized portable evidence, preserving commands/results/exits. Initial Windows
-CI found backslash/POSIX mismatch in the capture inventory; fixed with as_posix.
-Captured log whitespace was normalized. Reruns pass;
-[attempts](evidence/14-mgs4-patriotfix/attempts.txt) and logs retain failures.
-No approval, merge, tag or publication performed.
+Historical failures remain in original evidence/summary history. Initial header
+blob equality assertion ignored upstream CRLF checkout attributes; corrected
+by authenticating literal blobs plus declared line endings. Plain diff-check
+flags required Windows CRLF as whitespace; `core.whitespace=cr-at-eol` passes.
+Advisory newer-upstream pins do not authorize upgrades. Native hardware gates
+remain unavailable in this Worker seat.
