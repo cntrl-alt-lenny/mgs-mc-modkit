@@ -39,4 +39,3 @@ $ python3 tools/check_pins.py
 2 update(s) available. These are NOT drop-in bumps — read docs/UPGRADING.md before changing anything.
 
 exit=1
-

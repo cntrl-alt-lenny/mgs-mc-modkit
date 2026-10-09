@@ -58,3 +58,6 @@ Supplemental official release metadata: GET
 https://api.github.com/repos/ShizCalev/MGSPatriotFix/releases/tags/0.2.2
 via urllib.request (exit 0); MGS4 asset name, URL, size and GitHub SHA-256 digest
 recorded in release-asset.json. Digest also matches both local computations.
+
+Staged diff hygiene found one extra blank line at live-pins.txt EOF (exit 2);
+removed in a follow-up evidence-only commit without rewriting shared history.
