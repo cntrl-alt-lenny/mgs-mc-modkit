@@ -1,6 +1,7 @@
-# 17-delivery-review — Brain
+# 17-delivery-disposition — Brain
 
 Path: Small; exact-commit review evidence and correction handoffs only.
+This is Brain disposition, not an independent Verifier review of batches 12/16.
 
 ## Done
 
