@@ -1,0 +1,100 @@
+Batch 12 verification at 6a1e8765c6a991e8b71015d2600e1926dbaf3e81
+Host: macOS; Python 3.9.6; /usr/bin/bsdtar
+Output excerpts omit machine-specific paths.
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 69%]
+........................................................................ [ 92%]
+........................                                                 [100%]
+312 passed in 22.62s
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py
+(no output)
+exit=0
+
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 8 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 1 commit(s) after the Verifier's review -- Brain checks them
+  worker/12-install-plan-engine: 2 commit(s), last 2026-10-09; no summary yet: still working, or stopped without one
+  worker/16-volume1-qol-upgrade: 1 commit(s), last 2026-10-09; no summary yet: still working, or stopped without one
+  brain/11-12-briefs: 10 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 2 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/12-install-plan-engine; no uncommitted changes
+  not on GitHub yet: worker/12-install-plan-engine (2 commit(s)), worker/16-volume1-qol-upgrade (1 commit(s))
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to check the fixes in batch 14-mgs4-patriotfix
+exit=0
+
+$ git -c core.whitespace=cr-at-eol diff --check
+(no output)
+exit=0
+
+$ git diff origin/main -- docs/agents tools/fw.py
+(no output)
+exit=0
+
+Shortcut verification, same commit:
+$ python3 - <<'PY'
+from pathlib import Path
+import hashlib,re,shutil
+source=Path('install.py').read_bytes()
+version=re.search(rb'^MODKIT_VERSION = "([^"]+)"',source,re.M).group(1)
+digest=hashlib.sha256(source).hexdigest().encode()
+for name in ('Install-MGS-Mods.cmd','Install-MGS-Mods.desktop'):
+    data=Path(name).read_bytes()
+    tag=re.search(rb'TAG=([^";\r\n]+)',data).group(1)
+    sha=re.search(rb'SHA=([0-9a-f]{64})',data).group(1)
+    assert tag==b'v'+version and sha==digest
+    if name.endswith('.cmd'):
+        assert b'\n' not in data.replace(b'\r\n',b'')
+    else:
+        assert b'\r' not in data
+    print(name+': '+tag.decode()+' / '+sha.decode()+'; line endings OK')
+assert b'\r' not in source
+print('desktop-file-validate: '+str(shutil.which('desktop-file-validate')))
+PY
+Install-MGS-Mods.cmd: v2.3.0 / 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52; line endings OK
+Install-MGS-Mods.desktop: v2.3.0 / 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52; line endings OK
+desktop-file-validate: None
+exit=0
+
+Initial work-in-progress attempts (before committed delivery):
+python3 -m pytest tests/ -q: 2 failed, 281 passed in 7.21s; exit=1.
+Recipe-based fault hooks now ran during preparation rather than execution.
+Moved those fault injections to real InstallTxn replay; retained cancellation
+rollback and independent earlier-game commits as the assertions.
+python3 -m pytest tests/test_install_plan.py tests/test_user_journey.py tests/test_responsive_install.py -q:
+1 failed, 41 passed in 6.03s; exit=1.
+The corrupt-archive test omitted subprocess.CalledProcessError from its expected
+exceptions. Included the archive tool's real failure; zero-write assertion kept.
+Ruff initially reported E402 for the embedded module docstring after installer
+imports, then an unused sys import before the standalone test was added.
+Changed module header to a comment; standalone test uses sys. Final Ruff above passes.
+Plain git diff --check flagged required Windows CRLF as trailing whitespace;
+core.whitespace=cr-at-eol check above preserves and validates the required bytes.
