@@ -85,6 +85,107 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+# BEGIN EMBEDDED INSTALL PLAN
+# Game-neutral, versioned planning lifecycle (also embedded in install.py).
+from contextlib import ExitStack
+from dataclasses import dataclass
+
+
+class ReplanRequired(RuntimeError):
+    """Confirmed inputs changed; collect and confirm a fresh plan."""
+
+
+@dataclass(frozen=True)
+class PlanPackage:
+    name: str
+    version: str
+    source: str
+    sha256: str
+    role: str = "package"
+
+
+@dataclass(frozen=True)
+class PlanGame:
+    key: str
+    path: str
+    steam_root: str
+    settings: str
+    packages: tuple
+    inputs: str
+    incompatibilities: tuple = ()
+
+
+@dataclass(frozen=True)
+class InstallPlan:
+    games: tuple
+    schema: int = 1
+    profile: str = "vanilla-faithful"
+
+    def validate(self):
+        if self.schema != 1 or self.profile != "vanilla-faithful" or not self.games:
+            raise ValueError("Unsupported or empty installation plan")
+        if len({g.key for g in self.games}) != len(self.games):
+            raise ValueError("Duplicate games in installation plan")
+        if len({g.path for g in self.games}) != len(self.games):
+            raise ValueError("Games cannot share a destination")
+        for game in self.games:
+            if game.incompatibilities:
+                raise ValueError("Incompatible plan: " + "; ".join(game.incompatibilities))
+            if not game.packages:
+                raise ValueError("Game has no payloads")
+            for package in game.packages:
+                if len(package.sha256) != 64 or any(
+                        c not in "0123456789abcdef" for c in package.sha256):
+                    raise ValueError("Payload requires an exact SHA-256 identity")
+
+
+@dataclass(frozen=True)
+class PreparedGame:
+    game: PlanGame
+    actions: tuple
+    identities: tuple
+    mods: tuple
+    required_bytes: int
+
+
+@dataclass(frozen=True)
+class PreparedPlan:
+    plan: InstallPlan
+    games: tuple
+
+
+def prepare_plan(plan, adapter, workspace):
+    """Stage every game before allowing the executor to open a transaction."""
+    plan.validate()
+    adapter.recheck(plan)
+    games = []
+    for index, game in enumerate(plan.games):
+        adapter.check_cancelled()
+        games.append(adapter.prepare(game, workspace, index))
+    prepared = PreparedPlan(plan, tuple(games))
+    adapter.recheck(plan)
+    adapter.check_prepared(prepared)
+    adapter.check_space(prepared)
+    return prepared
+
+
+def execute_plan(prepared, adapter, outcomes):
+    """No UI callbacks: locks, recheck all inputs, then independent commits."""
+    prepared.plan.validate()
+    if tuple(g.game for g in prepared.games) != prepared.plan.games:
+        raise ValueError("Prepared games do not match plan order")
+    with ExitStack() as locks:
+        # A stable lock order prevents competing plans from deadlocking.
+        for game in sorted(prepared.plan.games, key=lambda g: g.path):
+            locks.enter_context(adapter.lock(game))
+        adapter.recheck(prepared.plan)
+        adapter.check_prepared(prepared)
+        adapter.check_space(prepared)
+        for index, game in enumerate(prepared.games):
+            adapter.check_cancelled()
+            adapter.execute(game, index, outcomes)
+# END EMBEDDED INSTALL PLAN
+
 UA = "Mozilla/5.0 mgs-mc-modkit"
 
 MODKIT_VERSION = "2.3.0"
@@ -3736,6 +3837,292 @@ def options_for_game(key: str, location: tuple, defaults: dict, log) -> dict:
     return opts
 
 
+# ---------------------------------------------------------------------------
+# Current-recipe adapter: planning never changes pins or mod-specific writers.
+# ---------------------------------------------------------------------------
+def _plan_json(value):
+    return json.dumps(value, sort_keys=True, default=lambda x: sorted(x))
+
+
+def _plan_inputs(game_dir, steam_root):
+    """Track directory membership, file identity and recipe configuration inputs.
+
+    Game assets use stat identities; settings/recovery/launcher records also
+    use content hashes. No save is copied or modified to collect this snapshot.
+    """
+    files = []
+    for directory, dirs, names in os.walk(game_dir, followlinks=False):
+        for name in sorted(dirs + names):
+            path = Path(directory) / name
+            stat = path.lstat()
+            rel = path.relative_to(game_dir).as_posix()
+            digest = None
+            if path.is_symlink():
+                digest = os.readlink(path)
+            elif path.is_file() and (
+                    rel.startswith(MODKIT_DIRNAME + "/") or
+                    name in ("MGSHDFix.settings", "MGSM2Fix.ini", "launcher_sv")):
+                # Recovery snapshots can include multi-GB audio: stat identity
+                # is sufficient for those; records and config get exact hashes.
+                if name in (MANIFEST_NAME, JOURNAL_NAME, "MGSHDFix.settings",
+                            "MGSM2Fix.ini", "launcher_sv"):
+                    digest = sha256_file(path)
+            files.append((rel, stat.st_mode, stat.st_size, stat.st_mtime_ns,
+                          stat.st_ctime_ns, stat.st_ino, digest))
+    root_stat = game_dir.stat()
+    return _plan_json((str(game_dir.resolve()), root_stat.st_dev, root_stat.st_ino,
+                       sorted(files), steamid64s(steam_root)))
+
+
+def _plan_packages(key, components):
+    g = GAMES[key]
+    if g.get("kind", "hdfix") == "m2fix":
+        packages = [PlanPackage("MGSM2Fix", M2FIX_VERSION, M2FIX_URL, M2FIX_SHA256)]
+    else:
+        packages = [PlanPackage("MGSHDFix", HDFIX_VERSION, HDFIX_URL, HDFIX_SHA256)]
+        for comp in components:
+            path = Path(comp["path"])
+            if path.is_symlink() or not path.is_file():
+                raise ValueError("Supplied audio must be a regular archive")
+            packages.append(PlanPackage(comp["status"], comp["filename"],
+                                        str(path.resolve()), sha256_file(path),
+                                        comp["role"]))
+        packages.append(PlanPackage(f"{g['short']} Community Bugfix Compilation",
+                                    g["bugfix_version"], g["bugfix_url"],
+                                    g["bugfix_sha256"]))
+    return tuple(packages)
+
+
+def build_install_plan(found, per_game, audio, expected_inputs=None):
+    games = []
+    for key, (game_dir, steam_root) in found.items():
+        if key not in GAMES:
+            raise ValueError("Unsupported game recipe")
+        game_dir, steam_root = game_dir.resolve(), steam_root.resolve()
+        if not (game_dir / GAMES[key]["exe"]).is_file():
+            raise ValueError("Game executable is missing")
+        if (game_dir / MODKIT_DIRNAME / JOURNAL_NAME).exists():
+            raise ReplanRequired("Interrupted installation needs recovery before planning")
+        components = audio.get(key, [])
+        roles = [c["role"] for c in components]
+        expected = [role for role in ("base", "hq", "update") if role in roles]
+        incompatible = []
+        if roles and (roles != expected or len(set(roles)) != len(roles)):
+            incompatible.append("Audio roles must be unique and ordered base, HQ ending, then update")
+        if key == "mgs1" and components:
+            incompatible.append("This recipe does not support supplied audio")
+        if key == "mgs2" and any(r != "base" for r in roles):
+            incompatible.append("MGS2 supports only base audio")
+        inputs = _plan_inputs(game_dir, steam_root)
+        if expected_inputs is not None and inputs != expected_inputs[key]:
+            raise ReplanRequired("Inputs changed while choosing options; restart to confirm a fresh plan")
+        games.append(PlanGame(key, os.path.normcase(str(game_dir)), str(steam_root),
+                              _plan_json(per_game[key]), _plan_packages(key, components),
+                              inputs, tuple(incompatible)))
+    plan = InstallPlan(tuple(games))
+    plan.validate()
+    return plan
+
+
+def _plan_validate_record(game):
+    live = Path(game.path)
+    root = live / MODKIT_DIRNAME
+    if root.is_symlink():
+        raise CorruptManifestError("Linked recovery directory; nothing was changed")
+    for directory in (root / "staging", root / "rollback", root / "backups"):
+        if directory.is_symlink():
+            raise CorruptManifestError("Linked transaction directory; backups kept")
+    record = root / MANIFEST_NAME
+    if record.exists():
+        data = _read_record(record)
+        _validate_manifest(data, live, root)
+        if (data.get("game") != game.key or "added" not in data or
+                "overwritten" not in data or not isinstance(data.get("mods", {}), dict)):
+            raise CorruptManifestError("Invalid install record; backups kept")
+    if (root / "backups").exists():
+        for directory, dirs, names in os.walk(root / "backups"):
+            if any((Path(directory) / name).is_symlink() for name in dirs + names):
+                raise CorruptManifestError("Linked backup; backups kept")
+
+
+class _PreparationTxn:
+    """Run existing recipes in a private virtual game; record replay actions."""
+    def __init__(self, game, directory, log):
+        self.game_dir = directory / "virtual"
+        self.game_dir.mkdir()
+        self.game_key, self.log = game.key, log
+        self.packages = game.packages
+        self.directory = directory
+        self.actions, self.identities, self.mods = [], [], {}
+        self.destinations = []
+        live = Path(game.path)
+        for path in live.glob("*_savedata_win/*/launcher/launcher_sv"):
+            rel = path.relative_to(live).as_posix()
+            _safe_game_path(live, rel)
+            dest = self.game_dir / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, dest)
+
+    def install_archive(self, archive, on_progress=None, component=None):
+        check_cancelled()
+        copied = self.directory / f"payload-{len(self.actions)}{archive.suffix}"
+        shutil.copyfile(archive, copied)
+        digest = sha256_file(copied)
+        package = self.packages[len(self.identities)]
+        if digest != package.sha256:
+            raise ReplanRequired("Payload differs from its confirmed checksum: " + package.name)
+        stage = self.directory / f"stage-{len(self.actions)}"
+        stage.mkdir()
+        rels = staged_files(copied, stage, on_progress=on_progress)
+        rels = validate_payload_paths(rels, self.game_key, component, self.log)
+        for rel in rels:
+            dest = _safe_game_path(self.game_dir, rel)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            self.destinations.append((rel, (stage / rel).stat().st_size))
+            os.replace(stage / rel, dest)
+        self.actions.append(("archive", str(copied), component))
+        self.identities.append((str(copied), digest))
+        shutil.rmtree(stage)
+        return rels
+
+    def write_bytes(self, rel, data):
+        dest = _safe_game_path(self.game_dir, rel)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+        self.actions.append(("bytes", rel, data))
+        self.destinations.append((rel, len(data)))
+
+    def read_text_ours(self, rel, encoding="utf-8"):
+        return _safe_game_path(self.game_dir, rel).read_text(encoding=encoding)
+
+    def note_mod(self, name, version):
+        self.mods[name] = version
+
+
+class CurrentRecipeAdapter:
+    def __init__(self, log, progress=None):
+        self.log, self.progress = log, progress
+
+    def check_cancelled(self):
+        check_cancelled()
+
+    def lock(self, game):
+        return GameLock(Path(game.path))
+
+    def recheck(self, plan):
+        for game in plan.games:
+            live = Path(game.path)
+            if (live / MODKIT_DIRNAME / JOURNAL_NAME).exists():
+                raise ReplanRequired("Recovery is pending; recover and confirm a fresh plan")
+            if _plan_inputs(live, Path(game.steam_root)) != game.inputs:
+                raise ReplanRequired("Game, settings, saves or recovery inputs changed; confirm a fresh plan")
+            for package in game.packages:
+                if package.role != "package":
+                    path = Path(package.source)
+                    if path.is_symlink() or not path.is_file() or sha256_file(path) != package.sha256:
+                        raise ReplanRequired("Supplied archive changed; select and confirm again")
+            supplied = [p for p in game.packages if p.role != "package"]
+            current = _plan_packages(game.key, [])
+            if tuple(p for p in game.packages if p.role == "package") != current:
+                raise ReplanRequired("Package definitions changed; confirm a fresh plan")
+            # Settings writers remain owned by the existing recipe.
+            if supplied and GAMES[game.key].get("kind") == "m2fix":
+                raise ValueError("Audio is incompatible with this recipe")
+
+    def prepare(self, game, workspace, index):
+        _plan_validate_record(game)
+        directory = workspace / str(index)
+        directory.mkdir()
+        tmp = directory / "downloads"
+        tmp.mkdir()
+        tx = _PreparationTxn(game, directory, self.log)
+        g, opts = GAMES[game.key], json.loads(game.settings)
+        if self.progress:
+            self.progress.update(f"{g['short']} — Preparing all selected payloads", 0)
+        if g.get("kind", "hdfix") == "m2fix":
+            install_m2fix(tx, tmp, opts, self.log)
+        else:
+            install_hdfix(tx, tmp, self.log)
+            for package in game.packages:
+                if package.role != "package":
+                    status, reason = validate_audio_for_role(Path(package.source), game.key, package.role)
+                    if status in ("not_audio", "wrong_game", "mismatch"):
+                        raise ValueError(reason)
+                    # Existing audio recipe/record naming stays unchanged.
+                    install_better_audio(tx, [{"path": package.source, "log": package.name,
+                                               "status": package.name, "filename": package.version}], self.log)
+            install_bugfix(tx, g, tmp, self.log)
+            write_settings(tx, g, opts, self.log)
+            if not set_launcher_options(tx, g, Path(game.steam_root), opts, self.log):
+                raise RuntimeError("A launcher save could not be parsed safely")
+        problems = verify_install(g, tx.game_dir)
+        if problems:
+            raise RuntimeError("Prepared payload verification failed: " + ", ".join(problems))
+        # Validate every eventual destination before creating any transaction.
+        size = 0
+        for rel, payload_size in tx.destinations:
+            dest = _safe_game_path(Path(game.path), rel)
+            if dest.is_symlink() or (dest.exists() and not dest.is_file()):
+                raise ValueError("Destination is not a regular file: " + rel)
+            # Extraction + installed payload, original backup + rollback fallback.
+            size += payload_size * 2 + (dest.stat().st_size * 3 if dest.exists() else 0)
+        shutil.rmtree(tx.game_dir)
+        return PreparedGame(game, tuple(tx.actions), tuple(tx.identities),
+                            tuple(tx.mods.items()), size)
+
+    def check_prepared(self, prepared):
+        for game in prepared.games:
+            for source, digest in game.identities:
+                path = Path(source)
+                if path.is_symlink() or not path.is_file() or sha256_file(path) != digest:
+                    raise ReplanRequired("Prepared payload changed; prepare a fresh plan")
+
+    def check_space(self, prepared):
+        volumes = {}
+        for game in prepared.games:
+            path = Path(game.game.path)
+            device = path.stat().st_dev
+            needed, _ = volumes.get(device, (SPACE_MARGIN_BYTES, path))
+            volumes[device] = (needed + game.required_bytes, path)
+        for needed, path in volumes.values():
+            if free_bytes(path) < needed:
+                raise RuntimeError("Not enough free space for the complete prepared installation")
+
+    def execute(self, prepared, index, outcomes):
+        game = prepared.game
+        tx = None
+        try:
+            tx = InstallTxn(Path(game.path), game.key, self.log)
+            tx.settings = {k: v for k, v in json.loads(game.settings).items() if k in SAVED_OPT_KEYS}
+            for number, (action, target, data) in enumerate(prepared.actions):
+                check_cancelled()
+                if self.progress:
+                    self.progress.update(f"{GAMES[game.key]['short']} — Installing prepared files",
+                                         (index + number / len(prepared.actions)) * 100 /
+                                         len(outcomes))
+                if action == "archive":
+                    tx.install_archive(Path(target), component=data)
+                else:
+                    tx.write_bytes(target, data)
+            for name, version in prepared.mods:
+                tx.note_mod(name, version)
+            problems = verify_install(GAMES[game.key], tx.game_dir)
+            if problems:
+                raise RuntimeError("Verification failed: " + ", ".join(problems))
+            check_cancelled()
+            tx.commit()
+            outcomes[game.key] = "installed and verified"
+        except BaseException:
+            if tx is None:
+                outcomes[game.key] = "not changed; inspect recovery record / lock"
+            elif tx.committed:
+                outcomes[game.key] = "installed and verified; recovery cleanup needs attention"
+            else:
+                restored = tx.rollback()
+                outcomes[game.key] = "previous setup restored" if restored else "recovery incomplete; backups kept"
+            raise
+
+
 def _main(log, log_path=None) -> int:
     ui = UI()
 
@@ -3836,8 +4223,18 @@ def _main(log, log_path=None) -> int:
     # picked 5.1 sound or PS2 buttons doesn't have to set them again.
     defaults = dict(opts)
     try:
-        per_game = {key: options_for_game(key, location, defaults, log)
-                    for key, location in found.items()}
+        per_game, choice_inputs = {}, {}
+        for key, (game_dir, sroot) in found.items():
+            with GameLock(game_dir):
+                if (game_dir / MODKIT_DIRNAME / JOURNAL_NAME).exists():
+                    notes, ok = recover_interrupted(game_dir, log)
+                    if not ok:
+                        raise RuntimeError("Recovery incomplete; backups kept. " + "; ".join(notes))
+                before = _plan_inputs(game_dir, sroot)
+                per_game[key] = options_for_game(key, found[key], defaults, log)
+                choice_inputs[key] = _plan_inputs(game_dir, sroot)
+                if before != choice_inputs[key]:
+                    raise ReplanRequired("Inputs changed while reading settings; restart planning")
     except (OSError, RuntimeError, configparser.Error) as e:
         ui.error(f"Existing settings could not be read safely: {e}.\n"
                  "Keep your settings file. Correct it with the pinned Config Tool before repairing.")
@@ -3853,6 +4250,11 @@ def _main(log, log_path=None) -> int:
     # 5. One review screen. Settings are shown, not asked — "Change settings"
     #    is there for anyone who wants something other than the recommendation.
     while True:
+        try:
+            review_plan = build_install_plan(found, per_game, audio_archives, choice_inputs)
+        except (ValueError, RuntimeError, OSError) as e:
+            ui.error(f"Installation plan is invalid: {e}")
+            return 1
         plan = []
         for key in found:
             g, (d, _) = GAMES[key], found[key]
@@ -3897,6 +4299,12 @@ def _main(log, log_path=None) -> int:
         if choice in (None, "cancel"):
             return 0
         if choice == "go":
+            try:
+                CurrentRecipeAdapter(log).recheck(review_plan)
+                confirmed_plan = review_plan
+            except (ValueError, RuntimeError, OSError) as e:
+                ui.error(f"Installation plan is invalid: {e}")
+                return 1
             break
         if choice == "reset":
             opts.update(defaults)
@@ -3912,95 +4320,20 @@ def _main(log, log_path=None) -> int:
 
     # Each game commits independently. Cancellation/failure keeps earlier successes.
     prog = ui.progress("Installing MGS mods", log)
-    total = len(found)
     outcomes = {key: "not started" for key in found}
     global CANCEL_EVENT, TRANSFER_PROGRESS
     previous_cancel, previous_transfer = CANCEL_EVENT, TRANSFER_PROGRESS
     CANCEL_EVENT = getattr(prog, "cancel_event", threading.Event())
 
     def install_selected():
-        global TRANSFER_PROGRESS
-        with tempfile.TemporaryDirectory(prefix="mgskit_") as td:
-            tmp = Path(td)
-            for i, key in enumerate(found):
-                check_cancelled()
-                g, (game_dir, sroot) = GAMES[key], found[key]
-                game_opts = per_game[key]
-                log(f"\n=== {g['name']} ===")
-
-                def stage(text, frac, short=g["short"], idx=i):
-                    prog.update(f"{short} — {text}", (idx + frac) / total * 100)
-
-                def transfer(name, received, size):
-                    detail = f"{received / 1024**2:.1f} MB"
-                    if size:
-                        detail += f" / {size / 1024**2:.1f} MB"
-                    stage(f"Downloading {name}: {detail}", 0.10)
-
-                TRANSFER_PROGRESS = transfer
-                tx = None
-                try:
-                    with GameLock(game_dir):
-                        tx = InstallTxn(game_dir, key, log)
-                        # Refresh inside the lock, after any interrupted run is recovered.
-                        fresh = options_for_game(key, found[key], defaults, log)
-                        if game_opts.get("_reset"):
-                            fresh.update(defaults)
-                            fresh["_reset"] = True
-                        for option in game_opts.get("_changed", set()):
-                            fresh[option] = game_opts[option]
-                        fresh["_changed"] = game_opts.get("_changed", set())
-                        game_opts = per_game[key] = fresh
-                        tx.settings = {k: game_opts[k] for k in SAVED_OPT_KEYS if k in game_opts}
-                        try:
-                            stage("Preparing", 0.05)
-                            if g.get("kind", "hdfix") == "m2fix":
-                                stage("Installing MGSM2Fix", 0.4)
-                                install_m2fix(tx, tmp, game_opts, log)
-                            else:
-                                stage("Downloading mods (verifying checksums)", 0.1)
-                                fetch(HDFIX_URL, tmp / f"MGSHDFix_{HDFIX_VERSION}.zip", log, sha256=HDFIX_SHA256)
-                                fetch(g["bugfix_url"], tmp / f"{g['short']}_bugfix_base.zip", log, sha256=g.get("bugfix_sha256"))
-                                stage("Extracting MGSHDFix", 0.2)
-                                install_hdfix(tx, tmp, log)
-                                if key in audio_archives:
-                                    def audio_report(status, frac):
-                                        stage(f"Extracting {status} audio", 0.30 + 0.35 * frac)
-                                    install_better_audio(tx, audio_archives[key], log, report=audio_report)
-                                stage("Extracting Bugfix Compilation", 0.7)
-                                install_bugfix(tx, g, tmp, log)
-                                stage("Writing settings + launcher options", 0.85)
-                                write_settings(tx, g, game_opts, log)
-                                if not set_launcher_options(tx, g, sroot, game_opts, log):
-                                    raise RuntimeError("A launcher save could not be parsed safely.")
-                            stage("Verifying installed content", 0.95)
-                            problems = verify_install(g, game_dir)
-                            if problems:
-                                raise RuntimeError("Verification failed: " + ", ".join(problems))
-                            if key in hdfix_sel:
-                                validate_settings((game_dir / "plugins/MGSHDFix.settings").read_text(encoding="utf-8-sig"))
-                            check_cancelled()
-                            tx.commit()
-                            outcomes[key] = "installed and verified"
-                        except BaseException:
-                            log(f"  ✗ {g['short']} interrupted — restoring pre-run files …")
-                            if tx.committed:
-                                outcomes[key] = "installed and verified; recovery cleanup needs attention"
-                            else:
-                                restored = tx.rollback()
-                                outcomes[key] = "previous setup restored" if restored else "recovery incomplete; backups kept"
-                            raise
-                    stage("Complete", 1.0)
-                except BaseException:
-                    if tx is None:
-                        outcomes[key] = "not changed; inspect recovery record / lock"
-                    raise
-                for archive in tmp.glob("*.zip"):
-                    archive.unlink(missing_ok=True)
+        with tempfile.TemporaryDirectory(prefix="mgskit_plan_") as td:
+            adapter = CurrentRecipeAdapter(log, prog)
+            prepared = prepare_plan(confirmed_plan, adapter, Path(td))
+            execute_plan(prepared, adapter, outcomes)
 
     try:
         run_with_progress(prog, install_selected)
-    except (RuntimeError, OSError, subprocess.SubprocessError, configparser.Error, KeyboardInterrupt) as e:
+    except (ValueError, RuntimeError, OSError, subprocess.SubprocessError, configparser.Error, KeyboardInterrupt) as e:
         log(traceback.format_exc())
         prog.close()
         label = "Installation cancelled" if isinstance(e, (CancelledInstall, KeyboardInterrupt)) else "Installation stopped"
@@ -4035,6 +4368,7 @@ def _main(log, log_path=None) -> int:
         # to do. No launch options, no reference file, no clipboard step.
         ui.info(
             f"✅ All done — {names} is modded and checked.\n\n"
+            "Installed files verified; game boots are not checked by this installer.\n\n"
             "Nothing else to set up: just launch the games from Steam.\n\n"
             + "\n".join(tips) + keep_note)
         return 0
@@ -4052,6 +4386,7 @@ def _main(log, log_path=None) -> int:
 
     ui.info(
         f"✅ All done — {names} is modded and checked.\n\n"
+        "Installed files verified; game boots are not checked by this installer.\n\n"
         "ONE thing left, which only you can do in Steam:\n"
         "right-click each game → Properties → Launch Options, and paste its "
         "line.\n\n"
