@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-labelledby="title description">
   <title id="title">MGS Master Collection Mod Kit</title>
-  <desc id="description">Vanilla-faithful fixes and restorations for Windows, Linux and Steam Deck. MGS1, MGS2 and MGS3; MGS4 implementation awaiting review.</desc>
+  <desc id="description">Vanilla-faithful fixes and restorations for Windows, Linux and Steam Deck. MGS1, MGS2 and MGS3; MGS4 integration in development.</desc>
   <rect width="1280" height="320" fill="#111713"/>
   <rect x="64" y="58" width="36" height="4" fill="#d0e598"/>
   <g font-family="Arial, Helvetica, sans-serif">
@@ -14,7 +14,7 @@
       <text x="880" y="175">MGS 3</text>
       <text x="1072" y="175" fill="#d0e598">MGS 4</text>
     </g>
-    <text x="1072" y="202" font-size="13" letter-spacing="1" fill="#afbbb3">AWAITING REVIEW</text>
+    <text x="1072" y="202" font-size="13" letter-spacing="1" fill="#afbbb3">IN DEVELOPMENT</text>
     <path d="M64 248H1216" stroke="#344137" stroke-width="1"/>
     <text x="64" y="285" font-size="16" fill="#afbbb3">Steam Deck &#183; Linux &#183; Windows</text>
     <text x="1216" y="285" text-anchor="end" font-size="14" font-weight="600" letter-spacing="1.4" fill="#d0e598">FIX. RESTORE. PLAY.</text>
