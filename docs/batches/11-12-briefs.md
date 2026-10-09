@@ -13,7 +13,9 @@ Batch 11 repair is now merged. Updated the engine handoff and added a second
 Worker for coordinated Volume 1 upgrades/preparation. Both start independently;
 [ownership and genuine dependencies](parallel-workers-brief.md) supersede the
 earlier MGS4 queue rule. Updated the standing owner decision for useful parallel
-Workers. Native exports,
+Workers. Recorded the [standalone embedding and sandbox interface decision](12-install-plan-interface.md)
+to preserve current shortcut delivery while preventing preparation from mutating
+live files. Native exports,
 game boots and audio observations remain distinct from Mac/offline checks.
 Production files, standing product scope and framework copies are unchanged.
 
