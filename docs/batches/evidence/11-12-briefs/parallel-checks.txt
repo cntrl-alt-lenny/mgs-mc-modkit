@@ -1,0 +1,102 @@
+$ git rev-parse HEAD
+d9e274126c7e6dd179d20607f5f3240368902c60
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/11-12-briefs (this machine's copy): 6 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 1 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 6 commit(s), last 2026-10-08; batch 14-mgs4-patriotfix: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 4 commit(s), last 2026-10-08; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/11-12-briefs; no uncommitted changes
+  not on GitHub yet: brain/11-12-briefs (2 commit(s)), brain/simple-banner (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <user-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch
+exit=0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 76%]
+...................................................................      [100%]
+283 passed in 6.72s
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py
+(no output)
+exit=0
+
+$ git diff --check
+(no output)
+exit=0
+
+$ git diff --exit-code origin/main -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop docs/agents tools/fw.py tests/test_framework.py
+(no output)
+exit=0
+
+Framework comparison: all six copies match immutable 4.0.0 source b036c761ac2af2d47e61a1b473c708f094bd4295 and manifest. exit=0
+
+Batch 12 interface clarification: documentation-only validation.
+
+$ git rev-parse HEAD
+c1ac26d0fa3d41b3713d32d762e9541568c33cc7
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/11-12-briefs (this machine's copy): 9 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 7 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 2 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 6 commit(s), last 2026-10-08; batch 14-mgs4-patriotfix: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/11-12-briefs; no uncommitted changes
+  not on GitHub yet: brain/11-12-briefs (2 commit(s))
+  uncommitted changes in linked checkout <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/verifier-14-mgs4-patriotfix
+  uncommitted changes in linked checkout <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-12-install-plan-engine
+  uncommitted changes in linked checkout <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-16-volume1-qol-upgrade
+  finished checkouts (clean, and their work is merged) that can be removed: <user-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch
+exit=0
+
+$ git diff --check 095a3b1b03d8bb543aa929069eca501b9e7cd8fa...HEAD
+(no output)
+exit=0
+
+$ git diff --exit-code origin/main -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop tools/fw.py docs/agents tests/test_framework.py
+(no output)
+exit=0

@@ -15,6 +15,9 @@ and Steam Deck/Linux, with repair and removal through the same shortcut.
 - Keep owner-approves as the merge rule; only the owner approves merging or release.
 - Codex needs no optional adapter or git hook for this adoption.
 - Preserve existing product work independently of framework adoption.
+- Plan two active Workers when useful independent work exists, with separate
+  ownership and Brain coordinating integration. Pending review or documentation
+  merges block a Worker only when its implementation actually depends on them.
 
 ## Scorecard
 
