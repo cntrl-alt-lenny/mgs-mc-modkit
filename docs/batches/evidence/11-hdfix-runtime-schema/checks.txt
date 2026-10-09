@@ -1,0 +1,703 @@
+Implementation commit: 099ae5231a0a99c14db2de727ea1a780e3f61194
+Host: M1 MacBook Pro; macOS-27.0.1-arm64-arm-64bit; Python 3.9.6
+Local account paths in fw output replaced with <HOME>. All checks read the above implementation commit.
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 76%]
+...................................................................      [100%]
+283 passed in 5.48s
+
+exit: 0
+
+$ python3 -m ruff check .
+All checks passed!
+
+exit: 0
+
+$ python3 -m py_compile tools/fw.py install.py
+
+exit: 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+
+exit: 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/11-hdfix-runtime-schema: 1 commit(s), last 2026-10-08; batch 11-hdfix-runtime-schema: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 2 commit(s), last 2026-10-08; batch 11-12-briefs: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/11-hdfix-runtime-schema; 1 uncommitted change(s)
+  not on GitHub yet: worker/11-hdfix-runtime-schema (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <HOME>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 11-hdfix-runtime-schema
+
+exit: 0
+
+$ python3 docs/batches/evidence/11-hdfix-runtime-schema/verify-pins.py
+Install-MGS-Mods.cmd v2.3.0 2985d44f82a73be71c555a1ded2130be817e20c4c8903a6463871a5e9097426e line endings OK
+Install-MGS-Mods.desktop v2.3.0 2985d44f82a73be71c555a1ded2130be817e20c4c8903a6463871a5e9097426e line endings OK
+All tracked Python LF / Python 3.9 grammar OK
+All mod pins/checksums/URLs, kit version and framework copies unchanged from 90967b9
+
+exit: 0
+
+$ git diff 90967b9 --check -- . :!Install-MGS-Mods.cmd
+
+exit: 0
+
+$ python3 docs/batches/evidence/11-hdfix-runtime-schema/audit-runtime.py /tmp/mgs-hdfix-batch11
+{
+  "source_sha256": {
+    "ConfigTool/main.cpp": "99a7051819fb4e6a5c5d623e718fbb8a97548c41a2ac0043f86094955fc0eabc",
+    "ConfigTool/tab_data.cpp": "f96e385ad00e144d838466a28cad5ccaf447b4312900d27121ba115f49241561",
+    "src/resources/config.cpp": "18581108db3ced5866d00bb31d6300abed2d5f5ec4db5dc1a156e9560add1f73",
+    "src/resources/config_keys.hpp": "67f699e684014a56aedb8b0a4d12c64022f46d1d49807a5d6d3b41f790f6a3df"
+  },
+  "calls": 133,
+  "runtime": {
+    "tree": "f4f662d67a2a033dee0877e436a0fe65eb719e0b",
+    "reads": {
+      "Bugfixes": [
+        "Boost Reverb Volume",
+        "Depth of Field Blur Strength",
+        "Fix  High  CPU  Usage",
+        "Fix Achievement Stat Tracking",
+        "Fix Aiming After Equip",
+        "Fix Aiming On Full Tilt",
+        "Fix Alt-Tab Loading Bugs",
+        "Fix Broken PS2 Visual Effects",
+        "Fix Depth of Field",
+        "Fix Film Grain",
+        "Fix M92 Laser Origin in FPV",
+        "Fix Motion Trails",
+        "Fix Mouse Cursor Showing",
+        "Reverb Volume Multiplier"
+      ],
+      "CAUTION - THIS WILL RESET ALL ACHIEVEMENTS": [
+        "Reset All Achievements"
+      ],
+      "Camera Positioning": [
+        "Disable HD Collection Camera Positioning",
+        "HD Collection Camera Toggle"
+      ],
+      "Caption Settings": [
+        "Caption Opacity (%)",
+        "Caption Outline Opacity (%)",
+        "Caption Size (%)"
+      ],
+      "Controller Settings": [
+        "Button Icons",
+        "DualShock Rumble Strength (%)",
+        "Dualshock 2 && 3 Controller Support",
+        "Restore PS2 Pressure Sensitive Binds",
+        "Set Menu OK && Cancel Button"
+      ],
+      "DISABLE STEAM ACHIEVEMENTS": [
+        "Disable Unlocking Steam Achievements"
+      ],
+      "Damaged Steam Cloud Save Data Fix": [
+        "Enable Console Notification When Fixed",
+        "Fix Mode"
+      ],
+      "Debugging": [
+        "Debug Logging",
+        "Start Game in Developer Menu"
+      ],
+      "Difficulty Restoration": [
+        "Enable Grenade Cooking",
+        "Restore PS2 Solidus Choking Difficulty",
+        "Toggle Grenade Cooking"
+      ],
+      "Enable Game Warnings": [
+        "Warn When FSR Upscaling is Enabled",
+        "Warn When Game is Muted",
+        "Warn When Missing Major Bugfix Mods",
+        "Warn When Save Files Are Read-Only",
+        "Warn When Save Folders Not Writable",
+        "Warn When Windows Slideshow Enabled"
+      ],
+      "Enhancements and Tweaks": [
+        "Anisotropic Filtering Level",
+        "Correct Aspect Ratio to 4:3",
+        "Correct Gamma Levels",
+        "Crop Overscan Area",
+        "Enable SMAA Anti-Aliasing",
+        "Nearest Neighbor Texture Filtering",
+        "Reduce Photosensitive Effects"
+      ],
+      "First Person Shooter Mode": [
+        "Enable First Person Shooter Mode",
+        "First Person Shooter - Movement Enabled By Default",
+        "Keep First Person View Across Rooms",
+        "Tap to Keep First Person View Active",
+        "Toggle First Person Shooter Mode",
+        "Toggle First Person Shooter Movement",
+        "Toggle Tap for First Person View"
+      ],
+      "Hotkeys": [
+        "Capture Hotkeys While Alt Tabbed",
+        "Cycle Wireframe Mode",
+        "Return to Developer Menu",
+        "Toggle Vector Line Fixes"
+      ],
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": [
+        "Render Height",
+        "Render Width"
+      ],
+      "Keep Aiming After Firing": [
+        "Always Keep Aiming",
+        "While Holding Lock On",
+        "While in FPS Mode",
+        "While in First Person"
+      ],
+      "Language Settings": [
+        "Game Language",
+        "Game Region"
+      ],
+      "Launcher and Splashscreens": [
+        "MSX Skip Launcher Game",
+        "Skip In-Game Splashscreens",
+        "Skip Launcher",
+        "Skip Launcher Splashscreens"
+      ],
+      "MGS2 Community Bugfix Compilation Integration": [
+        "Restore Title Screen 2 Color Swapping",
+        "Retro MSX Colonel Sprite"
+      ],
+      "Model Quality && Level of Detail Enhancements": [
+        "Always Show Grass",
+        "Always Show Weapon Shell Casings",
+        "Custom Grass Distance Multiplier",
+        "Force High Quality Characters",
+        "Increase Shadow Resolution",
+        "Make Snake's Bandana Heavier",
+        "Show Soft Particles",
+        "Toggle Always Show Grass"
+      ],
+      "Mouse Sensitivity": [
+        "Override Mouse Sensitivity",
+        "X Multiplier",
+        "Y Multiplier"
+      ],
+      "Speedrunner Settings": [
+        "Fix In-Game Timer Loading Pause",
+        "Force RTC Hostage Type",
+        "Gameplay Stats Overlay",
+        "Restore SoL Elevator Glitch",
+        "Show Pressure Level Overlay"
+      ],
+      "System Specific Fixes": [
+        "Audio Output Mode",
+        "Disable Windows Fullscreen Optimization",
+        "Force Dedicated GPU",
+        "Limit Game to 2 CPU Cores"
+      ],
+      "Third Person Freecam": [
+        "Camera - Zoom In Hotkey",
+        "Camera - Zoom Out Hotkey",
+        "Camera - Zoom Reset Hotkey",
+        "Camera - Zoom Speed",
+        "Camera - Zoom Step Amount",
+        "Enable Third Person Freecam",
+        "Horizontal Camera Sensitivity",
+        "Inherit Camera Rotation",
+        "Inherit Camera Rotation Toggle",
+        "Max Camera Distance",
+        "Third Person View Toggle",
+        "Vertical Camera Sensitivity"
+      ],
+      "Ultra-Wide / 16:10+": [
+        "Fix Aspect Ratio",
+        "Fix FOV",
+        "Fix Framebuffer",
+        "Lock HUD && Movies to 16:9"
+      ],
+      "Update Notifications": [
+        "Check For MGSHDFix Updates",
+        "In-Game Update Notifications"
+      ],
+      "Various": [
+        "Camera Triggers Steam Screenshot",
+        "Custom Lifebar Name",
+        "Enable Radar in Snake Tales",
+        "Fix Vamp Punch Damage Type",
+        "Force Sunglasses",
+        "High Frequency Blade Anywhere",
+        "Pause On Focus Loss",
+        "Restore Japanese Phone Ringtone",
+        "Restore Main Menu Voiceovers",
+        "Restore Node DoB && Bloodtype Entry",
+        "Restore Original Dogtag Names",
+        "Restore PS2 Memory Card Strings",
+        "Restore SoL Radar Rotation",
+        "T.Goggle Color Cycle Hotkey",
+        "Thermal Goggle Default Palette",
+        "Thermal Goggle Palette Swapping",
+        "Use Character Names for Lifebar",
+        "Use Custom Lifebar Name"
+      ],
+      "Window Settings": [
+        "Enable Resolution Overrides",
+        "Fullscreen, Borderless, and Windowed",
+        "Window Height",
+        "Window Width"
+      ]
+    }
+  }
+}
+
+exit: 0
+
+$ python3 tools/capture_settings_schema.py /tmp/mgs-hdfix-batch11 --tag 4.1.0 --tree f4f662d67a2a033dee0877e436a0fe65eb719e0b
+{
+  "upstream": "ShizCalev/MGSHDFix",
+  "tag": "4.1.0",
+  "tree": "f4f662d67a2a033dee0877e436a0fe65eb719e0b",
+  "sources": [
+    "ConfigTool/tab_data.cpp",
+    "src/resources/config_keys.hpp"
+  ],
+  "fields": {
+    "Bugfixes": {
+      "Boost Reverb Volume": "Bool",
+      "Depth of Field Blur Strength": "Float",
+      "Fix  High  CPU  Usage": "Choice",
+      "Fix Achievement Stat Tracking": "Bool",
+      "Fix Aiming After Equip": "Bool",
+      "Fix Aiming On Full Tilt": "Bool",
+      "Fix Alt-Tab Loading Bugs": "Bool",
+      "Fix Broken PS2 Visual Effects": "Bool",
+      "Fix Depth of Field": "Bool",
+      "Fix Film Grain": "Bool",
+      "Fix M92 Laser Origin in FPV": "Bool",
+      "Fix Motion Trails": "Choice",
+      "Fix Mouse Cursor Showing": "Bool",
+      "Reverb Volume Multiplier": "Float"
+    },
+    "CAUTION - THIS WILL RESET ALL ACHIEVEMENTS": {
+      "Reset All Achievements": "Bool"
+    },
+    "Camera Positioning": {
+      "Disable HD Collection Camera Positioning": "Bool",
+      "HD Collection Camera Toggle": "Hotkey"
+    },
+    "Caption Settings": {
+      "Caption Opacity (%)": "Int",
+      "Caption Outline Opacity (%)": "Int",
+      "Caption Size (%)": "Int"
+    },
+    "Controller Settings": {
+      "Button Icons": "Choice",
+      "DualShock Rumble Strength (%)": "Int",
+      "Dualshock 2 && 3 Controller Support": "Bool",
+      "Restore PS2 Pressure Sensitive Binds": "Bool",
+      "Set Menu OK && Cancel Button": "Choice"
+    },
+    "DISABLE STEAM ACHIEVEMENTS": {
+      "Disable Unlocking Steam Achievements": "Bool"
+    },
+    "Damaged Steam Cloud Save Data Fix": {
+      "Enable Console Notification When Fixed": "Bool",
+      "Fix Mode": "Choice"
+    },
+    "Debugging": {
+      "Debug Logging": "Bool",
+      "Start Game in Developer Menu": "Bool"
+    },
+    "Difficulty Restoration": {
+      "Enable Grenade Cooking": "Bool",
+      "Restore PS2 Solidus Choking Difficulty": "Choice",
+      "Toggle Grenade Cooking": "Hotkey"
+    },
+    "Enable Game Warnings": {
+      "Warn When FSR Upscaling is Enabled": "Bool",
+      "Warn When Game is Muted": "Bool",
+      "Warn When Missing Major Bugfix Mods": "Bool",
+      "Warn When Save Files Are Read-Only": "Bool",
+      "Warn When Save Folders Not Writable": "Bool",
+      "Warn When Windows Slideshow Enabled": "Bool"
+    },
+    "Enhancements and Tweaks": {
+      "Anisotropic Filtering Level": "Int",
+      "Correct Aspect Ratio to 4:3": "Bool",
+      "Correct Gamma Levels": "Bool",
+      "Crop Overscan Area": "Bool",
+      "Enable SMAA Anti-Aliasing": "Bool",
+      "Nearest Neighbor Texture Filtering": "Bool",
+      "Reduce Photosensitive Effects": "Bool"
+    },
+    "First Person Shooter Mode": {
+      "Enable First Person Shooter Mode": "Bool",
+      "First Person Shooter - Movement Enabled By Default": "Bool",
+      "Keep First Person View Across Rooms": "Bool",
+      "Tap to Keep First Person View Active": "Bool",
+      "Toggle First Person Shooter Mode": "Hotkey",
+      "Toggle First Person Shooter Movement": "Hotkey",
+      "Toggle Tap for First Person View": "Hotkey"
+    },
+    "Hotkeys": {
+      "Capture Hotkeys While Alt Tabbed": "Bool",
+      "Cycle Wireframe Mode": "Hotkey",
+      "Return to Developer Menu": "Hotkey",
+      "Toggle Vector Line Fixes": "Hotkey"
+    },
+    "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+      "Render Height": "Int",
+      "Render Width": "Int"
+    },
+    "Keep Aiming After Firing": {
+      "Always Keep Aiming": "Bool",
+      "While Holding Lock On": "Bool",
+      "While in FPS Mode": "Bool",
+      "While in First Person": "Bool"
+    },
+    "Language Settings": {
+      "Game Language": "Choice",
+      "Game Region": "Choice"
+    },
+    "Launcher and Splashscreens": {
+      "MSX Skip Launcher Game": "Choice",
+      "Skip In-Game Splashscreens": "Bool",
+      "Skip Launcher": "Bool",
+      "Skip Launcher Splashscreens": "Bool"
+    },
+    "MGS2 Community Bugfix Compilation Integration": {
+      "Restore Title Screen 2 Color Swapping": "Bool",
+      "Retro MSX Colonel Sprite": "Choice"
+    },
+    "Model Quality && Level of Detail Enhancements": {
+      "Always Show Grass": "Bool",
+      "Always Show Weapon Shell Casings": "Bool",
+      "Custom Grass Distance Multiplier": "Float",
+      "Force High Quality Characters": "Bool",
+      "Increase Shadow Resolution": "Bool",
+      "Make Snake's Bandana Heavier": "Bool",
+      "Show Soft Particles": "Bool",
+      "Toggle Always Show Grass": "Hotkey"
+    },
+    "Mouse Sensitivity": {
+      "Override Mouse Sensitivity": "Bool",
+      "X Multiplier": "Int",
+      "Y Multiplier": "Int"
+    },
+    "Speedrunner Settings": {
+      "Fix In-Game Timer Loading Pause": "Bool",
+      "Force RTC Hostage Type": "Choice",
+      "Gameplay Stats Overlay": "Choice",
+      "Restore SoL Elevator Glitch": "Bool",
+      "Show Pressure Level Overlay": "Bool"
+    },
+    "System Specific Fixes": {
+      "Audio Output Mode": "Choice",
+      "Disable Windows Fullscreen Optimization": "Bool",
+      "Force Dedicated GPU": "Bool",
+      "Limit Game to 2 CPU Cores": "Bool"
+    },
+    "Third Person Freecam": {
+      "Camera - Zoom In Hotkey": "Hotkey",
+      "Camera - Zoom Out Hotkey": "Hotkey",
+      "Camera - Zoom Reset Hotkey": "Hotkey",
+      "Camera - Zoom Speed": "Int",
+      "Camera - Zoom Step Amount": "Int",
+      "Enable Third Person Freecam": "Bool",
+      "Horizontal Camera Sensitivity": "Float",
+      "Inherit Camera Rotation": "Bool",
+      "Inherit Camera Rotation Toggle": "Hotkey",
+      "Max Camera Distance": "Int",
+      "Third Person View Toggle": "Hotkey",
+      "Vertical Camera Sensitivity": "Float"
+    },
+    "Ultra-Wide / 16:10+": {
+      "Fix Aspect Ratio": "Bool",
+      "Fix FOV": "Bool",
+      "Fix Framebuffer": "Bool",
+      "Lock HUD && Movies to 16:9": "Bool"
+    },
+    "Update Notifications": {
+      "Check For MGSHDFix Updates": "Bool",
+      "In-Game Update Notifications": "Bool"
+    },
+    "Various": {
+      "Camera Triggers Steam Screenshot": "Bool",
+      "Custom Lifebar Name": "Str",
+      "Enable Radar in Snake Tales": "Bool",
+      "Fix Vamp Punch Damage Type": "Bool",
+      "Force Sunglasses": "Choice",
+      "High Frequency Blade Anywhere": "Bool",
+      "Pause On Focus Loss": "Bool",
+      "Restore Japanese Phone Ringtone": "Bool",
+      "Restore Main Menu Voiceovers": "Bool",
+      "Restore Node DoB && Bloodtype Entry": "Bool",
+      "Restore Original Dogtag Names": "Bool",
+      "Restore PS2 Memory Card Strings": "Bool",
+      "Restore SoL Radar Rotation": "Bool",
+      "T.Goggle Color Cycle Hotkey": "Hotkey",
+      "Thermal Goggle Default Palette": "Choice",
+      "Thermal Goggle Palette Swapping": "Bool",
+      "Use Character Names for Lifebar": "Bool",
+      "Use Custom Lifebar Name": "Bool"
+    },
+    "Window Settings": {
+      "Enable Resolution Overrides": "Bool",
+      "Fullscreen, Borderless, and Windowed": "Choice",
+      "Window Height": "Int",
+      "Window Width": "Int"
+    }
+  },
+  "constraints": {
+    "Bugfixes": {
+      "Fix  High  CPU  Usage": {
+        "choices": [
+          "Full",
+          "Half",
+          "Disabled"
+        ]
+      },
+      "Fix Motion Trails": {
+        "choices": [
+          "Full (Gameplay + Cutscenes)",
+          "Cutscenes Only",
+          "Disabled"
+        ]
+      }
+    },
+    "System Specific Fixes": {
+      "Audio Output Mode": {
+        "choices": [
+          "Stereo (2.0)",
+          "Surround Sound (5.1)"
+        ]
+      }
+    },
+    "Damaged Steam Cloud Save Data Fix": {
+      "Fix Mode": {
+        "choices": [
+          "Move Outdated Save Data to Backup Folder",
+          "Delete Outdated Save Data",
+          "Disable Damaged Save Data Fix"
+        ]
+      }
+    },
+    "Controller Settings": {
+      "Set Menu OK && Cancel Button": {
+        "choices": [
+          "Default",
+          "East for OK",
+          "South for OK"
+        ]
+      },
+      "DualShock Rumble Strength (%)": {
+        "range": [
+          0,
+          200
+        ]
+      }
+    },
+    "Window Settings": {
+      "Window Width": {
+        "range": [
+          0,
+          16384
+        ]
+      },
+      "Fullscreen, Borderless, and Windowed": {
+        "choices": [
+          "Exclusive Fullscreen",
+          "Borderless Fullscreen",
+          "Borderless Windowed",
+          "Windowed (with borders)"
+        ]
+      },
+      "Window Height": {
+        "range": [
+          0,
+          16384
+        ]
+      }
+    },
+    "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+      "Render Width": {
+        "range": [
+          0,
+          16384
+        ]
+      },
+      "Render Height": {
+        "range": [
+          0,
+          16384
+        ]
+      }
+    },
+    "Enhancements and Tweaks": {
+      "Anisotropic Filtering Level": {
+        "range": [
+          0,
+          16
+        ]
+      }
+    },
+    "Launcher and Splashscreens": {
+      "MSX Skip Launcher Game": {
+        "choices": [
+          "Metal Gear (MSX)",
+          "Metal Gear 2: Solid Snake"
+        ]
+      }
+    },
+    "Various": {
+      "Force Sunglasses": {
+        "choices": [
+          "Normal",
+          "Always",
+          "Never"
+        ]
+      },
+      "Thermal Goggle Default Palette": {
+        "choices": [
+          "Substance",
+          "Sons of Liberty",
+          "Splinter Cell",
+          "White Hot",
+          "Black Hot"
+        ]
+      }
+    },
+    "Caption Settings": {
+      "Caption Size (%)": {
+        "range": [
+          1,
+          100
+        ]
+      },
+      "Caption Opacity (%)": {
+        "range": [
+          0,
+          100
+        ]
+      },
+      "Caption Outline Opacity (%)": {
+        "range": [
+          0,
+          100
+        ]
+      }
+    },
+    "Speedrunner Settings": {
+      "Gameplay Stats Overlay": {
+        "choices": [
+          "Disabled",
+          "Top Left",
+          "Top Right",
+          "Bottom Left",
+          "Bottom Right"
+        ]
+      },
+      "Force RTC Hostage Type": {
+        "choices": [
+          "Normal",
+          "Kato-chan",
+          "Old Beauties",
+          "Jennifer"
+        ]
+      }
+    },
+    "MGS2 Community Bugfix Compilation Integration": {
+      "Retro MSX Colonel Sprite": {
+        "choices": [
+          "Disabled",
+          "MSX2",
+          "Subsistence"
+        ]
+      }
+    },
+    "Difficulty Restoration": {
+      "Restore PS2 Solidus Choking Difficulty": {
+        "choices": [
+          "Disabled",
+          "Duration Increase Only",
+          "Life Reduction Only",
+          "Full Restoration"
+        ]
+      }
+    },
+    "Third Person Freecam": {
+      "Camera - Zoom Speed": {
+        "range": [
+          1,
+          500
+        ]
+      }
+    },
+    "Mouse Sensitivity": {
+      "X Multiplier": {
+        "range": [
+          1,
+          100
+        ]
+      },
+      "Y Multiplier": {
+        "range": [
+          1,
+          100
+        ]
+      }
+    }
+  },
+  "source_sha256": {
+    "ConfigTool/tab_data.cpp": "f96e385ad00e144d838466a28cad5ccaf447b4312900d27121ba115f49241561",
+    "src/resources/config_keys.hpp": "67f699e684014a56aedb8b0a4d12c64022f46d1d49807a5d6d3b41f790f6a3df"
+  }
+}
+
+exit: 0
+
+$ python3 -u tools/refresh_checksums.py
+
+HDFIX_SHA256
+  https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.0/MGSHDFix_4.1.0.zip
+  pinned: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523
+  actual: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523   ✓ match
+
+M2FIX_SHA256
+  https://github.com/nuggslet/MGSM2Fix/releases/download/v3.6/MGSM2Fix_3.6.0.zip
+  pinned: a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d
+  actual: a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d   ✓ match
+
+GAMES['mgs2']['bugfix_sha256']
+  https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/download/3.0.0/MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip
+  pinned: a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003
+  actual: a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003   ✓ match
+
+GAMES['mgs3']['bugfix_sha256']
+  https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/download/2.0.1/MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip
+  pinned: a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769
+  actual: a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769   ✓ match
+
+All pinned checksums match the live release assets.
+
+exit: 0
+
+$ command -v desktop-file-validate
+No executable found; exit: 1. Validation NOT RUN.
+
+Earlier targeted regression attempt: python3 -m pytest tests/test_settings_preservation.py -q
+1 failed, 20 passed in 0.36s; exit: 1. Wrong-game test manifest; fixed helper.
+Rerun: python3 -m pytest tests/test_settings_preservation.py tests/test_schema_capture.py -q
+91 passed in 1.17s; exit: 0.
+git diff --check reports the edited .cmd pin as trailing whitespace due to mandated CRLF; byte verification passes. The above diff check excludes only .cmd.

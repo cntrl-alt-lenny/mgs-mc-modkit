@@ -3,10 +3,10 @@
 > **Read this before changing any version number in `install.py`.**
 
 The four pinned mod versions are **a set, not four independent choices**. They
-are pinned together because they depend on each other, and because MGSHDFix has
-no runtime defaults — the kit ships a `MGSHDFix.settings` file matched to one
-specific version of its Config Tool, and the game **hard-aborts on a single
-missing key**.
+are pinned together because they depend on each other, and because MGSHDFix requires all runtime-read settings. The kit ships a
+`MGSHDFix.settings` file matched to one
+specific version of its Config Tool, and the mod **aborts initialization on a single
+missing key**. C++ initial values do not provide missing-key fallback.
 
 `tools/check_pins.py` (and the weekly `check-mod-versions` workflow) tells you
 when something newer exists. It deliberately never edits anything.
@@ -95,8 +95,10 @@ Comments and whitespace between tokens can vary; string contents and all
 other tokens must match. Any tail change requires source-format review,
 even if it appears unrelated to canonical keys. This is an explicit bounded
 allowlist, not general C++ namespace or preprocessor support. Spacers and the
-reviewed inline achievement Safety Switch row are outside the canonical schema. Known
-`MG`-only fields are excluded. Unknown game names, computed keys, new field
+reviewed inline achievement Safety Switch row are outside the canonical schema.
+Canonical `MG`-only fields are included: game flags control visibility, while
+hidden controls are still serialized. Runtime-required fields must not be
+filtered by the target game. Unknown game names, computed keys, new field
 types, malformed initializers and unreviewed flag/preprocessor syntax stop
 capture with an offending-construct error requesting source-format review. Do
 not turn an error into a count-based guess.
@@ -171,6 +173,9 @@ if either shortcut's pin disagrees with `install.py`.
 | MGS3 Bugfix | `2.0.1` | Paired with MGSHDFix 4.x. |
 | MGSM2Fix | `v3.6` | Independent MGS1 component. |
 
-This set is the known-good baseline. Any future version change must update the
+This is the pinned baseline, with native compatibility still unproven. Batch 10
+Windows logs exposed an incomplete kit schema; the three omitted runtime keys
+are corrected by batch 11, subject to independent review and native retesting.
+Any future version change must update the
 whole coupled set, regenerate the settings template, and pass a real install →
 launch → repair → uninstall check.

@@ -10,11 +10,11 @@ import install
 from test_transaction import DEFAULT_OPTS
 
 
-def settings(tmp_path, opts=None):
+def settings(tmp_path, opts=None, game_key="mgs2"):
     game = tmp_path / "game"
     game.mkdir(exist_ok=True)
-    tx = install.InstallTxn(game, "mgs2", lambda m: None)
-    install.write_settings(tx, install.GAMES["mgs2"], opts or DEFAULT_OPTS, lambda m: None)
+    tx = install.InstallTxn(game, game_key, lambda m: None)
+    install.write_settings(tx, install.GAMES[game_key], opts or DEFAULT_OPTS, lambda m: None)
     text = (game / "plugins/MGSHDFix.settings").read_text()
     tx.commit()
     return game, text
@@ -112,3 +112,83 @@ def test_known_old_template_value_is_migrated(tmp_path):
     (game / "plugins/MGSHDFix.settings").write_text(text)
     opts = install.options_for_game("mgs2", (game, tmp_path), DEFAULT_OPTS, lambda m: None)
     assert "Show Pressure Level Overlay=0" in opts["_existing_settings"]
+
+
+def legacy_settings(text):
+    parser = install.parse_ini(text)
+    for section, keys in install.SETTINGS_MIGRATION_DEFAULTS.items():
+        for key in keys:
+            del parser[section][key]
+    return install.render_ini(parser)
+
+
+def test_every_pinned_runtime_reader_has_a_template_key():
+    evidence = json.loads((Path(__file__).parent / 'fixtures/hdfix-4.1.0-runtime-reads.json').read_text())
+    template = install.parse_ini(install.SETTINGS_TEMPLATE)
+    assert evidence['tree'] == 'f4f662d67a2a033dee0877e436a0fe65eb719e0b'
+    assert {s: set(keys) for s, keys in evidence['reads'].items()} == {
+        s: set(template[s]) for s in template.sections()}
+    # Explicit regression: all three hidden MG controls are serialized upstream.
+    assert template['Launcher and Splashscreens']['MSX Skip Launcher Game'] == '"Metal Gear (MSX)"'
+    assert template['Enhancements and Tweaks']['Crop Overscan Area'] == '1'
+    assert template['Enhancements and Tweaks']['Correct Aspect Ratio to 4:3'] == '1'
+
+
+@pytest.mark.parametrize('game_key', ['mgs2', 'mgs3'])
+def test_complete_legacy_schema_migrates_and_preserves_preferences(tmp_path, game_key):
+    game, text = settings(tmp_path, game_key=game_key)
+    legacy = legacy_settings(text).replace('Game Language="en"', 'Game Language="fr"').replace(
+        'Render Width=0', 'Render Width=1920').replace('Skip Launcher=1', 'Skip Launcher=0')
+    path = game / 'plugins/MGSHDFix.settings'
+    path.write_text(legacy)
+    saves = game / 'save.bin'
+    saves.write_bytes(b'protected-save')
+    manifest_before = (game / install.MODKIT_DIRNAME / install.MANIFEST_NAME).read_bytes()
+    opts = install.options_for_game(game_key, (game, tmp_path), DEFAULT_OPTS, lambda m: None)
+    assert path.read_text() == legacy  # preview has no write side effects
+    assert (game / install.MODKIT_DIRNAME / install.MANIFEST_NAME).read_bytes() == manifest_before
+    tx = install.InstallTxn(game, game_key, lambda m: None)
+    install.write_settings(tx, install.GAMES[game_key], opts, lambda m: None)
+    actual = install.validate_settings(tx.read_text_ours('plugins/MGSHDFix.settings'))
+    previous = install.parse_ini(legacy)
+    for section in previous.sections():
+        for key, value in previous[section].items():
+            assert actual[section][key] == value
+    for section, keys in install.SETTINGS_MIGRATION_DEFAULTS.items():
+        for key, value in keys.items():
+            assert actual[section][key] == value
+    assert saves.read_bytes() == b'protected-save'
+    tx.rollback()
+    assert path.read_text() == legacy
+    assert saves.read_bytes() == b'protected-save'
+
+
+@pytest.mark.parametrize('change', [
+    lambda t: t.replace('Fix Film Grain=1\n', ''),
+    lambda t: t.replace('Render Width=0', 'Render Width=-1'),
+    lambda t: t.replace('Fix Film Grain=1', 'Fix Film Grain=yes'),
+    lambda t: t + '\n[Unknown]\nEdit=1\n',
+    lambda t: t.replace('[Launcher and Splashscreens]',
+                        '[Launcher and Splashscreens]\nMSX Skip Launcher Game="Metal Gear (MSX)"'),
+    lambda t: t.replace('Fix Film Grain=1', 'Fix Film Grain=1\nFix Film Grain=0'),
+])
+def test_migration_refuses_malformed_or_partial_legacy_without_writes(tmp_path, change):
+    game, text = settings(tmp_path)
+    path = game / 'plugins/MGSHDFix.settings'
+    path.write_text(change(legacy_settings(text)))
+    before = {p.relative_to(game): p.read_bytes() for p in game.rglob('*') if p.is_file()}
+    with pytest.raises(RuntimeError, match='Settings validation'):
+        install.options_for_game('mgs2', (game, tmp_path), DEFAULT_OPTS, lambda m: None)
+    assert {p.relative_to(game): p.read_bytes() for p in game.rglob('*') if p.is_file()} == before
+
+
+def test_new_fields_custom_preferences_survive_repair(tmp_path):
+    game, text = settings(tmp_path)
+    edited = text.replace('MSX Skip Launcher Game="Metal Gear (MSX)"',
+                          'MSX Skip Launcher Game="Metal Gear 2: Solid Snake"').replace(
+        'Crop Overscan Area=1', 'Crop Overscan Area=0').replace(
+        'Correct Aspect Ratio to 4:3=1', 'Correct Aspect Ratio to 4:3=0')
+    tx = install.InstallTxn(game, 'mgs2', lambda m: None)
+    install.write_settings(tx, install.GAMES['mgs2'], {**DEFAULT_OPTS, '_existing_settings': edited}, lambda m: None)
+    assert tx.read_text_ours('plugins/MGSHDFix.settings') == edited
+    tx.commit()

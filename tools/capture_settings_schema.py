@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture a bounded static MGS2/MGS3 Config Tool schema, not a binary export.
+"""Capture the bounded universal Config Tool schema, not a binary export.
 
 Supports the reviewed 4.1.0/4.1.1/4.1.2 kTabs initializer layout. Game flags
 are MG/MGS2/MGS3, OR expressions, and constexpr int aliases (including the
@@ -218,7 +218,7 @@ def capture(root, tag, tree):
             parts = braced(declaration)
             if len(parts) < 8 or len(parts) > 17:
                 fail('field initializer ' + declaration)
-            flags = flag_names(parts[0], definitions)
+            flag_names(parts[0], definitions)  # validate even hidden game flags
             kind_match = re.fullmatch(r'Field::(Bool|Int|Float|Str|Choice|Hotkey|Spacer)', parts[7])
             if not kind_match:
                 fail('field type ' + declaration)
@@ -242,8 +242,8 @@ def capture(root, tag, tree):
                 fail('canonical section/key ' + declaration)
             section = constant(section_match.group(1) + '_Section')
             key = constant(key_match.group(1) + '_Setting')
-            if not {'MGS2', 'MGS3'} & flags:
-                continue
+            # Game flags control visibility, not serialization: hidden controls
+            # enter m_controls and OnSave writes them too (reviewed 4.1.0).
             if not section or not key or key in fields.get(section, {}):
                 fail('empty/duplicate canonical field ' + declaration)
             fields.setdefault(section, {})[key] = kind

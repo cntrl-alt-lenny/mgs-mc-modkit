@@ -20,11 +20,19 @@ Original because MGSHDFix handles resolution.
 Unsupported keys or malformed settings stop repair before replacement. Use the
 Config Tool shipped with the pinned release to correct them. Keep a copy of
 your current configuration first. The kit migrates the old template's incorrect
-`Show Pressure Level Overlay="Disabled"` value to the upstream boolean `0`.
+`Show Pressure Level Overlay="Disabled"` value to the upstream boolean `0`. A complete legacy 128-key file also gains
+the three omitted runtime keys: `MSX Skip Launcher Game="Metal Gear (MSX)"`,
+`Crop Overscan Area=1` and `Correct Aspect Ratio to 4:3=1`, using upstream
+4.1.0 defaults. Existing supported preferences survive; other missing keys,
+partial migrations and malformed values are refused. Preview migrates in memory;
+only the normal installation transaction writes the repaired file.
 
-The shipped MGSHDFix schema contains 27 sections and 128 exact keys. It is derived
+The shipped MGSHDFix schema contains 27 sections and 131 exact keys. It is derived
 from `ConfigTool/tab_data.cpp` and `src/resources/config_keys.hpp` in MGSHDFix
-4.1.0, independently of the installer template. The capture records upstream
+4.1.0, independently of the installer template. Game flags hide controls in the UI;
+the universal Config Tool still creates, reads and saves those controls. The
+runtime reads all 131 keys (some conditionally), including all three MG-only
+fields even in MGS2/MGS3. The earlier game-filtered fixture was incomplete. The capture records upstream
 tree and source hashes in `tests/fixtures/hdfix-4.1.0-schema.json`. Runtime
 validation checks exact keys, value types, and upstream choices/ranges where
 the Config Tool declares them. Dynamic language/hotkey choices still require
@@ -37,5 +45,7 @@ python tools/capture_settings_schema.py /path/to/MGSHDFix --tag 4.1.0 --tree f4f
 ```
 
 This writes a candidate JSON to stdout for review. Update the fixture and the
-installer's embedded schema together only after comparing a Config Tool export.
+installer's embedded schema together after authenticating the source and reviewing runtime readers and saving logic.
+Native per-game exports and Windows/Deck initialization remain required release
+evidence; static completeness does not prove a successful game boot.
 Upstream Config Tool definitions are by Afevis and contributors, under MIT.
