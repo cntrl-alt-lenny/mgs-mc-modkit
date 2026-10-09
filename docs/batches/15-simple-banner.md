@@ -10,7 +10,7 @@ and precise delivery status in README. Removed the unsupported one-click claim a
 waveforms and technical labels. Kept an accessible SVG title/description.
 
 Clarified that MGS4 is implemented on the Worker branch in PR #19, but awaits
-the corrections identified by independent review and merge before inclusion
+the launcher-engine connection, final independent review and merge before inclusion
 in the main installer. This is
 more precise than "integration in progress" and does not imply native gameplay
 validation. No production code, pins, framework or release change.
@@ -30,7 +30,7 @@ and production equality pass. All six framework copies match immutable 4.0.0
 source and manifest. [Actual check evidence](evidence/15-simple-banner/checks.txt)
 records the checked commit; only documentation/artwork differs from main.
 After the independent review, refreshed status to corrections pending and the
-banner to a stable in-development label; rerendered both preview sizes.
+banner to a stable in-development label; rerendered both preview sizes. After Brain reproduced the delivered corrections, refreshed README status to launcher integration and final review pending; artwork is unchanged.
 
 ## Not checked
 
