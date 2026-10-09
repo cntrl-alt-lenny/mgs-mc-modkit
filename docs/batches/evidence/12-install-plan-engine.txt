@@ -98,3 +98,77 @@ imports, then an unused sys import before the standalone test was added.
 Changed module header to a comment; standalone test uses sys. Final Ruff above passes.
 Plain git diff --check flagged required Windows CRLF as trailing whitespace;
 core.whitespace=cr-at-eol check above preserves and validates the required bytes.
+
+CI run 37920332356 at delivery 54743c5fbac0b19f9a4e450b6974514bac38584b:
+$ gh pr checks 22 --watch --interval 10
+test (3.9): pass 30s; test (3.11): pass 25s; test (3.12): pass 27s
+test-windows: fail 1m6s
+exit=1
+$ gh run view 37920332356 --log-failed
+Windows Python 3.12 actual test output:
+FAILED tests/test_install_plan.py::test_embedded_module_matches_source_and_standalone_compiles
+UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d
+1 failed, 309 passed, 2 skipped in 42.85s; test command exit=1
+log retrieval exit=0
+Cause: new parity test used read_text without an explicit UTF-8 encoding.
+Fix: read both authoritative/embedded source files as UTF-8; no production change.
+
+Final production/test checks at ff10ab5629a8564692fb7379bcdba8f3513bb8cf
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 69%]
+........................................................................ [ 92%]
+........................                                                 [100%]
+312 passed in 9.95s
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py
+(no output)
+exit=0
+
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/12-install-plan-engine (this machine's copy): 4 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 3 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/16-volume1-qol-upgrade: 2 commit(s), last 2026-10-09; batch 16-volume1-qol-upgrade: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 8 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 1 commit(s) after the Verifier's review -- Brain checks them
+  brain/11-12-briefs: 10 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 2 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/12-install-plan-engine; no uncommitted changes
+  not on GitHub yet: worker/12-install-plan-engine (1 commit(s))
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 12-install-plan-engine
+exit=0
+
+
+Repeated shortcut verification at ff10ab5629a8564692fb7379bcdba8f3513bb8cf
+Same Python assertion command above:
+Install-MGS-Mods.cmd: v2.3.0 / 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52; line endings OK
+Install-MGS-Mods.desktop: v2.3.0 / 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52; line endings OK
+desktop-file-validate: None
+exit=0
