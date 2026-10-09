@@ -220,16 +220,16 @@ def test_zenity_queued_cancel_restores_install_and_reports_cancellation(
     monkeypatch.setattr(install, "find_games", lambda: {"mgs2": (game_dir, root)})
     before = {p.relative_to(game_dir): p.read_bytes() for p in game_dir.rglob("*") if p.is_file()}
     ready = threading.Event()
-    real_install_hdfix = install.install_hdfix
+    real_install_archive = install.InstallTxn.install_archive
 
-    def install_then_wait(tx, tmp, log):
-        real_install_hdfix(tx, tmp, log)
+    def install_then_wait(tx, archive, *args, **kwargs):
+        real_install_archive(tx, archive, *args, **kwargs)
         assert (game_dir / "winhttp.dll").read_bytes() != before[install.Path("winhttp.dll")]
         ready.set()
         assert install.CANCEL_EVENT.wait(5), "UI pump did not detect Zenity cancellation"
         install.check_cancelled()
 
-    monkeypatch.setattr(install, "install_hdfix", install_then_wait)
+    monkeypatch.setattr(install.InstallTxn, "install_archive", install_then_wait)
 
     class CancelUI(FakeUI):
         def progress(self, title, log):
