@@ -1,0 +1,150 @@
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/18-correction-disposition/probes.py audio --seat .worktrees/worker-12-install-plan-engine
+Reviewed SHA: c3ecd64a7a3a3a3e8994a77511bb1585b3ec04a9
+Replacement classification: missing_identity
+Replacement refused: Supplied audio acceptance changed; select and confirm again
+PASS: original acceptance retained; all game bytes unchanged
+All fixtures disposable; native games/exports/binaries NOT RUN
+
+exit 0
+
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/18-correction-disposition/probes.py removal --seat .worktrees/worker-14-mgs4-patriotfix --archive /tmp/mgs14-verifier.zip
+Reviewed SHA: c2e7ea470d5c38390238fc8854f31187499ff330
+Removal returns success: True
+Unowned MGSM2Fix.asi preserved: True
+Save bytes preserved: True
+Removal notes: ['removed 9 installed file(s)', 'removed the mgs-modkit backup/manifest folder']
+PASS: actual-archive removal preserves unowned ASI and save bytes
+All fixtures disposable; native games/exports/binaries NOT RUN
+
+exit 0
+
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/18-correction-disposition/probes.py source --seat .worktrees/worker-14-mgs4-patriotfix --source /tmp/mgs14-verifier-patriot
+Reviewed SHA: c2e7ea470d5c38390238fc8854f31187499ff330
+Exact source tree: c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de
+src/resources/stdafx.h modified refused: Unreviewed source bytes: src/resources/stdafx.h; source-format review required
+src/resources/stdafx.h omitted refused: Source inventory changed; source-format review required
+ConfigTool/pch.h modified refused: Unreviewed source bytes: ConfigTool/pch.h; source-format review required
+ConfigTool/pch.h omitted refused: Source inventory changed; source-format review required
+src/resources/version.h modified refused: Unreviewed source bytes: src/resources/version.h; source-format review required
+src/resources/version.h omitted refused: Source inventory changed; source-format review required
+Added header refused: Source inventory changed; source-format review required
+PASS: exact fresh source reproduces fixture; all three header edits/omissions/additions refused
+All fixtures disposable; native games/exports/binaries NOT RUN
+
+exit 0
+
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/18-correction-disposition/probes.py windows --seat .worktrees/worker-16-volume1-qol-upgrade
+Reviewed SHA: b0d6a83a2d8e5551c0d78407929c6286854e7192
+Original member: 'a\\b'
+Normalized member: 'a/b'
+Raw backslash refused: unsafe archive path: a\b
+PASS: raw serialized path rejected despite matching normalized layout
+All fixtures disposable; native games/exports/binaries NOT RUN
+
+exit 0
+
+cwd: .worktrees/worker-16-volume1-qol-upgrade
+$ python3 tools/validate_volume1_candidate.py --source /tmp/mgs-batch16/hdfix --archives /tmp/mgs-batch16
+{
+  "archives": [
+    {
+      "asset": "MGSHDFix_4.1.2.zip",
+      "sha256": "fbac84acc36bd395ab649beb576cf60e861fb43d3b36c26057fe900f5fa38e1d",
+      "members": 13,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGSM2Fix_3.7.3.zip",
+      "sha256": "0dabbe0b74bd1844d9f03d864949534ca3c29ea7bd9cf109f877963186e4aa80",
+      "members": 7,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "sha256": "a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003",
+      "members": 10441,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "sha256": "a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769",
+      "members": 4514,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGSM2Fix_3.6.0.zip",
+      "sha256": "a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d",
+      "members": 7,
+      "crc": "pass"
+    }
+  ],
+  "source": {
+    "commit": "33e80bf4d2223f6866b0b92e06c3c9b85efab652",
+    "fields": 134,
+    "native_exports": "not established by source"
+  }
+}
+
+exit 0
+
+cwd: .
+$ gh run view 37927964314 --json headSha,conclusion,url
+{"conclusion":"success","headSha":"c3ecd64a7a3a3a3e8994a77511bb1585b3ec04a9","url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37927964314"}
+
+exit 0
+
+cwd: .
+$ gh run view 37927638509 --json headSha,conclusion,url
+{"conclusion":"success","headSha":"b0d6a83a2d8e5551c0d78407929c6286854e7192","url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37927638509"}
+
+exit 0
+
+cwd: .
+$ gh run view 37928609687 --json headSha,conclusion,url
+{"conclusion":"success","headSha":"c2e7ea470d5c38390238fc8854f31187499ff330","url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928609687"}
+
+exit 0
+
+cwd: .
+$ git merge-tree --write-tree origin/main worker/14-mgs4-patriotfix
+29a8c22ab0ff19ef739f97e0334d7cb0bf1fc7fd
+100644 395815fc1d5a135b2cf79a43d9dc33f69362e670 1	README.md
+100644 245f806d96b3152b140bbd82d83e9fbb5034f45a 2	README.md
+100644 183b1c5363ceadd0fc9ef83c9d34d87debd60bf4 3	README.md
+
+Auto-merging README.md
+CONFLICT (content): Merge conflict in README.md
+
+exit 1
+
+cwd: .
+$ git merge-tree --write-tree worker/12-install-plan-engine worker/14-mgs4-patriotfix
+7fd1af327e0ec7c9c74aa09ee8d008934a77d532
+100644 d43ca2146096f541695519efa5304a6fb8789a47 1	Install-MGS-Mods.cmd
+100644 80183743b0521b328123a5a6d1781d2ff08b3ac8 2	Install-MGS-Mods.cmd
+100644 a1affe9b937b0efe64a7f2186352ecc5f8c9e05f 3	Install-MGS-Mods.cmd
+100644 de0f6178270b745deda71a04e4e8f962718d8cab 1	Install-MGS-Mods.desktop
+100644 88339e28ee3bc5664dd3b7697e1f6401521ed6a5 2	Install-MGS-Mods.desktop
+100644 bea073131c6e8a5b9aa8a69ea32550b2ca8e5e41 3	Install-MGS-Mods.desktop
+100644 395815fc1d5a135b2cf79a43d9dc33f69362e670 1	README.md
+100644 245f806d96b3152b140bbd82d83e9fbb5034f45a 2	README.md
+100644 183b1c5363ceadd0fc9ef83c9d34d87debd60bf4 3	README.md
+100644 4ab266dd4d074319b30c3ea0cd0737c44f91236f 1	install.py
+100644 96f807091c28d985020e32f32ec45f187404c036 2	install.py
+100644 e445475c48fd4dfad4fb31db8ed2fee528dc6517 3	install.py
+
+Auto-merging Install-MGS-Mods.cmd
+CONFLICT (content): Merge conflict in Install-MGS-Mods.cmd
+Auto-merging Install-MGS-Mods.desktop
+CONFLICT (content): Merge conflict in Install-MGS-Mods.desktop
+Auto-merging README.md
+CONFLICT (content): Merge conflict in README.md
+Auto-merging install.py
+CONFLICT (content): Merge conflict in install.py
+Auto-merging tests/conftest.py
+
+exit 1
