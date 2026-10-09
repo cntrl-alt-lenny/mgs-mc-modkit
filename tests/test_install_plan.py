@@ -84,7 +84,10 @@ def test_bad_last_game_does_not_mutate_earlier_games(
         path.parent.mkdir(parents=True)
         path.write_bytes(b"broken")
     else:
-        (found["mgs3"][0] / "plugins").symlink_to(tmp_path / "elsewhere", target_is_directory=True)
+        try:
+            (found["mgs3"][0] / "plugins").symlink_to(tmp_path / "elsewhere", target_is_directory=True)
+        except OSError:
+            pytest.skip("This platform does not permit creating symlinks")
     before = snapshot(found)
     plan = install.build_install_plan(found, options, {})
     workspace = tmp_path / "workspace"

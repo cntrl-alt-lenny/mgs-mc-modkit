@@ -3871,7 +3871,7 @@ def _plan_inputs(game_dir, steam_root):
                           stat.st_ctime_ns, stat.st_ino, digest))
     root_stat = game_dir.stat()
     return _plan_json((str(game_dir.resolve()), root_stat.st_dev, root_stat.st_ino,
-                       sorted(files), steamid64s(steam_root)))
+                       sorted(files), sorted(steamid64s(steam_root))))
 
 
 def _plan_packages(key, components):
@@ -4112,6 +4112,9 @@ class CurrentRecipeAdapter:
             check_cancelled()
             tx.commit()
             outcomes[game.key] = "installed and verified"
+            if self.progress:
+                self.progress.update(f"{GAMES[game.key]['short']} — Complete",
+                                     (index + 1) * 100 / len(outcomes))
         except BaseException:
             if tx is None:
                 outcomes[game.key] = "not changed; inspect recovery record / lock"
@@ -4326,6 +4329,15 @@ def _main(log, log_path=None) -> int:
     CANCEL_EVENT = getattr(prog, "cancel_event", threading.Event())
 
     def install_selected():
+        global TRANSFER_PROGRESS
+
+        def transfer(name, received, size):
+            detail = f"{received / 1024**2:.1f} MB"
+            if size:
+                detail += f" / {size / 1024**2:.1f} MB"
+            prog.update(f"Preparing — downloading {name}: {detail}", 0)
+
+        TRANSFER_PROGRESS = transfer
         with tempfile.TemporaryDirectory(prefix="mgskit_plan_") as td:
             adapter = CurrentRecipeAdapter(log, prog)
             prepared = prepare_plan(confirmed_plan, adapter, Path(td))
