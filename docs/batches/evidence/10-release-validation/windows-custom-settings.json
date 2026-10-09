@@ -1,0 +1,61 @@
+[
+  {
+    "game": "MGS1",
+    "path": "MGSM2Fix.ini",
+    "before_sha256": "483605b66bbe1a3db898e31e2d1c7ca9dbf752164d9e2b4d4809efb4cd11a664",
+    "after_sha256": "496743c579abb1d5dd3c6333e79fb17534514e4ce746277b111668ce29d53c84",
+    "before_values": {
+      "External Resolution/Width": "0",
+      "External Resolution/Height": "0"
+    },
+    "chosen_values": {
+      "External Resolution": {
+        "Width": "1024",
+        "Height": "768"
+      }
+    },
+    "validation": "INI dimensions parsed"
+  },
+  {
+    "game": "MGS2",
+    "path": "plugins/MGSHDFix.settings",
+    "before_sha256": "991c70959dd18e6633f39188e8de7cd10304beb8195df81b943d9f1c057062b7",
+    "after_sha256": "631a45bd038f05182128b1d7e6f90de15c9b05451494201fe760922dbadeedf5",
+    "before_values": {
+      "Language Settings/Game Language": "\"en\"",
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)/Render Width": "0",
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)/Render Height": "0"
+    },
+    "chosen_values": {
+      "Language Settings": {
+        "Game Language": "\"fr\""
+      },
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+        "Render Width": "1280",
+        "Render Height": "720"
+      }
+    },
+    "validation": "candidate validator passed"
+  },
+  {
+    "game": "MGS3",
+    "path": "plugins/MGSHDFix.settings",
+    "before_sha256": "b1b53b46f9ed5a0af1b94ae31856c100190b28168182bc39a1dcad8c5a249c4c",
+    "after_sha256": "2aa5d7bb050e0ec33045f93c374101bebc57572a8612076092172f65cf496dca",
+    "before_values": {
+      "Language Settings/Game Language": "\"en\"",
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)/Render Width": "0",
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)/Render Height": "0"
+    },
+    "chosen_values": {
+      "Language Settings": {
+        "Game Language": "\"es\""
+      },
+      "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+        "Render Width": "1600",
+        "Render Height": "900"
+      }
+    },
+    "validation": "candidate validator passed"
+  }
+]

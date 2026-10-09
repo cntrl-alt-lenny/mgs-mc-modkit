@@ -1,0 +1,105 @@
+{
+  "files": [
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/launcher/launcher_sv",
+      "bytes": 9125,
+      "source_sha256": "55aecc55ac2ea539d5e5063c807eadb4115a4c44c89f88cfb88eb5b02f39899d",
+      "protected_sha256": "55aecc55ac2ea539d5e5063c807eadb4115a4c44c89f88cfb88eb5b02f39899d",
+      "equal": true
+    },
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/launcher/usersv",
+      "bytes": 4096,
+      "source_sha256": "c289c901d8268fc508209a98d50b08c7d79d3c5e2d150c1d669d610f2305fd26",
+      "protected_sha256": "c289c901d8268fc508209a98d50b08c7d79d3c5e2d150c1d669d610f2305fd26",
+      "equal": true
+    },
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/MGSHDFix_mgs2_stats.sav",
+      "bytes": 174,
+      "source_sha256": "492f46034cb96a7c4fef7d2d1b3fae319eec82a9bb706c29ec24f07badc2dca2",
+      "protected_sha256": "492f46034cb96a7c4fef7d2d1b3fae319eec82a9bb706c29ec24f07badc2dca2",
+      "equal": true
+    },
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/Outdated Saves/STE131640000G000_2026-07-25/DNUWtIbW7MTmosHaVwDSl4JHXjJMl",
+      "bytes": 29354,
+      "source_sha256": "8379eb1aaa3a1722de9b3967247aab14e63cf9a36b99da99709c3210d1fe379b",
+      "protected_sha256": "8379eb1aaa3a1722de9b3967247aab14e63cf9a36b99da99709c3210d1fe379b",
+      "equal": true
+    },
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/STE131640000G000/Dtc6HIba7MTmssHaVwDSl4Kt6liA2",
+      "bytes": 29354,
+      "source_sha256": "22a4098ba49bfcb31edd0016bc5199417389649ae758143ba4f0c45c66b072d4",
+      "protected_sha256": "22a4098ba49bfcb31edd0016bc5199417389649ae758143ba4f0c45c66b072d4",
+      "equal": true
+    },
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/STE131640000G000/STE131640000G000",
+      "bytes": 5120,
+      "source_sha256": "7c57dcdeccaca250f60c35985eb8a16f9b26d5667493a427212507cd9d032243",
+      "protected_sha256": "7c57dcdeccaca250f60c35985eb8a16f9b26d5667493a427212507cd9d032243",
+      "equal": true
+    },
+    {
+      "path": "MGS2/mgs2_savedata_win/<account>/steam_autocloud.vdf",
+      "bytes": 51,
+      "source_sha256": "298becd380b2790686043fcc62e3bf4b2ca8c93c1c9f1b4c13b5aadb9991d006",
+      "protected_sha256": "298becd380b2790686043fcc62e3bf4b2ca8c93c1c9f1b4c13b5aadb9991d006",
+      "equal": true
+    },
+    {
+      "path": "MGS3/mgs3_savedata_win/<account>/launcher/launcher_sv",
+      "bytes": 333,
+      "source_sha256": "642ef25155ddb7e090c476c9a1bd2321b56d0d705a0735d80bf0e71e0221129a",
+      "protected_sha256": "642ef25155ddb7e090c476c9a1bd2321b56d0d705a0735d80bf0e71e0221129a",
+      "equal": true
+    },
+    {
+      "path": "MGS3/mgs3_savedata_win/<account>/launcher/usersv",
+      "bytes": 4096,
+      "source_sha256": "0dfd3ff68909c1746f4095110faf4f34cf5b5e47365052fa7d3f34e484171620",
+      "protected_sha256": "0dfd3ff68909c1746f4095110faf4f34cf5b5e47365052fa7d3f34e484171620",
+      "equal": true
+    },
+    {
+      "path": "MGS3/mgs3_savedata_win/<account>/STE1316501G000001/_gE1QdT0GM70eAcPiqjvR4Ig95sIh",
+      "bytes": 19068,
+      "source_sha256": "eb9b8a3a58d1cee951bf45e06433c936a89bf0f9f53f613069f47995a84d0fa8",
+      "protected_sha256": "eb9b8a3a58d1cee951bf45e06433c936a89bf0f9f53f613069f47995a84d0fa8",
+      "equal": true
+    },
+    {
+      "path": "MGS3/mgs3_savedata_win/<account>/STE1316501G000001/STE1316501G000001",
+      "bytes": 29,
+      "source_sha256": "de9e5e7ea834c435bcfb307305ca3b200371f15d7bda13e7d1a1464e67559f15",
+      "protected_sha256": "de9e5e7ea834c435bcfb307305ca3b200371f15d7bda13e7d1a1464e67559f15",
+      "equal": true
+    },
+    {
+      "path": "MGS3/mgs3_savedata_win/<account>/steam_autocloud.vdf",
+      "bytes": 51,
+      "source_sha256": "298becd380b2790686043fcc62e3bf4b2ca8c93c1c9f1b4c13b5aadb9991d006",
+      "protected_sha256": "298becd380b2790686043fcc62e3bf4b2ca8c93c1c9f1b4c13b5aadb9991d006",
+      "equal": true
+    },
+    {
+      "path": "userdata/<account>/2131630/remote/data_008_0000.bin",
+      "bytes": 17695388,
+      "source_sha256": "d5d5d6dc0ff447b569c4151902a4587a2afa80de1fef3179d749c754006d0afb",
+      "protected_sha256": "d5d5d6dc0ff447b569c4151902a4587a2afa80de1fef3179d749c754006d0afb",
+      "equal": true
+    },
+    {
+      "path": "userdata/<account>/2131630/remotecache.vdf",
+      "bytes": 312,
+      "source_sha256": "d72d5fabc01be5faa8f5fb7951b585f40af897d8409231e650f24833a7064159",
+      "protected_sha256": "d72d5fabc01be5faa8f5fb7951b585f40af897d8409231e650f24833a7064159",
+      "equal": true
+    }
+  ],
+  "count": 14,
+  "bytes": 17796551,
+  "all_equal": true
+}

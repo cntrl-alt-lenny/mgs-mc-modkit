@@ -1,0 +1,88 @@
+Candidate: 15d9277196e7bd1cfbd45fe280a230050b276bed
+$ gh run view 37525559856 --json jobs,headSha,conclusion,event,url
+Output: ci-run.json
+exit=0
+$ gh run view 37525559856 --log
+exit=0
+Selected lines below; ANSI color bytes and trailing whitespace removed. Remote shell exit values are not separately exposed by these logs; step conclusions are in ci-run.json. No hardware checks ran in CI.
+
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:28.3255959Z ##[group]Operating System
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:28.3256708Z Ubuntu
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:28.3257319Z 24.04.5
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:28.3258450Z LTS
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:28.3259038Z ##[endgroup]
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:29.3733825Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +15d9277196e7bd1cfbd45fe280a230050b276bed:refs/remotes/origin/main
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:29.8314960Z  * [new ref]         15d9277196e7bd1cfbd45fe280a230050b276bed -> origin/main
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:29.8403367Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:29.8753686Z [command]/usr/bin/git log -1 --format=%H
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:29.8786576Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:30.0501422Z Successfully set up CPython (3.12.14)
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:30.0503481Z ##[endgroup]
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:30.0812759Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:40.1207657Z bsdtar 3.7.2 - libarchive 3.7.2 zlib/1.3 liblzma/5.4.5 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.5
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.4044939Z ##[group]Run python -m py_compile install.py
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.4045330Z ^[[36;1mpython -m py_compile install.py^[[0m
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.5013716Z ##[group]Run ruff check .
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.5014035Z ^[[36;1mruff check .^[[0m
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.5350568Z All checks passed!
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.5395715Z ##[group]Run python -m pytest tests/ -q
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:43.5396112Z ^[[36;1mpython -m pytest tests/ -q^[[0m
+test (3.12)	UNKNOWN STEP	2026-10-06T20:19:50.1720837Z 273 passed in 6.30s
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:28.0891450Z ##[group]Operating System
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:28.0892107Z Ubuntu
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:28.0892747Z 24.04.5
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:28.0893379Z LTS
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:28.0893930Z ##[endgroup]
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.4159790Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +15d9277196e7bd1cfbd45fe280a230050b276bed:refs/remotes/origin/main
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.7451834Z  * [new ref]         15d9277196e7bd1cfbd45fe280a230050b276bed -> origin/main
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.7529521Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.7827999Z [command]/usr/bin/git log -1 --format=%H
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.7859609Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.9524723Z Successfully set up CPython (3.11.16)
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.9527568Z ##[endgroup]
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:29.9720109Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:39.7841508Z bsdtar 3.7.2 - libarchive 3.7.2 zlib/1.3 liblzma/5.4.5 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.5
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.2837664Z ##[group]Run python -m py_compile install.py
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.2838074Z ^[[36;1mpython -m py_compile install.py^[[0m
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.3710691Z ##[group]Run ruff check .
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.3710996Z ^[[36;1mruff check .^[[0m
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.4031765Z All checks passed!
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.4075432Z ##[group]Run python -m pytest tests/ -q
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:42.4075813Z ^[[36;1mpython -m pytest tests/ -q^[[0m
+test (3.11)	UNKNOWN STEP	2026-10-06T20:19:49.0008783Z 273 passed in 5.51s
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:28.3650573Z ##[group]Operating System
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:28.3651202Z Ubuntu
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:28.3651838Z 24.04.5
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:28.3652359Z LTS
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:28.3653015Z ##[endgroup]
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:29.3501490Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +15d9277196e7bd1cfbd45fe280a230050b276bed:refs/remotes/origin/main
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:29.6450913Z  * [new ref]         15d9277196e7bd1cfbd45fe280a230050b276bed -> origin/main
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:29.6526795Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:29.6835533Z [command]/usr/bin/git log -1 --format=%H
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:29.6865054Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:37.6090537Z Successfully set up CPython (3.9.25)
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:37.6091535Z ##[endgroup]
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:37.6252763Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:45.5770751Z bsdtar 3.7.2 - libarchive 3.7.2 zlib/1.3 liblzma/5.4.5 bz2lib/1.0.8 liblz4/1.9.4 libzstd/1.5.5
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.4818945Z ##[group]Run python -m py_compile install.py
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.4819394Z ^[[36;1mpython -m py_compile install.py^[[0m
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.5634947Z ##[group]Run ruff check .
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.5635246Z ^[[36;1mruff check .^[[0m
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.5952284Z All checks passed!
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.5991361Z ##[group]Run python -m pytest tests/ -q
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:48.5991858Z ^[[36;1mpython -m pytest tests/ -q^[[0m
+test (3.9)	UNKNOWN STEP	2026-10-06T20:19:55.6190296Z 273 passed in 6.73s
+test-windows	UNKNOWN STEP	2026-10-06T20:19:28.6276450Z ##[group]Operating System
+test-windows	UNKNOWN STEP	2026-10-06T20:19:28.6277077Z Microsoft Windows Server 2025
+test-windows	UNKNOWN STEP	2026-10-06T20:19:28.6277646Z 10.0.26100
+test-windows	UNKNOWN STEP	2026-10-06T20:19:28.6278157Z Datacenter
+test-windows	UNKNOWN STEP	2026-10-06T20:19:28.6278635Z ##[endgroup]
+test-windows	UNKNOWN STEP	2026-10-06T20:19:33.1854309Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +15d9277196e7bd1cfbd45fe280a230050b276bed:refs/remotes/origin/main
+test-windows	UNKNOWN STEP	2026-10-06T20:19:34.4285422Z  * [new ref]         15d9277196e7bd1cfbd45fe280a230050b276bed -> origin/main
+test-windows	UNKNOWN STEP	2026-10-06T20:19:34.5011355Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test-windows	UNKNOWN STEP	2026-10-06T20:19:34.7415917Z 15d9277196e7bd1cfbd45fe280a230050b276bed
+test-windows	UNKNOWN STEP	2026-10-06T20:19:34.9747510Z Successfully set up CPython (3.12.10)
+test-windows	UNKNOWN STEP	2026-10-06T20:19:34.9748781Z ##[endgroup]
+test-windows	UNKNOWN STEP	2026-10-06T20:19:35.4850328Z bsdtar 3.8.4 - libarchive 3.8.4 zlib/1.2.13.1-motley liblzma/5.8.1 bz2lib/1.0.8 libzstd/1.5.7 cng/2.0 libb2/bundled
+test-windows	UNKNOWN STEP	2026-10-06T20:19:35.6291689Z ^[[36;1mpython -m pytest tests/ -q^[[0m
+test-windows	UNKNOWN STEP	2026-10-06T20:20:02.2580139Z 271 passed, 2 skipped in 18.08s

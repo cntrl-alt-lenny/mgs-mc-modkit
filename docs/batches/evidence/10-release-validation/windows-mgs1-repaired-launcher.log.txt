@@ -1,0 +1,532 @@
+﻿[2026-10-07 16:05:59.188] [MGSM2Fix] [info] MGSM2Fix v3.6.0 loaded.
+[2026-10-07 16:05:59.188] [MGSM2Fix] [info] ----------
+[2026-10-07 16:05:59.188] [MGSM2Fix] [info] [System] CPU: AMD Ryzen 7 5800X 8-Core Processor
+[2026-10-07 16:05:59.191] [MGSM2Fix] [info] [System] GPU: Virtual Display Driver (driver 11.30.4.434)
+[2026-10-07 16:05:59.191] [MGSM2Fix] [info] [System] GPU: NVIDIA GeForce RTX 2060 (driver 32.0.16.1714)
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [System] RAM: 15.93 GB (16305 MB)
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [System] OS: Windows 11 Pro (build 26300.9550)
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] ----------
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bDebuggerEnabled: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iDebuggerPort: 27615
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bDebuggerAutoUpdate: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bDebuggerExclusive: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bBreak: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bConsole: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bError: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iLevel: 0
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iNativeLevel: 0
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iEmulatorLevel: 0
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iRendererLevel: 0
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bExternalEnabled: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iExternalWidth: 1024
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iExternalHeight: 768
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bExternalWindowed: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bExternalBorderless: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bInternalEnabled: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] iInternalHeight: 768
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bInternalWidescreen: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bInternalBorderless: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bRemoveDeadzone: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bLauncherSkipNotice: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bLauncherStartGame: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesDisableRAM: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesDisableCDROM: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesDisableFont: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesRemoveUnderpants: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesEnableMosaic: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesRestoreGhosts: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bPatchesRestoreMedicine: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bGameStageSelect: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bShouldCheckForUpdates: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bConsoleUpdateNotifications: true
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bDisableWindowsFullscreenOptimization: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Config] bDisableWindowsSlideshowWarning: false
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] ----------
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Module] Name: METAL GEAR SOLID.exe
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Module] Path: $STEAM\steamapps\common\MGS1\METAL GEAR SOLID.exe
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Module] Address: 0x7ff733ad0000
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] [Module] Timestamp: 2025-11-20 (1763620269)
+[2026-10-07 16:05:59.193] [MGSM2Fix] [info] ----------
+[2026-10-07 16:05:59.265] [MGSM2Fix] [info] Detected game: METAL GEAR SOLID (Steam app 2131630).
+[2026-10-07 16:05:59.265] [MGSM2Fix] [info] MGSM2Fix v3.6.0 started for METAL GEAR SOLID.
+[2026-10-07 16:05:59.265] [MGSM2Fix] [info] ----------
+[2026-10-07 16:05:59.266] [MGSM2Fix] [info] [EPI-64] printf is 0x7ff733bc81c0.
+[2026-10-07 16:05:59.266] [MGSM2Fix] [info] [EPI-64] printf hook succeeded.
+[2026-10-07 16:05:59.272] [MGSM2Fix] [info] [SQ-64] sq_vm_realloc is 0x7ff7340a8740.
+[2026-10-07 16:05:59.278] [MGSM2Fix] [info] [SQ-64<Standard>] SQVM::SQVM is 0x7ff7340c36d0.
+[2026-10-07 16:05:59.278] [MGSM2Fix] [info] [SQ-64<Standard>] SQVM::SQVM hook succeeded.
+[2026-10-07 16:05:59.283] [MGSM2Fix] [info] [SQ-64<Standard>] SQVM::CallNative is 0x7ff7340c9c50.
+[2026-10-07 16:05:59.283] [MGSM2Fix] [info] [SQ-64<Standard>] SQVM::CallNative hook succeeded.
+[2026-10-07 16:05:59.283] [MGSM2Fix] [info] [SQ-64<Standard>] Sqrat::BindFunc is 0x7ff733ad1bc0.
+[2026-10-07 16:05:59.283] [MGSM2Fix] [info] [SQ-64<Standard>] Sqrat::BindFunc hook succeeded.
+[2026-10-07 16:05:59.290] [MGSM2Fix] [info] [Config-64] MWinResCfg::GetValue is 0x7ff7341d3ab0.
+[2026-10-07 16:05:59.291] [MGSM2Fix] [info] [Config-64] MWinResCfg::GetValue hook succeeded.
+[2026-10-07 16:05:59.296] [MGSM2Fix] [info] [Borderless-64A] MWin::CreateWindow is 0x7ff7341802ff.
+[2026-10-07 16:05:59.296] [MGSM2Fix] [info] [Borderless-64A] MWin::CreateWindow patched.
+[2026-10-07 16:05:59.297] [MGSM2Fix] [info] [PSX] machine_psx_cmd is 0x7ff733bdc830.
+[2026-10-07 16:05:59.297] [MGSM2Fix] [info] [PSX] machine_psx_cmd hook succeeded.
+[2026-10-07 16:05:59.299] [MGSM2Fix] [info] [PSX] cpu_r3000_cmd is 0x7ff733c034b0.
+[2026-10-07 16:05:59.299] [MGSM2Fix] [info] [PSX] cpu_r3000_cmd hook succeeded.
+[2026-10-07 16:05:59.301] [MGSM2Fix] [info] [PSX] m2epi_load_module is 0x7ff733bdd100.
+[2026-10-07 16:05:59.301] [MGSM2Fix] [info] [PSX] m2epi_load_module hook succeeded.
+[2026-10-07 16:05:59.302] [MGSM2Fix] [info] [PSX] r3000_step is 0x7ff733c05850.
+[2026-10-07 16:05:59.302] [MGSM2Fix] [info] [PSX] r3000_step hook succeeded.
+[2026-10-07 16:05:59.304] [MGSM2Fix] [info] [PSX] r3000_decode is 0x7ff733c056a0.
+[2026-10-07 16:05:59.309] [MGSM2Fix] [info] [PSX] R3000 BASE is 0x7ff734241fa0.
+[2026-10-07 16:05:59.315] [MGSM2Fix] [info] [PSX] R3000 BcondZ is 0x7ff734241ea0.
+[2026-10-07 16:05:59.321] [MGSM2Fix] [info] [PSX] R3000 COP0 is 0x7ff734241e20.
+[2026-10-07 16:05:59.327] [MGSM2Fix] [info] [PSX] R3000 COP2 is 0x7ff734241ba0.
+[2026-10-07 16:05:59.327] [MGSM2Fix] [info] [PSX] R3000 GTE is 0x7ff733c05420.
+[2026-10-07 16:05:59.327] [MGSM2Fix] [info] [PSX] R3000 LBx is 0x7ff733c044a0.
+[2026-10-07 16:05:59.327] [MGSM2Fix] [info] [PSX] R3000 LWx is 0x7ff733c04530.
+[2026-10-07 16:05:59.327] [MGSM2Fix] [info] [PSX] R3000 NOP is 0x7ff733c055a0.
+[2026-10-07 16:05:59.327] [MGSM2Fix] [info] [PSX] R3000 SCP is 0x7ff733c055b0.
+[2026-10-07 16:05:59.332] [MGSM2Fix] [info] [PSX] R3000 SPECIAL is 0x7ff734241c20.
+[2026-10-07 16:05:59.333] [MGSM2Fix] [info] [PSX] GTE_RotTransPersSX2 is 0x7ff733c08105.
+[2026-10-07 16:05:59.333] [MGSM2Fix] [info] [PSX] GTE_RotTransPersSX2 hook succeeded.
+[2026-10-07 16:05:59.334] [MGSM2Fix] [info] [PSX] GTE_RotTransPersSX2P is 0x7ff733c095b2.
+[2026-10-07 16:05:59.334] [MGSM2Fix] [info] [PSX] GTE_RotTransPersSX2P hook succeeded.
+[2026-10-07 16:05:59.335] [MGSM2Fix] [info] [PSX] GPU_SetResolution is 0x7ff733bc9f69.
+[2026-10-07 16:05:59.335] [MGSM2Fix] [info] [PSX] GPU_SetResolution hook succeeded.
+[2026-10-07 16:05:59.336] [MGSM2Fix] [info] [PSX] GPU_SetSmoothing is 0x7ff733bd410b.
+[2026-10-07 16:05:59.336] [MGSM2Fix] [info] [PSX] GPU_SetSmoothing hook succeeded.
+[2026-10-07 16:05:59.343] [MGSM2Fix] [info] [Analog] MInputSteam::DeadzoneAxis1 is 0x7ff73415e4f6.
+[2026-10-07 16:05:59.343] [MGSM2Fix] [info] [Analog] MInputSteam::DeadzoneAxis1 patched.
+[2026-10-07 16:05:59.349] [MGSM2Fix] [info] [Analog] MInputSteam::DeadzoneAxis2 is 0x7ff73415e51a.
+[2026-10-07 16:05:59.349] [MGSM2Fix] [info] [Analog] MInputSteam::DeadzoneAxis2 patched.
+[2026-10-07 16:05:59.360] [MGSM2Fix] [info] ----------
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("CLASSNAME")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("CAPTION")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WINDOW_W")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WINDOW_H")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WINDOW_DPI_X")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WINDOW_DPI_Y")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("SCREEN_W")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("SCREEN_H")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("RSC_PATH")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("M_SPEC")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FIT_MODE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("RSC_W")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("RSC_H")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("EMBED_FONT")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("USE_DEPTH_STENCIL")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("VISIBLE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("SOFTKEYPAD")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("SOFTKEYPAD_TYPE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("MOUSE_TO_TOUCHPAD")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("PRINT_CAPABILITY")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("SAFE_SCREEN_RATIO_X")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("SAFE_SCREEN_RATIO_Y")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("DISPLAYADAPTER_ID")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FULLSCREEN_MODE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FULLSCREEN_VSYNC")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FULLSCREEN_TYPE_PURE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FULLSCREEN_REFRESHRATE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FULLSCREEN_LOGWINDOW")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FULLSCREEN_CURSOR")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("MOUSE_CURSOR")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WINDOW_VSYNC")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("D3D_PUREDEVICE")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WINDOWEDGE_SIZING")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("EXTERNAL_DATA_PATH")
+[2026-10-07 16:05:59.407] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("WEB_DATA_PATH")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("LAST_CLIENT_SIZE_ENABLED")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("LAST_WINDOW_POS_X")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("LAST_WINDOW_POS_Y")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("LAST_WINDOW_POS_ENABLED")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("BOOT_FULLSCREEN")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("LAST_CLIENT_SIZE_X")
+[2026-10-07 16:05:59.408] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("LAST_CLIENT_SIZE_Y")
+[2026-10-07 16:06:00.022] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("OVERRIDE_LOCALE_COUNTRY")
+[2026-10-07 16:06:00.022] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("OVERRIDE_LOCALE_LANGUAGE")
+[2026-10-07 16:06:00.022] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("OVERRIDE_LOCALE_TIMEZONE")
+[2026-10-07 16:06:00.022] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4daf0d70, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x0 (0 bytes).
+[2026-10-07 16:06:00.226] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4daf23f0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:00.226] [MGSM2Fix] [info] [SQ] SQVM 0x14b4daf23f0 hooked: debug info is enabled, exceptions are disabled.
+[2026-10-07 16:06:00.228] [MGSM2Fix] [info] [SQ] [printf] スクリプティング開始
+[2026-10-07 16:06:00.228] [MGSM2Fix] [info] [SQ] Loading script system/script/const.nut.
+[2026-10-07 16:06:00.228] [MGSM2Fix] [info] [SQ] Loading script system/script/init_sub.nut.
+[2026-10-07 16:06:00.243] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_1st() : start
+[2026-10-07 16:06:00.243] [MGSM2Fix] [info] [SQ] Loading script system/script/utils.nut.
+[2026-10-07 16:06:00.243] [MGSM2Fix] [info] [SQ] Loading script system/script/init_specdepend.nut.
+[2026-10-07 16:06:00.243] [MGSM2Fix] [info] [SQ] Loading script system/script/game_content.nut.
+[2026-10-07 16:06:00.243] [MGSM2Fix] [info] [SQ] Loading script system/script/wipe.nut.
+[2026-10-07 16:06:00.354] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:00.354] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:00.383] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_1st() : done
+[2026-10-07 16:06:00.383] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_preload() : start
+[2026-10-07 16:06:00.383] [MGSM2Fix] [info] [SQ] Loading script system/script/medal_system.nut.
+[2026-10-07 16:06:00.383] [MGSM2Fix] [info] [SQ] Loading script system/script/preload.nut.
+[2026-10-07 16:06:00.383] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_sound.nut.
+[2026-10-07 16:06:00.383] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_guide.nut.
+[2026-10-07 16:06:00.415] [MGSM2Fix] [info] [SQ] [printf] medal system initialize start.
+[2026-10-07 16:06:00.415] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:00.415] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "087/config/title_medal_system.psb"
+[2026-10-07 16:06:00.540] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found '087/sound/title_menu_sound.psb'
+[2026-10-07 16:06:00.630] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_preload() : done
+[2026-10-07 16:06:00.630] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_create_systemdata() : start
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/emulator_sram.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/emulator_attr.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/backup.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/backup_specdepend.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_saveload.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_pad.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_etc.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_screen.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_sound.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_savedata.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_network.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_setting_game.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_backup_flags.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_window_info.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_work_medal.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_work_title.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_work_trial.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_sram_data.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/systemdata_purchase_record.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_setting_subitem.nut.
+[2026-10-07 16:06:00.632] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_motion_preload_mgs.nut.
+[2026-10-07 16:06:00.679] [MGSM2Fix] [info] [SQ] [printf] dev_name : MGS1Collection
+[2026-10-07 16:06:00.679] [MGSM2Fix] [info] [SQ] Loading script system/script/system_dialog.nut.
+[2026-10-07 16:06:00.724] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4a565d70, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:00.725] [MGSM2Fix] [info] [SQ] SQVM 0x14b4a565d70 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:00.758] [MGSM2Fix] [info] [SQ] Loading script system/script/system_dialog.nut.
+[2026-10-07 16:06:00.817] [MGSM2Fix] [info] [SQ] [printf] g_backup_control : initialize successed.
+[2026-10-07 16:06:00.824] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:00.880] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4a5645d0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:00.880] [MGSM2Fix] [info] [SQ] SQVM 0x14b4a5645d0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:00.895] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:00.942] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4a5645d0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:00.943] [MGSM2Fix] [info] [SQ] SQVM 0x14b4a5645d0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.039] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:01.042] [MGSM2Fix] [info] [SQ] Screen bounds are 1024x768.
+[2026-10-07 16:06:01.043] [MGSM2Fix] [info] [SQ] Screen mode is 2.
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_create_systemdata() : done
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] Loading script system/script/session_base.nut.
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] Loading script system/script/session_common.nut.
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] Loading script system/script/session_specdepend.nut.
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] Loading script system/script/session_rule.nut.
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] Loading script system/script/ranking_manager.nut.
+[2026-10-07 16:06:01.090] [MGSM2Fix] [info] [SQ] Loading script system/script/ranking_manager_specdepend.nut.
+[2026-10-07 16:06:01.160] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4a5621d0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.160] [MGSM2Fix] [info] [SQ] SQVM 0x14b4a5621d0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.363] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4d62a2f0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.363] [MGSM2Fix] [info] [SQ] SQVM 0x14b4d62a2f0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] [printf] -------- mode_logo_all() : forked
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_prepare_for_autoload() : start
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/emulator.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_frame_base.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/dialog.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/notice_dialog.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/autosave_wait_dialog.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/motion_process.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_bg.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/popup_dialog.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/backup_statedata.nut.
+[2026-10-07 16:06:01.377] [MGSM2Fix] [info] [SQ] Loading script system/script/backup_replaydata.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_frame_base.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_info.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_motion.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_motion_text.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_base.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/itemindicator.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_setting_subitem.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_setting.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_subitem_window.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_select_list.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_title_ticker.nut.
+[2026-10-07 16:06:01.400] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_base.nut.
+[2026-10-07 16:06:01.401] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4d629e70, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.401] [MGSM2Fix] [info] [SQ] SQVM 0x14b4d629e70 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.401] [MGSM2Fix] [info] [SQ] [printf] 	mode_logo_all : start
+[2026-10-07 16:06:01.461] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_prepare_for_autoload() : done
+[2026-10-07 16:06:01.461] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_autoload_systemdata() : start
+[2026-10-07 16:06:01.461] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_autoload_systemdata() : done
+[2026-10-07 16:06:01.461] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_emulator() : start
+[2026-10-07 16:06:01.462] [MGSM2Fix] [info] [SQ] [printf] regionTag : JAPAN
+[2026-10-07 16:06:01.462] [MGSM2Fix] [info] [SQ] [printf] country   : jp
+[2026-10-07 16:06:01.462] [MGSM2Fix] [info] [SQ] [printf] arch      : psx
+[2026-10-07 16:06:01.463] [MGSM2Fix] [info] [SQ] [printf] parsed rom's path (system/roms/mgs_jp_disc1-20230407.lz4a): 
+[2026-10-07 16:06:01.463] [MGSM2Fix] [info] [SQ] [printf] 	 path : "system/roms/"
+[2026-10-07 16:06:01.463] [MGSM2Fix] [info] [SQ] [printf] 	 name : "mgs_jp_disc1-20230407"
+[2026-10-07 16:06:01.463] [MGSM2Fix] [info] [SQ] [printf] 	 ext  : ".lz4a"
+[2026-10-07 16:06:01.463] [MGSM2Fix] [info] [EPI] [printf] spu.0.preamp_default=0.0
+[2026-10-07 16:06:01.463] [MGSM2Fix] [info] [EPI] [printf] spu.1.preamp_default=0.0
+[2026-10-07 16:06:01.464] [MGSM2Fix] [info] [SQ] ROM image is roms/mgs_jp_disc1-20230407.lz4a.
+[2026-10-07 16:06:01.464] [MGSM2Fix] [info] [EPI] [printf] console.overdrive=0
+[2026-10-07 16:06:01.464] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/mgs-disc1-ripped-washed.bin'
+[2026-10-07 16:06:01.464] [MGSM2Fix] [info] [SQ] Disk ID is 0.
+[2026-10-07 16:06:01.464] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/mgs-disc1-ripped-washed.bin'
+[2026-10-07 16:06:01.464] [MGSM2Fix] [info] [SQ] Disk ID is 0.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module cpu_m37702 at 0x7ff734587108.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module cpu_m37702.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module cpu_r3000 at 0x7ff734587360.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module cpu_r3000.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module cdrom at 0x7ff734587248.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module cdrom.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module dmac at 0x7ff734587220.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module dmac.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module gpu at 0x7ff734587068.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module gpu.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module intc at 0x7ff734587338.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module intc.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module machine_psx at 0x7ff734587090.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module machine_psx.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module mdec at 0x7ff7345870e0.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module mdec.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module rtc at 0x7ff734587180.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module rtc.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module sec at 0x7ff7345872c0.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module sec.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module sio at 0x7ff7345871a8.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module sio.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module spu at 0x7ff734587270.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module spu.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module machine_fx at 0x7ff7345871d0.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module machine_fx.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module zoom at 0x7ff7345871f8.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module zoom.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module ataflash at 0x7ff734587158.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module ataflash.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module i28f160 at 0x7ff734587310.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module i28f160.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module machine_gnet at 0x7ff734587130.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module machine_gnet.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module dev_c352 at 0x7ff734587298.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module dev_c352.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module dev_s11snd at 0x7ff7345872e8.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module dev_s11snd.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [PSX] Loading system module machine_system11 at 0x7ff7345870b8.
+[2026-10-07 16:06:01.465] [MGSM2Fix] [info] [EPI] [printf] load module machine_system11.
+[2026-10-07 16:06:01.466] [MGSM2Fix] [info] [EPI] [printf] acc_fx.dll: open failed
+[2026-10-07 16:06:01.468] [MGSM2Fix] [info] [EPI] [printf] acc_psx.dll: open failed
+[2026-10-07 16:06:01.469] [MGSM2Fix] [info] [EPI] [printf] acc_psxlib.dll: open failed
+[2026-10-07 16:06:01.471] [MGSM2Fix] [info] [EPI] [printf] acc_system11.dll: open failed
+[2026-10-07 16:06:01.473] [MGSM2Fix] [info] [EPI] [printf] acc_tmp.dll: open failed
+[2026-10-07 16:06:01.474] [MGSM2Fix] [info] [EPI] [printf] cpu_r3000_p.dll: open failed
+[2026-10-07 16:06:01.474] [MGSM2Fix] [info] [PSX] Loading system module machine_psx at 0x7ff734587090.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] module machine_psx already loaded.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_jp from 0x7ff734587818 to 0x14b4e4783e0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_jp.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_us from 0x7ff7345877b0 to 0x14b4e478360.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_us.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_uk from 0x7ff734587748 to 0x14b4e478540.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_uk.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_fr from 0x7ff7345876e0 to 0x14b4e4784e0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_fr.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_it from 0x7ff734587678 to 0x14b4e478500.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_it.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_de from 0x7ff7345875c0 to 0x14b4e478200.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_de.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_es from 0x7ff734587558 to 0x14b4e4782a0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_es.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_int from 0x7ff7345874f0 to 0x14b4e478480.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_int.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_vr_jp from 0x7ff734587488 to 0x14b4e478d50.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_vr_jp.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_vr_us from 0x7ff734587420 to 0x14b4e479090.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_vr_us.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked user module mgs_r3000_vr_eu from 0x7ff7345873b8 to 0x14b4e4790f0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module mgs_r3000_vr_eu.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_kernel from 0x7ff734587ac8 to 0x14b4e478fd0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_kernel.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libc2 from 0x7ff734587a88 to 0x14b4e478ad0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libc2.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libcd from 0x7ff734587a48 to 0x14b4e478b10.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libcd.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libcard from 0x7ff734587a08 to 0x14b4e478b30.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libcard.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libetc from 0x7ff7345879c8 to 0x14b4e479070.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libetc.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libgpu from 0x7ff734587988 to 0x14b4e4789b0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libgpu.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libgte from 0x7ff734587948 to 0x14b4e479050.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libgte.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libpad from 0x7ff734587908 to 0x14b4e478e10.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libpad.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libpress from 0x7ff7345878c8 to 0x14b4e478db0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libpress.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libsnd from 0x7ff734587888 to 0x14b4e478cd0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libsnd.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [PSX] Hooked kernel module acc_libspu from 0x7ff734587848 to 0x14b4e478ed0.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [EPI] [printf] load module acc_libspu.
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4d627290, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.475] [MGSM2Fix] [info] [SQ] SQVM 0x14b4d627290 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.476] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4d628fd0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.476] [MGSM2Fix] [info] [SQ] SQVM 0x14b4d628fd0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.476] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4d6290f0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.476] [MGSM2Fix] [info] [SQ] SQVM 0x14b4d6290f0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.517] [MGSM2Fix] [info] [EPI] [printf] console.machine_country=jp
+[2026-10-07 16:06:01.517] [MGSM2Fix] [info] [EPI] [printf] machine_md.use_4ptap=0
+[2026-10-07 16:06:01.517] [MGSM2Fix] [info] [EPI] [printf] spu.0.preamp=  0.0
+[2026-10-07 16:06:01.517] [MGSM2Fix] [info] [EPI] [printf] spu.1.preamp=  0.0
+[2026-10-07 16:06:01.517] [MGSM2Fix] [info] [EPI] [printf] spu.framerate=60.00
+[2026-10-07 16:06:01.517] [MGSM2Fix] [info] [EPI] [printf] rtc.framerate=60.00
+[2026-10-07 16:06:01.525] [MGSM2Fix] [info] [PSX] Loading image at 0x14b51865060 with size 1443184704 bytes.
+[2026-10-07 16:06:01.526] [MGSM2Fix] [info] [MGS 1] mgs_loader_stage is 0xabcec.
+[2026-10-07 16:06:01.526] [MGSM2Fix] [info] [EPI] [printf] r3000: mgs_r3000_jp accelerator found! (sum=0x77c8ed13)
+[2026-10-07 16:06:01.527] [MGSM2Fix] [info] [PSX] Loading image at 0x14b51865060 with size 1443184704 bytes.
+[2026-10-07 16:06:01.529] [MGSM2Fix] [info] [MGS 1] mgs_loader_stage is 0xabcec.
+[2026-10-07 16:06:01.529] [MGSM2Fix] [info] [EPI] [printf] r3000: mgs_r3000_jp accelerator found! (sum=0x77c8ed13)
+[2026-10-07 16:06:01.664] [MGSM2Fix] [info] [EPI] [printf] console.overdrive=0
+[2026-10-07 16:06:01.693] [MGSM2Fix] [info] [SQ] SQVM 0x14b4daf0d70 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [SQ] [printf] onInitializeFinish() : 
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [SQ] [printf] >>>setMemoryPatch
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_vr_eu.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_vr_us.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_vr_jp.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_int.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_es.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_de.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_it.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_fr.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_uk.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_us.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to mgs_r3000_jp.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Hooked kernel module at 0xa0.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Hooked kernel module at 0xb0.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Hooked kernel module at 0xc0.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Hooked kernel module at 0xf000.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Hooked kernel module at 0xfff0.
+[2026-10-07 16:06:01.694] [MGSM2Fix] [info] [PSX] Applied hooks to kernel modules.
+[2026-10-07 16:06:01.696] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_emulator() : done
+[2026-10-07 16:06:01.696] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_last() : start
+[2026-10-07 16:06:01.698] [MGSM2Fix] [info] [SQ] [printf] -------- init_system_last() : done
+[2026-10-07 16:06:01.721] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4f340, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.721] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4f340 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.721] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4efe0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.721] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4efe0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.721] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4f580, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.721] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4f580 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.752] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4e6e0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b462213e0 (184 bytes).
+[2026-10-07 16:06:01.753] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4e6e0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.753] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found '087/movie/title_opening.mp4'
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] [printf] init_sub end.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_frame_base.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_info.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_motion.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_motion_text.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_base.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/itemindicator.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_setting_subitem.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_setting.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_subitem_window.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_select_list.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_title_ticker.nut.
+[2026-10-07 16:06:01.771] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_base.nut.
+[2026-10-07 16:06:01.814] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_title.nut.
+[2026-10-07 16:06:01.860] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4f460, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4e105f20 (198 bytes).
+[2026-10-07 16:06:01.860] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4f460 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:01.875] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:01.875] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/script/mode_title_mgs.nut"
+[2026-10-07 16:06:01.875] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_title_mgs.nut.
+[2026-10-07 16:06:02.049] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4e6e0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4e105f20 (198 bytes).
+[2026-10-07 16:06:02.049] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4e6e0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:02.067] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.067] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.068] [MGSM2Fix] [info] [SQ] Title ID is 102.
+[2026-10-07 16:06:02.071] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.071] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.085] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.114] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.114] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.114] [MGSM2Fix] [info] [SQ] Title ID is 101.
+[2026-10-07 16:06:02.118] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.118] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.135] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.182] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.182] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.183] [MGSM2Fix] [info] [SQ] Title ID is 99.
+[2026-10-07 16:06:02.189] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.189] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.204] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.253] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.253] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.253] [MGSM2Fix] [info] [SQ] Title ID is 986.
+[2026-10-07 16:06:02.257] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.257] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.271] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.316] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.316] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.316] [MGSM2Fix] [info] [SQ] Title ID is 985.
+[2026-10-07 16:06:02.320] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.320] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.334] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.361] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.361] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.362] [MGSM2Fix] [info] [SQ] Title ID is 984.
+[2026-10-07 16:06:02.365] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.365] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.379] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.426] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.426] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.426] [MGSM2Fix] [info] [SQ] Title ID is 983.
+[2026-10-07 16:06:02.430] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.430] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.445] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.486] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.486] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.486] [MGSM2Fix] [info] [SQ] Title ID is 982.
+[2026-10-07 16:06:02.490] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.490] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.503] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.549] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.549] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.550] [MGSM2Fix] [info] [SQ] Title ID is 981.
+[2026-10-07 16:06:02.553] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.553] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.567] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.595] [MGSM2Fix] [info] [SQ] [printf] set_item_string_default_language: eng
+[2026-10-07 16:06:02.595] [MGSM2Fix] [info] [SQ] [printf] s_package_region=europe
+[2026-10-07 16:06:02.595] [MGSM2Fix] [info] [SQ] Title ID is 980.
+[2026-10-07 16:06:02.599] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.599] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen_sys.nut.
+[2026-10-07 16:06:02.613] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.646] [MGSM2Fix] [info] [SQ] Loading script system/script/setting_screen.nut.
+[2026-10-07 16:06:02.693] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_dialog_mgs.nut.
+[2026-10-07 16:06:02.780] [MGSM2Fix] [info] [SQ] [printf] load_systemdata_title_affect_sram() :Try to apply SRAM IMAGE
+[2026-10-07 16:06:02.788] [MGSM2Fix] [info] [SQ] [printf] util_update_pad_key_for_menu 0x00000200
+[2026-10-07 16:06:02.791] [MGSM2Fix] [info] [SQ] [printf] ::g_emu_task.replayMode is "idle"
+[2026-10-07 16:06:02.793] [MGSM2Fix] [info] [SQ] [printf] load result 3
+[2026-10-07 16:06:02.793] [MGSM2Fix] [info] [SQ] [printf] ExecAutoload: ret = 3
+[2026-10-07 16:06:02.793] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/mgs-disc1-ripped-washed.bin'
+[2026-10-07 16:06:02.793] [MGSM2Fix] [info] [SQ] Disk ID is 0.
+[2026-10-07 16:06:02.808] [MGSM2Fix] [info] [SQ] [printf] util_update_pad_key_for_menu 0x00000200
+[2026-10-07 16:06:02.814] [MGSM2Fix] [info] [SQ] [printf] ::g_emu_task.replayMode is "idle"
+[2026-10-07 16:06:02.818] [MGSM2Fix] [info] [SQ] Loading script system/script/menu_dialog_mgs.nut.
+[2026-10-07 16:06:02.818] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_main.nut.
+[2026-10-07 16:06:02.819] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4fa00, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4ea3e770 (168 bytes).
+[2026-10-07 16:06:02.820] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4fa00 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:02.846] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4f460, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4ea3e770 (168 bytes).
+[2026-10-07 16:06:02.846] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4f460 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:02.858] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_title_select.nut.
+[2026-10-07 16:06:02.921] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4e6e0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4ea3e770 (168 bytes).
+[2026-10-07 16:06:02.921] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4e6e0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:02.936] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:02.936] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/script/mode_title_select_mgs.nut"
+[2026-10-07 16:06:02.936] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_title_select_mgs.nut.
+[2026-10-07 16:06:02.982] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4ffa0, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4ea3e770 (168 bytes).
+[2026-10-07 16:06:02.984] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4ffa0 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:03.355] [MGSM2Fix] [info] [SQ] Loading script system/script/mode_scenariobook.nut.
+[2026-10-07 16:06:03.400] [MGSM2Fix] [info] [SQ] SQVM is 0x14b4ea4fe80, SQSharedState is 0x14b4611c0e0 & scratchpad is 0x14b4ea3e770 (168 bytes).
+[2026-10-07 16:06:03.403] [MGSM2Fix] [info] [SQ] SQVM 0x14b4ea4fe80 hooked: debug info is enabled, exceptions are enabled.
+[2026-10-07 16:06:03.480] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:03.480] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/roms/MGS_EN_DISC1-washed.BIN"
+[2026-10-07 16:06:03.481] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:03.481] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/roms/MGS_FR_DISK1-washed.BIN"
+[2026-10-07 16:06:03.482] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:03.482] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/roms/MGS_DE_DISC1-washed.BIN"
+[2026-10-07 16:06:03.483] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:03.483] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/roms/MGS_IT_DISC1-washed.BIN"
+[2026-10-07 16:06:03.485] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:03.485] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/roms/MGS_ES_DISC1-washed.BIN"
+[2026-10-07 16:06:03.486] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/MGS_US_DISC1-washed.BIN'
+[2026-10-07 16:06:03.487] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/mgs-disc1-ripped-washed.bin'
+[2026-10-07 16:06:03.488] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): dir          = ""
+[2026-10-07 16:06:03.489] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): checked_path = "system/roms/MGS_SPECIAL_MISSIONS-washed.BIN"
+[2026-10-07 16:06:03.490] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/mgs-vr-missions-ripped-washed.bin'
+[2026-10-07 16:06:03.491] [MGSM2Fix] [info] [SQ] [printf] conv_checked_path(): not found 'system/roms/INTEGRAL_DISC1-washed.bin'
+[2026-10-07 16:06:04.208] [MGSM2Fix] [info] [SQ] [printf] Ver.3.0.0
+[2026-10-07 16:07:07.182] [MGSM2Fix] [info] [M2] MWinResCfg::GetValue("FORCE_TERMINATE_ON_CLOSE")
+

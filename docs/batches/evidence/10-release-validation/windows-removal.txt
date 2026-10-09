@@ -1,0 +1,17 @@
+﻿MGS Mod Kit 2.3.0; platform=win32; Python=3.12.10
+Diagnostic log: $USERPROFILE\AppData\Local\MGSModKit\logs\20261007T151504Z-e85a664e.log
+
+=== Uninstalling Metal Gear Solid 2: Sons of Liberty ===
+    • removed 486 installed file(s)
+    • restored 9875 original file(s) from backup
+    • removed the mgs-modkit backup/manifest folder
+
+=== Uninstalling Metal Gear Solid 3: Snake Eater ===
+    • removed 672 installed file(s)
+    • restored 3790 original file(s) from backup
+    • removed the mgs-modkit backup/manifest folder
+
+=== Uninstalling Metal Gear Solid (1) ===
+    • removed 7 installed file(s)
+    • removed the mgs-modkit backup/manifest folder
+

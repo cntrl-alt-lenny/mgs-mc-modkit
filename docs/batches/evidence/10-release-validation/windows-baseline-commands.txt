@@ -1,0 +1,76 @@
+Windows Worker,2026-10-07, before kit testing.
+Redaction: $STEAM = default Windows Steam directory; $PROTECTED = private
+workspace work/windows-validation-protected. <account> replaces Steam account
+directory identifiers. These substitutions remove personal/account paths only.
+
+$ Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,OSArchitecture
+Microsoft Windows 11 Pro 10.0.26300 26300 64-bit
+exit=0
+$ Get-CimInstance Win32_ComputerSystem | Format-List Manufacturer,Model
+Manufacturer : Gigabyte Technology Co., Ltd.
+Model : X570 AORUS ELITE
+exit=0
+$ Get-CimInstance Win32_VideoController | Format-List Name,DriverVersion
+Name : Virtual Display Driver
+DriverVersion : 11.30.4.434
+Name : NVIDIA GeForce RTX 2060
+DriverVersion : 32.0.16.1714
+exit=0
+$ Get-CimInstance Win32_Processor | Format-List Name
+Name : AMD Ryzen 7 5800X 8-Core Processor
+exit=0
+$ Get-PSDrive C | Format-List Used,Free
+Used : 538094501888
+Free : 245353246720
+exit=0
+$ Get-Content $STEAM\steamapps\libraryfolders.vdf
+One library entry; path=$STEAM; target apps2131630,2131640,2131650 absent.
+Other library/account contents omitted.
+exit=0
+$ foreach($id in @('2131630','2131640','2131650')) { Write-Output "appmanifest_$id.acf exists: $(Test-Path -LiteralPath ($STEAM+'\steamapps\appmanifest_'+$id+'.acf'))" }
+appmanifest_2131630.acf exists: False
+appmanifest_2131640.acf exists: False
+appmanifest_2131650.acf exists: False
+exit=0
+$ foreach($n in @('MGS1','MGS2','MGS3')) { Write-Output "$n folder exists: $(Test-Path -LiteralPath ($STEAM+'\steamapps\common\'+$n))" }
+MGS1 folder exists: False
+MGS2 folder exists: True
+MGS3 folder exists: True
+exit=0
+$ Get-ChildItem -LiteralPath $STEAM\steamapps\common\MGS2 -Force | Format-Table Name,Mode,Length
+mgs2_savedata_win d-----
+$ Get-ChildItem -LiteralPath $STEAM\steamapps\common\MGS3 -Force | Format-Table Name,Mode,Length
+mgs3_savedata_win d-----
+exit=0
+$ Get-ChildItem -LiteralPath $STEAM\steamapps\common\MGS2,$STEAM\steamapps\common\MGS3 -Recurse -File | Measure-Object -Property Length -Sum
+Count :12
+Sum :100851
+exit=0
+$ Get-ChildItem -LiteralPath "$env:LOCALAPPDATA\MGSModKit" -Force -ErrorAction SilentlyContinue
+No output (directory absent).
+exit=0 (combined inspection shell)
+$ rg --files $STEAM\userdata | rg '(2131630|2131640|2131650|mgs)'
+userdata/<account>/2131630/remotecache.vdf
+userdata/<account>/2131630/remote/data_008_0000.bin
+userdata/<account>/config/librarycache/2131650.json
+userdata/<account>/config/librarycache/2131640.json
+userdata/<account>/config/librarycache/2131630.json
+exit=0
+
+Exact preservation operation (task variable names redacted to stable placeholders):
+$ New-Item -ItemType Directory -Force -Path $PROTECTED | Out-Null
+$ foreach($n in @('MGS1','MGS2','MGS3')) { $sourceTaskPath=$STEAM+'\steamapps\common\'+$n; if(Test-Path -LiteralPath $sourceTaskPath) { Copy-Item -LiteralPath $sourceTaskPath -Destination ($PROTECTED+'\'+$n) -Recurse -Force } }
+$ foreach($accountTaskDir in Get-ChildItem -LiteralPath ($STEAM+'\userdata') -Directory) { foreach($id in @('2131630','2131640','2131650')) { $sourceTaskPath=Join-Path $accountTaskDir.FullName $id; if(Test-Path -LiteralPath $sourceTaskPath) { $destTaskDir=Join-Path $PROTECTED ('userdata\'+$accountTaskDir.Name); New-Item -ItemType Directory -Force -Path $destTaskDir | Out-Null; Copy-Item -LiteralPath $sourceTaskPath -Destination (Join-Path $destTaskDir $id) -Recurse -Force } } }
+No output; files copied. Combined shell exit=0. Initial CSV hash warning retained
+in windows-run.md; successful source/copy comparisons then ran before UI installs:
+$ $hashTaskList=Get-ChildItem -LiteralPath $PROTECTED -Recurse -File | Where-Object Name -ne 'protected-hashes.csv' | Get-FileHash -Algorithm SHA256
+$ $hashTaskList | Export-Csv -LiteralPath ($PROTECTED+'\protected-hashes.csv') -NoTypeInformation
+$ $matchTaskCount=0; foreach($entryTaskHash in $hashTaskList) { $relTaskPath=$entryTaskHash.Path.Substring($PROTECTED.Length+1); if($relTaskPath.StartsWith('userdata\')) { $originalTaskPath=$STEAM+'\'+$relTaskPath } else { $originalTaskPath=$STEAM+'\steamapps\common\'+$relTaskPath }; if((Get-FileHash -LiteralPath $originalTaskPath -Algorithm SHA256).Hash -ne $entryTaskHash.Hash) { throw 'Protected copy hash mismatch' }; $matchTaskCount++ }; Write-Output "Protected copies verified: $matchTaskCount files, all source/copy SHA256 equal"
+Protected copies verified:14 files, all source/copy SHA256 equal
+exit=0
+
+Second independent portable comparison while Steam downloads were in progress:
+$ py -3 docs/batches/evidence/10-release-validation/inventory-preservation.py --steam-root $STEAM --protected-root $PROTECTED
+See windows-protected-inventory.json (exact retained stdout, count14,
+bytes17796551, all_equal=true).
+exit=0

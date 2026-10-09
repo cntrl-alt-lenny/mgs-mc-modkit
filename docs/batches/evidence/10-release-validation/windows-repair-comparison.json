@@ -1,0 +1,61 @@
+{
+  "before_phase": "custom-before-repair",
+  "after_phase": "repaired-before-boots",
+  "before_scope": "managed + saves + executables",
+  "after_scope": "managed + saves + executables",
+  "games": [
+    {
+      "game": "MGS1",
+      "before_files": 9,
+      "after_files": 9,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "save_changes": [],
+      "userdata_changes": [],
+      "shared_file_changes": [
+        "MGSM2Fix.ini",
+        "mgs-modkit/manifest.json"
+      ],
+      "before_only_snapshot_files": [],
+      "added_files": []
+    },
+    {
+      "game": "MGS2",
+      "before_files": 20245,
+      "after_files": 20245,
+      "original_backups": 9875,
+      "backup_mismatches_against_before": [],
+      "save_changes": [],
+      "userdata_changes": [],
+      "shared_file_changes": [
+        "logs/MGS2-Community-Bugfix-Compilation_Game.log",
+        "logs/MGS2-Community-Bugfix-Compilation_Launcher.log",
+        "logs/MGSHDFix_Game.log",
+        "logs/MGSHDFix_Launcher.log",
+        "mgs-modkit/manifest.json",
+        "plugins/MGSHDFix.settings"
+      ],
+      "before_only_snapshot_files": [],
+      "added_files": []
+    },
+    {
+      "game": "MGS3",
+      "before_files": 8259,
+      "after_files": 8259,
+      "original_backups": 3790,
+      "backup_mismatches_against_before": [],
+      "save_changes": [],
+      "userdata_changes": [],
+      "shared_file_changes": [
+        "logs/MGS3-Community-Bugfix-Compilation_Game.log",
+        "logs/MGS3-Community-Bugfix-Compilation_Launcher.log",
+        "logs/MGSHDFix_Game.log",
+        "logs/MGSHDFix_Launcher.log",
+        "mgs-modkit/manifest.json",
+        "plugins/MGSHDFix.settings"
+      ],
+      "before_only_snapshot_files": [],
+      "added_files": []
+    }
+  ]
+}

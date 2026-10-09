@@ -1,0 +1,189 @@
+Placeholders: $STEAM=observed default Steam library; $PROTECTED=untracked private pre-kit backup under task work/. $CHECKOUT=Worker checkout, $USERPROFILE=local Windows profile, $WORK=task work/, $LOCALAPPDATA=local application-data directory. Prefix substitutions are case-insensitive; account directory identifiers are replaced by <account>. Exact commands below use these stable placeholders; task-specific variables resolve to the same observed locations.
+$ Get-Process -Name 'METAL GEAR SOLID','METAL GEAR SOLID2','METAL GEAR SOLID3','launcher' -ErrorAction SilentlyContinue | Select-Object ProcessName,Id,Path
+
+no target processes; command completed exit=0
+$ New-Item -ItemType Directory -Path $PROTECTED -Force
+$ foreach($game in 'MGS1','MGS2','MGS3'){New-Item -ItemType Directory -Path "$PROTECTED/$game" -Force; Get-ChildItem "$STEAM/steamapps/common/$game" -Directory -Filter '*_savedata_win' | ForEach-Object{Copy-Item -LiteralPath $_.FullName -Destination "$PROTECTED/$game" -Recurse -Force}}
+$ foreach($account in Get-ChildItem "$STEAM/userdata" -Directory){foreach($appid in '2131630','2131640','2131650'){$source=Join-Path $account.FullName $appid;if(Test-Path -LiteralPath $source){$destination=Join-Path "$PROTECTED/userdata" $account.Name;New-Item -ItemType Directory -Path $destination -Force;Copy-Item -LiteralPath $source -Destination $destination -Recurse -Force}}}
+copy commands completed exit=0
+$ py -3 docs/batches/evidence/10-release-validation/inventory-preservation.py --steam-root $STEAM --protected-root $PROTECTED > windows-prekit-protected-inventory.json
+comparison exit=0; JSON retained separately
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase pre-kit-after-stock --output docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json
+$ Get-Date -Format o
+$ foreach($item in @(@('MGS1','2131630','METAL GEAR SOLID.exe'),@('MGS2','2131640','METAL GEAR SOLID2.exe'),@('MGS3','2131650','METAL GEAR SOLID3.exe'))){$item[0]; Get-Content "$STEAM/steamapps/appmanifest_$($item[1]).acf" | Select-String '"(appid|name|StateFlags|buildid|installdir)"' | ForEach-Object{$_.Line.Trim()}; (Get-FileHash -Algorithm SHA256 "$STEAM/steamapps/common/$($item[0])/$($item[2])").Hash}
+2026-10-07T15:24:05.9534533+01:00
+MGS1
+"appid"		"2131630"
+"name"		"METAL GEAR SOLID - Master Collection Version"
+"StateFlags"		"4"
+"installdir"		"MGS1"
+"buildid"		"20872173"
+E320062847EC71A52292E9931BCF2EE33EA6586429ECB2A38E567AB37B66C373
+MGS2
+"appid"		"2131640"
+"name"		"METAL GEAR SOLID 2: Sons of Liberty - Master Collection Version"
+"StateFlags"		"4"
+"installdir"		"MGS2"
+"buildid"		"21578573"
+9C8575E6B2D6449636D1A04B63EF8C9E44C3AECF84CADDDC27B4874C62688F2B
+MGS3
+"appid"		"2131650"
+"name"		"METAL GEAR SOLID 3: Snake Eater - Master Collection Version"
+"StateFlags"		"4"
+"installdir"		"MGS3"
+"buildid"		"22192289"
+81596A6A670263DA6EE59C959B65CBF833BE985E64FA0332AD926271AA060BFE
+commands completed exit=0
+MGS1 app2131630 build20872173 StateFlags4: 5 files, 11329670966 bytes
+MGS2 app2131640 build21578573 StateFlags4: 34583 files, 19581063465 bytes
+MGS3 app2131650 build22192289 StateFlags4: 54932 files, 18838524755 bytes
+exit=0
+$ py -3 install.py
+Launched exact candidate installer from Worker checkout (production SHA256 checked in windows-checks.txt); native GUI process pending final exit.
+$ (below Python source) | py -3 -
+from pathlib import Path
+import gzip, hashlib
+source=Path('docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json')
+raw=source.read_bytes()
+encoded=gzip.compress(raw,compresslevel=9,mtime=0)
+archive=source.with_suffix('.json.gz')
+archive.write_bytes(encoded)
+assert gzip.decompress(archive.read_bytes())==raw
+print('uncompressed bytes='+str(len(raw))+' sha256='+hashlib.sha256(raw).hexdigest())
+print('gzip bytes='+str(len(encoded))+' sha256='+hashlib.sha256(encoded).hexdigest())
+print('decompressed bytes equal=True')
+uncompressed bytes=18143343 sha256=f26162fbb51f866bf6dbc2a70706508f479d09fbf3d9cc717f1de3f754a13b36
+gzip bytes=4145507 sha256=23ff3238dfbef82562b060405e41f1f12af3453c234edb6f47e790963e5e5029
+decompressed bytes equal=True
+exit=0
+$ Move-Item -LiteralPath docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json -Destination $WORK/windows-validation-raw/windows-prekit-snapshot.json; original JSON preserved untracked, gzip metadata committed. exit=0
+$ Get-Date -Format o
+$ foreach($folder in 'backups','rollback','staging'){$files=Get-ChildItem -LiteralPath "$STEAM/steamapps/common/MGS2/mgs-modkit/$folder" -Recurse -File -Force;[PSCustomObject]@{Record=$folder;Files=$files.Count;Bytes=($files | Measure-Object Length -Sum).Sum} | ConvertTo-Json -Compress}
+2026-10-07T15:28:19.6421533+01:00
+{"Record":"backups","Files":9874,"Bytes":923474580}
+{"Record":"rollback","Files":9874,"Bytes":923474580}
+{"Record":"staging","Files":8147,"Bytes":602652376}
+commands completed exit=0; live progress sample, not completed manifest or installed verification
+$ Get-Process -Id 65500 -ErrorAction SilentlyContinue | Select-Object Id,CPU,Responding,MainWindowHandle,MainWindowTitle
+15:32:26: PID65500 CPU81.6875 RespondingTrue MainWindowHandle0 MainWindowTitle empty.
+Fresh process remains pending; no final exit value exposed yet. Allthree committed manifests present, journals absent, stagedfilecounts0.
+Sky list_windows/list_apps expose no Python target; prior progress capture and supported activation each returned foreground-window/process-ID error. Final completion dialog unobserved, not a command success/exit0 claim.
+$ Get-Content $LOCALAPPDATA/MGSModKit/logs/20261007T141529Z-2df2c0e9.log -Raw; redact case-insensitive $CHECKOUT,$STEAM,$USERPROFILE and Steam-account IDs; save windows-fresh-install.txt
+Capture/redaction command exit=0. Log snapshot currently ends MGS1 Complete100%, not final process exit.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase installed-before-boots --managed --output docs/batches/evidence/10-release-validation/windows-installed-snapshot.json
+MGS1 app2131630 build20872173 StateFlags4: 9 files, 21010726 bytes
+MGS2 app2131640 build21578573 StateFlags4: 20244 files, 2226361600 bytes
+MGS3 app2131650 build22192289 StateFlags4: 8258 files, 2090672328 bytes
+exit=0
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-installed-snapshot.json --output docs/batches/evidence/10-release-validation/windows-install-comparison.json
+MGS1: 0 original backup hashes compared, 0 mismatch; save changes=[]; userdata changes=[]
+MGS2: 9875 original backup hashes compared, 0 mismatch; save changes=[]; userdata changes=[]
+MGS3: 3790 original backup hashes compared, 0 mismatch; save changes=[]; userdata changes=[]
+exit=0
+15:40-15:43 follow-up: actual final info text All done/all three modded and checked became visible over Steam in a Sky screenshot. Python completion dialog still not enumerated, no acknowledgement or process exit inferred.
+$ Get-Content $STEAM/steamapps/common/MGS1/MGSM2Fix.log -Raw; replace $STEAM,$USERPROFILE,Steam account IDs; Set-Content windows-modded-mgs1.log.txt -Encoding UTF8
+capture/redaction exit=0; full actual runtime log retained
+$ (Get-Process -Id 50816).Modules | Where-Object {$_.ModuleName -match 'MGSM2Fix|dinput8|d3d11'} | ForEach-Object {[pscustomobject]@{ModuleName=$_.ModuleName;FileName=($_.FileName -replace [regex]::Escape($STEAM),'$STEAM');FileVersion=$_.FileVersionInfo.FileVersion}} | ConvertTo-Json
+15:44:26: local d3d11.dll9.7.0; Windows DINPUT8.dll10.0.26100.1; Windows d3d11.dll10.0.26100.9549; local MGSM2Fix64.asi3.6.0. exit=0
+$ Get-WinEvent -FilterHashtable @{LogName='Application';Id=1000;StartTime=(Get-Date).AddMinutes(-5)} | Where-Object {$_.Message -match 'METAL GEAR SOLID.exe'}; replace $STEAM,$USERPROFILE
+TimeCreated15:44:54.067; app METAL GEAR SOLID.exe; module same; exception0xc0000005; offset0x5d42b4; process0xC680. command exit=0 (query, not game result)
+$ Get-Content $STEAM/logs/gameprocess_log.txt -Tail 8; replace $STEAM
+[2026-10-07 15:45:03] AppID 2131630 no longer tracking PID 50816, exit code -1073741819
+query exit=0; game abnormal exit retained
+$ foreach($taskName in 'MGSHDFix_Launcher','MGSHDFix_Game','MGS2-Community-Bugfix-Compilation_Launcher','MGS2-Community-Bugfix-Compilation_Game'){Get-Content -Raw "$STEAM/steamapps/common/MGS2/logs/$taskName.log"; replace $STEAM,$USERPROFILE,Steam account IDs; Set-Content "windows-modded-mgs2-$taskName.txt" -Encoding UTF8}
+capture/redaction exit=0; four actual runtime logs retained
+$ [pscustomobject]@{FileVersion=(Get-Item "$STEAM/steamapps/common/MGS2/plugins/MGSHDFix.asi").VersionInfo.FileVersion;SettingsSHA256=(Get-FileHash "$STEAM/steamapps/common/MGS2/plugins/MGSHDFix.settings").Hash;Time=(Get-Date -Format o)} | ConvertTo-Json
+15:47:36: FileVersion4.1.0.0; SettingsSHA256991C70959DD18E6633F39188E8DE7CD10304BEB8195DF81B943D9F1C057062B7. exit=0
+$ (Get-Process -Id 51636).Modules | Where-Object {$_.ModuleName -match 'Fix|winhttp|wininet'} | ForEach-Object {[pscustomobject]@{Name=$_.ModuleName;Path=($_.FileName -replace [regex]::Escape($STEAM),'$STEAM');Version=$_.FileVersionInfo.FileVersion}} | ConvertTo-Json
+local WININET/WINHTTP9.7.4, MGSHDFix.asi4.1.0.0, MGS2-Community-Bugfix-Compilation.asi3.0.0; system WININET11.00.26100.8875/WINHTTP10.0.26100.8521. exit=0
+$ Get-Process -Id 51636 | Select-Object Id,Responding,CPU,MainWindowTitle; Get-Date -Format o
+15:48:09: PID51636 RespondingTrue CPU0.703125 MainWindowTitle METAL GEAR SOLID2.exe. exit=0
+$ Get-Content $STEAM/logs/gameprocess_log.txt -Tail 5; replace $STEAM
+[2026-10-07 15:48:18] AppID 2131640 no longer tracking PID 51636, exit code -1073741510
+[2026-10-07 15:48:18] AppID 2131640 no longer tracking PID 52152, exit code 0
+query exit=0; actual game-owned console X close requested15:48:16, game exit0xC000013A retained, no force termination
+$ py -3 docs/batches/evidence/10-release-validation/customize-windows.py --steam-root $STEAM --output docs/batches/evidence/10-release-validation/windows-custom-settings.json
+First attempt15:51:23 exit=1: AssertionError ExternalResolution, before any writes. Corrected evidence helper to observed section External Resolution.
+Second attempt exit=0: MGS1 external1024x768; MGS2 fr/1280x720; MGS3 es/1600x900. Detailed before/after settings SHA256 and chosen values are actual stdout retained verbatim as windows-custom-settings.json (one row per game). Candidate HDFix validator passed2/3; MGS1 INI dimensions parsed. No candidate schema changed.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase custom-before-repair --managed --output docs/batches/evidence/10-release-validation/windows-before-repair-snapshot.json.gz
+metadata uncompressed bytes=6121004 sha256=cd3bbe0c8bbb766f8347dad0a511623d2c9a4d6235e5ca241923e3093fa93473
+metadata gzip bytes=1387574 sha256=f0141537c89be18a2009a348c1d3cf506e87f73149ebc9954b9259c92b2a3e5b
+MGS1 app2131630 build20872173 StateFlags4: 9 files, 21010731 bytes
+MGS2 app2131640 build21578573 StateFlags4: 20245 files, 2226273782 bytes
+MGS3 app2131650 build22192289 StateFlags4: 8259 files, 2090594652 bytes
+exit=0. Initial helper aliases two single root version cache filenames as <account>; original snapshot unchanged, actual hashes verified against real files, all paths unique. Comparator canonicalizes only these aliases; updated helper masks numeric accounts only.
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-installed-snapshot.json docs/batches/evidence/10-release-validation/windows-before-repair-snapshot.json.gz --output docs/batches/evidence/10-release-validation/windows-game-write-comparison.json
+Final alias-aware comparison exit=0; MGS1 remote data_008_0000.bin+remotecache changed after game autosave; MGS2/MGS3 launcher/usersv+root Bugfix version cache+remotecache changed. All9875/3790 original backups match, no gameplay save-file differences for MGS2/3.
+$ py -3 install.py
+MGS2-only second candidate session60596 PID47032; logfile20261007T145155Z-ec68af7c.log. Prearmed no-audio ReadyToInstall; second InstallNow15:58:18 refused by real OS lock. Full actual traceback/output retained windows-concurrent-refusal.txt; process exit pending native error dialog, not claimed0/1 yet.
+$ py -3 install.py
+All3 first repair session60857 PID62488; logfile20261007T145336Z-dd1996b4.log. Supported ChangeSettings Keyboard/Mouse, Bootstraightoff, Stereo/HQmovies/Skiplogos preserved. InstallNow15:57:26; MGS2 verified/committed33%, MGS3 verified/committed66%, MGS1 Complete100% observed16:02:44. Full redacted actual output retained windows-repair.txt; final process exit still pending native info dialog.
+$ py -3 observe-settings.py --steam-root $STEAM --phase repaired-before-boots --output docs/batches/evidence/10-release-validation/windows-repaired-settings.json
+exit=0, actual stdout retained windows-repaired-settings.json: MGS1 external1024x768/StartGamefalse; MGS2 fr/eu1280x720, KeyboardMouse/SkipLauncher0; MGS3 es/us1600x900, KeyboardMouse/SkipLauncher0. This helper was initially saved at checkout root then moved unchanged into evidence/; future invocation uses docs/batches/evidence/10-release-validation/observe-settings.py. No production file was changed.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase repaired-before-boots --managed --output docs/batches/evidence/10-release-validation/windows-after-repair-snapshot.json.gz
+Completed exit=0; no game process or file mutation concurrent.
+metadata uncompressed bytes=6121097 sha256=dea7a8d16a4e6283e071e52be8b2a200152389673f8b9ecb5f3f6db0fdf8a702
+metadata gzip bytes=1387356 sha256=d980c4d6c22147bdb5d7b4cf1075d6c1fd40e19043423b2e0330bb04c4886974
+MGS1 app2131630 build20872173 StateFlags4: 9 files, 21010741 bytes
+MGS2 app2131640 build21578573 StateFlags4: 20245 files, 2226361652 bytes
+MGS3 app2131650 build22192289 StateFlags4: 8259 files, 2090672387 bytes
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-before-repair-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-after-repair-snapshot.json.gz --output docs/batches/evidence/10-release-validation/windows-repair-comparison.json
+exit=0. All3 save changes=[] and userdata changes=[]; MGS2 9875/MGS3 3790 original backups, zero mismatches.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase closed-before-removal --managed --output docs/batches/evidence/10-release-validation/windows-before-removal-snapshot.json.gz
+metadata uncompressed bytes=6121097 sha256=59aa0b1059aa58cade36be1ab661002b6d053d6615d37953561202897b326888
+metadata gzip bytes=1387355 sha256=373db7b50b8775d29a5fc5209504558a9bb79eaaf6625402657d1e07dbb8e44c
+MGS1 app2131630 build20872173 StateFlags4: 9 files, 21010740 bytes
+MGS2 app2131640 build21578573 StateFlags4: 20245 files, 2226361652 bytes
+MGS3 app2131650 build22192289 StateFlags4: 8259 files, 2090672387 bytes
+exit=0. Closed-game snapshot16:12:57–16:15 before any removal mutation.
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-after-repair-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-before-removal-snapshot.json.gz --output docs/batches/evidence/10-release-validation/windows-repaired-boot-comparison.json
+exit=0. Separate repaired MGS1 boots changed its remote save/cache only; all other saves/userdata unchanged, original backups still byte equal.
+$ py -3 install.py --uninstall
+GUI session40728/PID49176. Actual checklist all3 checked, OK clicked; subsequent native yes/no dialog not enumerated by Sky, MainWindowHandle0/RespondingTrue. Log20261007T151317Z-147f7f08.log contained header only, no uninstall transaction/operation. No confirmation input or restoration occurred.
+$ Get-CimInstance Win32_Process -Filter 'ProcessId=49176' | Select-Object ProcessId,Name,CommandLine
+Validated our python.exe install.py --uninstall process. Public tool output formatted under earlier table columns; exact process identity was separately observed on launch.
+$ Get-Process -Id 49176 | Stop-Process
+Controlled cleanup exit=0; GUI session40728 returned actual process exit=1. This is not successful native removal.
+$ py -3 -u -c "import runpy,sys;sys.modules['tkinter']=None;sys.argv=['install.py','--uninstall'];runpy.run_path('install.py',run_name='__main__')"
+Backend-selection harness only: unchanged main selects its real existing terminal UI when tkinter unavailable. No filesystem/restoration mocks; candidate installer SHA unchanged.
+Session61064/PID47224, log20261007T151504Z-e85a664e.log. Real first input Return (blank=keep all3 default selections); actual confirmation input y+Return16:15:41, after pre-removal snapshot completed. Native GUI acknowledgement remains untested. Actual terminal completion/output retained windows-removal-console.txt and session log windows-removal.txt; process exit=0.
+$ py -3 docs/batches/evidence/10-release-validation/audit-windows.py --steam-root $STEAM --output docs/batches/evidence/10-release-validation/windows-removed-audit.json
+exit=0; all3 loaders/mod configs/kit records absent, original executable hashes/builds unchanged. MGS1 MGSM2Fix.log still present. Exact stdout retained in JSON.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase removed-before-stock-boots --output docs/batches/evidence/10-release-validation/windows-after-removal-snapshot.json.gz
+Full closed-game snapshot began16:17:54 before any post-removal stock boot, completed exit0 by16:31:05.
+metadata uncompressed bytes=17696530 sha256=0a4d3a61dea01f8eeaf6da945ec17a64637e313ce8146a6451f60377d8bf483e
+metadata gzip bytes=4143383 sha256=818037cbfc4948372ae851d055334b3197d865a5d0da4525f4af12e40d12b5ae
+MGS1 app2131630 build20872173 StateFlags4: 7files11329925424bytes
+MGS2 app2131640 build21578573 StateFlags4: 34584files19581063495bytes
+MGS3 app2131650 build22192289 StateFlags4: 54933files18838524792bytes
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-before-removal-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-after-removal-snapshot.json.gz --output docs/batches/evidence/10-release-validation/windows-removal-comparison.json
+exit0; directly compare former backup bytes to final live originals: MGS2 9875/MGS3 3790, zero mismatches. All common save hashes unchanged; all remote saves unchanged. MGS1 remotecache.vdf alone changed, cause unproven; MGS2/MGS3 userdata unchanged. Cross-scope before_only/added paths null, avoiding inference about official files outside managed scope. Original snapshots immutable; alias normalization only the two documented historical root caches.
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-prekit-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-after-removal-snapshot.json.gz --output docs/batches/evidence/10-release-validation/windows-stock-restoration-comparison.json
+exit0; all stock files present; all original assets/executables byte equal. Only shared common changes: eachMGS2/MGS3 launcher/usersv, already changed before removal. ExtrasMGS1 MGSM2Fix.log+winbackup/meta_008_0000.bin, eachMGS2/MGS3 Bugfixversion cache. Source gameplay/autosave/cache changes across earlier boots separate from removal proof. First attempt printed the full huge cross-scope report to tool output, truncated; report retained, then helper prevented misleading cross-scope added-files list and reran successfully. No game/installer data changed.
+$ Get-CimInstance Win32_Process | Where-Object {$_.ProcessId -in @(65500,62488,47032)} | Select-Object ProcessId,Name,CommandLine | ConvertTo-Json
+All3 validated python.exe install.py. Fresh65500, repair62488, refusal47032; all RespondingTrue, MainWindowHandle0/titleempty. Fresh Sky list_windows again had Steam/Codex/Claude only; no targetable native final dialog. No safe supported acknowledgement available.
+$ Stop-Process -Id 65500,62488,47032
+Controlled cleanup16:18:20 exit=0. Fresh session31217, repair60857 and refusal60596 EACH returned actual process exit=1 after termination. These are cleanup exits, not operation-success/refusal-code claims. Verified content/log outcomes remain separate; native acknowledgement/successful normal exit unproven.
+$ $taskRoot=$WORK; $taskSteam=$STEAM
+$ $taskResults=foreach($taskPhase in @(@('initial','windows-validation-protected','windows-protected-inventory.json'),@('prekit','windows-validation-prekit','windows-prekit-protected-inventory.json'))){$taskOutput= & py -3 docs/batches/evidence/10-release-validation/inventory-preservation.py --steam-root $taskSteam --protected-root (Join-Path $taskRoot $taskPhase[1]) 2>&1; $taskCode=$LASTEXITCODE; $taskOriginal=Get-Content (Join-Path 'docs/batches/evidence/10-release-validation' $taskPhase[2]) -Raw | ConvertFrom-Json; $taskCurrent=($taskOutput -join "`n") | ConvertFrom-Json; $taskMismatches=@($taskCurrent.files | Where-Object {$taskRow=$_; ($taskOriginal.files | Where-Object {$_.path -eq $taskRow.path}).protected_sha256 -ne $taskRow.protected_sha256}); [PSCustomObject]@{phase=$taskPhase[0];copy_files=$taskCurrent.count;copy_bytes=$taskCurrent.bytes;protected_copy_hash_mismatch_count=$taskMismatches.Count;protected_copy_hash_mismatches=@($taskMismatches | ForEach-Object {$_.path});current_source_copy_all_equal=$taskCurrent.all_equal;inventory_command_exit=$taskCode} }; $taskResults | ConvertTo-Json -Depth 4 | Set-Content docs/batches/evidence/10-release-validation/windows-protected-final.txt
+Collector exit=0. Both underlying source/copy inventories exit1 because game-written source files changed; independently compared original protected hashes have mismatch_count0 (14 files17796551bytes,16files17799742bytes). Initial formatting yielded a null empty-path placeholder; corrected explicit count+empty pipeline, final stdout retained windows-protected-final.txt. No protected data changed or deleted.
+
+$ Get-Process | Where-Object {$_.ProcessName -eq 'METAL GEAR SOLID2'} | ForEach-Object {[pscustomobject]@{PID=$_.Id;Responding=$_.Responding;CPU=$_.CPU;ModModules=@($_.Modules | Where-Object {$_.ModuleName -match 'MGSM2Fix|MGSHDFix|Community-Bugfix'})}} | ConvertTo-Json
+Stock post-removal16:35:58: PID29724/RespondingTrue/CPU36.328125/ModModules[]. Same actual module filter for MGS1 PID9376 at16:32:49 CPU4 and MGS3 PID45580 at16:41:21 CPU5.3125, all RespondingTrue/ModModules[]. Query exits0; not game-exit claims. Actual Steam commands/build/executable identities in audit and scoped process record; visual/close inputs/results in windows-poststock-observations.md.
+$ Get-Content $STEAM/logs/gameprocess_log.txt | Select-String '^\[2026-10-07 16:(3[2-9]|4[0-9]):.*AppID 21316[345]0' | ForEach-Object {$_.Line -replace [regex]::Escape($STEAM),'$STEAM'} | Set-Content docs/batches/evidence/10-release-validation/windows-poststock-steam-process.txt
+exit0, actual scoped Steam outputs retained: stockMGS1 9376 exit0, stockMGS2 game29724/launcher30292 exit0, stockMGS3 game45580 exit-1073741819/launcher11428 exit0. No forced game termination. No unrelated apps/logs redistributed.
+$ $taskEvents=Get-WinEvent -FilterHashtable @{LogName='Application';Id=1000;StartTime=(Get-Date).AddMinutes(-10)} -ErrorAction SilentlyContinue | Where-Object {$_.Message -match 'METAL GEAR SOLID3.exe'}; $taskEvents | ForEach-Object {$_.TimeCreated.ToString('o'); $_.Message -replace [regex]::Escape($STEAM),'$STEAM' -replace [regex]::Escape($USERPROFILE),'$USERPROFILE'} | Set-Content docs/batches/evidence/10-release-validation/windows-poststock-mgs3-events.txt
+exit0 capture, event1000 fault16:47:27.7109220/c0000005/offset115f64/process0xB20C. Exact sanitized event retained; close/fault causality unproven.
+$ py -3 docs/batches/evidence/10-release-validation/snapshot-windows.py --steam-root $STEAM --phase closed-after-poststock-boots --managed --output docs/batches/evidence/10-release-validation/windows-final-snapshot.json.gz
+metadata uncompressed bytes=4991 sha256=46b618e926dcddbf59a6ae9b959616594d62278d1eb3f85e19659bcc8ead91c1
+metadata gzip bytes=1564 sha256=e58ddb494e770402746e3cae677ba47bcb19c99778d6da63519497306f2f345f
+MGS1 app2131630 build20872173 StateFlags4: 1file12081224bytes
+MGS2 app2131640 build21578573 StateFlags4: 9files10889280bytes
+MGS3 app2131650 build22192289 StateFlags4: 7files12971654bytes
+exit0, all target games closed before snapshot.
+$ py -3 docs/batches/evidence/10-release-validation/compare-windows.py docs/batches/evidence/10-release-validation/windows-after-removal-snapshot.json.gz docs/batches/evidence/10-release-validation/windows-final-snapshot.json.gz --output docs/batches/evidence/10-release-validation/windows-poststock-write-comparison.json
+exit0. MGS1 save/userdatachanges[]. MGS2/MGS3 launcher/usersv + target Steamremotecache changed after stock boots; gameplay saves unchanged. These are post-boot writes, not removal mutations.
+$ py -3 docs/batches/evidence/10-release-validation/audit-windows.py --steam-root $STEAM --output docs/batches/evidence/10-release-validation/windows-final-audit.json
+exit0, exact actual stdout retainedJSON: all3 stockexe hashes/builds unchanged, candidate loaders/configs/kit recovery folders absent.
+$ Get-Process | Where-Object {$_.ProcessName -match '^METAL GEAR SOLID[23]?$' -or ($_.ProcessName -eq 'launcher' -and $_.Path -match '\\MGS[123]\\')} | Select-Object Id,ProcessName
+16:48:45 queryexit0, no targets. Sky final Steam state: all3PLAY, no downloadsqueue, network/disk0bps; no gamewindows returned. Private preservedcopies remain retained; permitted generatedleftovers listed separately.

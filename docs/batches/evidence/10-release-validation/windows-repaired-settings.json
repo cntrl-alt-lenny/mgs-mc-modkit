@@ -1,0 +1,87 @@
+{
+  "phase": "repaired-before-boots",
+  "utc": "2026-10-07T15:03:46.522227+00:00",
+  "games": [
+    {
+      "game": "MGS1",
+      "path": "MGSM2Fix.ini",
+      "exists": true,
+      "sha256": "b8e393c84b8499c05185516f4b1cb82f7c46ab238bc0a9787ef1ecee2a3a4aa8",
+      "values": {
+        "External Resolution": {
+          "Enabled": "true",
+          "Width": "1024",
+          "Height": "768",
+          "Windowed": "false",
+          "Borderless": "true"
+        },
+        "Internal Resolution": {
+          "Widescreen": "false",
+          "Borderless": "false",
+          "Enabled": "false",
+          "Height": "0"
+        },
+        "Launcher": {
+          "SkipNotice": "true",
+          "StartGame": "false"
+        }
+      }
+    },
+    {
+      "game": "MGS2",
+      "path": "plugins/MGSHDFix.settings",
+      "exists": true,
+      "sha256": "28dc7c56183c7a2158b055f256c06b76aa715a74fbfe543dc868482e62c4f06f",
+      "values": {
+        "Language Settings": {
+          "Game Language": "\"fr\"",
+          "Game Region": "\"eu\""
+        },
+        "Controller Settings": {
+          "Button Icons": "\"Keyboard / Mouse\"",
+          "Dualshock 2 && 3 Controller Support": "0",
+          "DualShock Rumble Strength (%)": "100",
+          "Restore PS2 Pressure Sensitive Binds": "0",
+          "Set Menu OK && Cancel Button": "\"Default\""
+        },
+        "Launcher and Splashscreens": {
+          "Skip In-Game Splashscreens": "1",
+          "Skip Launcher": "0",
+          "Skip Launcher Splashscreens": "1"
+        },
+        "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+          "Render Height": "720",
+          "Render Width": "1280"
+        }
+      }
+    },
+    {
+      "game": "MGS3",
+      "path": "plugins/MGSHDFix.settings",
+      "exists": true,
+      "sha256": "16143b27f0c1f6f45e951626520db8c4c30fa836edfc46ac4292544705155c3f",
+      "values": {
+        "Language Settings": {
+          "Game Language": "\"es\"",
+          "Game Region": "\"us\""
+        },
+        "Controller Settings": {
+          "Button Icons": "\"Keyboard / Mouse\"",
+          "Dualshock 2 && 3 Controller Support": "0",
+          "DualShock Rumble Strength (%)": "100",
+          "Restore PS2 Pressure Sensitive Binds": "0",
+          "Set Menu OK && Cancel Button": "\"Default\""
+        },
+        "Launcher and Splashscreens": {
+          "Skip In-Game Splashscreens": "1",
+          "Skip Launcher": "0",
+          "Skip Launcher Splashscreens": "1"
+        },
+        "Internal Resolution / Render Scale (+ Downsampling / Supersampling / 21:9+ and 4:3 Support)": {
+          "Render Height": "900",
+          "Render Width": "1600"
+        }
+      }
+    }
+  ]
+}

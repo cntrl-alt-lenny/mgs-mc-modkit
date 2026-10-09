@@ -1,0 +1,27 @@
+﻿MGS Mod Kit 2.3.0; platform=win32; Python=3.12.10
+Diagnostic log: $USERPROFILE\AppData\Local\MGSModKit\logs\20261007T145155Z-ec68af7c.log
+
+=== Metal Gear Solid 2: Sons of Liberty ===
+Traceback (most recent call last):
+  File "$CHECKOUT\install.py", line 1761, in __enter__
+    msvcrt.locking(self.file.fileno(), msvcrt.LK_NBLCK, 1)
+PermissionError: [Errno 13] Permission denied
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "$CHECKOUT\install.py", line 3969, in _main
+    run_with_progress(prog, install_selected)
+  File "$CHECKOUT\install.py", line 3660, in run_with_progress
+    raise failure[0]
+  File "$CHECKOUT\install.py", line 3643, in worker
+    result.append(operation())
+                  ^^^^^^^^^^^
+  File "$CHECKOUT\install.py", line 3910, in install_selected
+    with GameLock(game_dir):
+         ^^^^^^^^^^^^^^^^^^
+  File "$CHECKOUT\install.py", line 1768, in __enter__
+    raise RuntimeError("Another installer is working on this game. Close it and try again.") from e
+RuntimeError: Another installer is working on this game. Close it and try again.
+
+
