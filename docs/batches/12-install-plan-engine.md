@@ -2,34 +2,31 @@
 
 ## Done
 
-Built from `origin/main` at `85697bd`, independently of batches 14/16. Followed the complete brief at `095a3b1b03d8bb543aa929069eca501b9e7cd8fa` and Brain's embedding decision at `5f6dd663d72a987b06b5910a88eb7e2550b5bce9`.
+Continued the same isolated Worker branch from `8297142978fc2b6932fc2c0af9485b4b074e09c5`, following the complete correction brief at `fbc360f7d820dc3795aa6c56bf2f778608ac62d7` and Brain's batch 17 review/probe. No dependency on batches 14/16.
 
-Added authoritative game-neutral `install_plan.py`, deterministically embedded into standalone `install.py`. Plans record schema/profile, ordered games/paths/settings, exact package versions/checksums, supplied archive roles/identities, incompatibilities and input assumptions. `tools/embed_install_plan.py --check` verifies without writing; sync rejects missing/duplicate markers and non-LF Python.
+Retained the game-neutral plan engine, deterministic standalone embedding, private preparation sandbox and unchanged transaction/recovery/removal recipes. Selection now captures immutable audio acceptance: exact source/digest, game, role, classification and explicit confirmation. Digests bracket classification and confirmation. Collection carries that acceptance into the plan; planning cannot silently hash replacement bytes into a new acceptance. Plan validation requires matching acceptance; preparation checks classification and authenticates copied bytes; review, preparation and execution rechecks retain the selected digest. Changed files require fresh selection/confirmation before game writes, including settings/reset loops. Confident and unchanged explicitly accepted uncertain files need no executor prompts. Independent components and hard rejects remain.
 
-The current-recipe adapter runs unchanged recipes against a private sandbox, authenticates every cached archive, validates generated settings, launcher records, destinations, existing records and aggregate per-volume space before any game-file write. Preparation never constructs live InstallTxn. Pending recovery is handled under locks before choices are collected; later recovery or stale inputs require a fresh plan. Execution locks all selected games, rechecks inputs/cache/space, then replays local archives and prepared bytes through unchanged InstallTxn. No executor downloads, settings regeneration, picking or confirmation. Earlier commits, restored games and unstarted games remain separate.
-
-Preserved entry points, independently selectable ordered audio components, mod-specific writers, pins/schema, transaction/recovery/removal contracts and record schema. Regenerated both shortcut hashes without changing release version/tag. Installed-file verification explicitly does not establish game playability.
+Regenerated both shortcuts at unchanged v2.3.0. No pins, settings schema, mod writers, release tags or other seats changed.
 
 ## Checked
 
-Production/test commit: `ff10ab5629a8564692fb7379bcdba8f3513bb8cf`. Actual commands, output excerpts and exit codes: [evidence](evidence/12-install-plan-engine.txt).
+Production/test commit: `67c7bbf873ea6405519f3fb43f738541d4041044`. Actual commands, outputs, exits and initial failures: [evidence](evidence/12-install-plan-engine.txt).
 
-| Command | Actual output | Exit |
+| Command | Actual result | Exit |
 |:--|:--|:--|
-| `python3 -m pytest tests/ -q` | `312 passed in 9.95s` | 0 |
-| `python3 -m ruff check .` | `All checks passed!` | 0 |
+| `python3 -m pytest tests/ -q` | 335 passed in 33.50s | 0 |
+| `python3 -m ruff check .` | All checks passed! | 0 |
 | `python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py` | no output | 0 |
 | `python3 tools/embed_install_plan.py --check` | standalone/source match | 0 |
-| `python3 tools/fw.py check` | `0 error(s), 0 warning(s)` | 0 |
-| `python3 tools/fw.py status` | `all project checks pass` | 0 |
-| Both shortcut tag/SHA/line-ending assertions | v2.3.0; SHA `5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52` | 0 |
+| `python3 tools/fw.py check` | 0 errors, 0 warnings | 0 |
+| Independent shortcut/SHA/line endings/Python 3.9 assertions | both v2.3.0; SHA `64a8a44300b247796da988b40a0d37c734cdac6cb9d02389e0c99a041741e3ea` | 0 |
 
-Tests include late failure with zero earlier mutation, stale inputs/cache/recovery, concurrent refusal, cancellation/failure/recovery outcomes, no executor interaction, schema-1 repair/removal, source parity and isolated standalone import/execution without the source module. Applicable UPGRADING checks cover settings/archive layout synthetically; no coupled values changed. Framework copies unchanged.
+Brain's original probe installs the replacement at the old SHA; corrected planning rejects it. Twenty-three new tests cover confident/uncertain replacements, actual main review/settings/reset/prepared loops, classification/confirmation changes, acceptance game/role/proof corruption and unchanged accepted files. Each rejection checks every selected game's snapshot. Existing rollback, cancellation, recovery, old-record, no-interaction and standalone/parity checks remain green. Applicable UPGRADING archive/settings checks are synthetic; coupled values unchanged. Framework copies unchanged.
 
 ## Not checked
 
-NOT RUN: native Windows/Steam Deck game boots, real install→repair→remove, licensed/user-supplied audio, native Config Tool and GUI rendering. `desktop-file-validate` unavailable on this Mac. Independent Verifier review remains required; cross-platform CI results are on the draft PR. No MGS4 integration, new profile/game, release, merge or tag.
+Native Windows/Steam Deck game boots, real install→repair→remove, licensed/user audio compatibility, Config Tool and GUI rendering: NOT RUN. `desktop-file-validate` unavailable locally; Linux CI runs it. Independent Verifier review remains required. Exact-delivery CI is reported on PR #22.
 
 ## Failed or blocked
 
-No implementation blocker. Initial fault-hook, exception-expectation, Ruff and Windows UTF-8 parity-test failures were corrected and retained in evidence. Framework 4.0.1 availability is Brain-owned; unrelated seats were preserved. Brain coordinates integration order with Worker 16 and exact-commit Checked review.
+No implementation blocker. Initial tests required collection metadata and corrected fixture filenames/classification shapes; failures retained in evidence. Ordinary diff checking flags required CMD CRLF; CR-aware checking passes. Framework status initially hit a disappearing app capture ref (exit 2); retry retained. Framework update remains Brain-owned. No acceptance, merge, tag or publication.
