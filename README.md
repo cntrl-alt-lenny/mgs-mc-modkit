@@ -17,6 +17,10 @@ Steam Deck · Linux · Windows — vanilla-faithful fixes and restorations.
 
 </div>
 
+The installer currently covers **Master Collection Volume 1: MGS1, MGS2 and MGS3**. MGS4 integration with [MGSPatriotFix](https://github.com/ShizCalev/MGSPatriotFix) is planned but is not available in the installer yet. Peace Walker is not currently supported.
+
+**Development validation is pending.** Automated tests do not establish successful Windows or Steam Deck game boots, audio compatibility, or complete restoration. See the [native release validation requirements](docs/RELEASING.md).
+
 ## Install
 
 1. Install MGS1, MGS2 and/or MGS3 through Steam. Close the games and finish Steam downloads.
@@ -33,11 +37,14 @@ The installer saves these lines on your Desktop and offers clipboard copying. Wi
 
 ## What you get
 
-| Game | Pinned mods | Result |
-|:--|:--|:--|
-| MGS1 | [MGSM2Fix](https://github.com/nuggslet/MGSM2Fix) 3.6.0 | Resolution, texture restoration and analog fixes |
-| MGS2 | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) 4.1.0 + [Bugfix](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) 3.0.0 | Aspect ratio, CPU, visual and asset fixes |
-| MGS3 | MGSHDFix 4.1.0 + [Bugfix](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) 2.0.1 | Aspect ratio, CPU, visual and asset fixes |
+| Game | Installer pins | Latest stable upstream | Result |
+|:--|:--|:--|:--|
+| MGS1 | [MGSM2Fix](https://github.com/nuggslet/MGSM2Fix) 3.6.0 | [MGSM2Fix 3.7.3](https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.7.3) | Resolution, texture restoration and analog fixes |
+| MGS2 | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) 4.1.0 + [Bugfix](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) 3.0.0 | [MGSHDFix 4.1.2](https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.2) + [Bugfix 3.0.0](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/tag/3.0.0) | Aspect ratio, CPU, visual and asset fixes |
+| MGS3 | MGSHDFix 4.1.0 + [Bugfix](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) 2.0.1 | [MGSHDFix 4.1.2](https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.2) + [Bugfix 2.0.1](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/tag/2.0.1) | Aspect ratio, CPU, visual and asset fixes |
+| MGS4 | Integration in progress; not installed yet | [MGSPatriotFix 0.2.2](https://github.com/ShizCalev/MGSPatriotFix/releases/tag/0.2.2) | Planned fixes and QoL support |
+
+Latest upstream versions were checked on **8 October 2026**. The installer uses the pinned versions above. Newer releases require a coordinated settings, archive checksum and compatibility review before adoption; see [upgrading](docs/UPGRADING.md).
 
 Mods come from their authors' official releases. AI-upscaled textures and gameplay changes are excluded. MGS1's first boot: choose **US**, **Max**, **4:3**, **Smoothing Off**.
 
