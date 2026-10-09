@@ -45,10 +45,10 @@ def prepared_world(tmp_path, patch_download):
 
 def test_embedded_module_matches_source_and_standalone_compiles():
     root = Path(install.__file__).parent
-    body = (root / "install.py").read_text()
+    body = (root / "install.py").read_text(encoding="utf-8")
     embedded = body.split('# BEGIN EMBEDDED INSTALL PLAN\n', 1)[1].split(
         '# END EMBEDDED INSTALL PLAN\n', 1)[0]
-    assert embedded == (root / "install_plan.py").read_text()
+    assert embedded == (root / "install_plan.py").read_text(encoding="utf-8")
     compile(body, "standalone-install.py", "exec")
 
 
