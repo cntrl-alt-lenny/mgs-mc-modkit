@@ -30,7 +30,7 @@ and production equality pass. All six framework copies match immutable 4.0.0
 source and manifest. [Actual check evidence](evidence/15-simple-banner/checks.txt)
 records the checked commit; only documentation/artwork differs from main.
 After the independent review, refreshed status to corrections pending and the
-banner to a stable in-development label; rerendered both preview sizes. After Brain reproduced the delivered corrections, refreshed README status to launcher integration and final review pending; artwork is unchanged.
+banner to a stable in-development label; rerendered both preview sizes. After Brain reproduced the delivered corrections, refreshed README status to launcher integration and final review pending; artwork is unchanged. Status refresh at `ae062b8` passes framework/whitespace/production equality; actual commands are in [status-refresh.txt](evidence/15-simple-banner/status-refresh.txt).
 
 ## Not checked
 
