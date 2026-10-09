@@ -319,3 +319,29 @@ def test_orphan_save_backup_and_duplicate_asi_refuse(tmp_path, patch_download):
     (other / 'MGS4/MGSPatriotFix.asi').write_bytes(b'manual')
     with pytest.raises(RuntimeError, match='Duplicate PatriotFix'):
         perform(other, tmp_path)
+
+
+@pytest.mark.parametrize('header', ['ConfigTool/pch.h', 'src/resources/stdafx.h',
+                                  'src/resources/version.h'])
+def test_capture_authenticates_compiled_headers(tmp_path, monkeypatch, header):
+    import hashlib
+    import tools.capture_patriot_schema as tool
+    monkeypatch.setattr(tool.subprocess, 'check_output', lambda *a, **k: tool.TREE)
+    reviewed = {}
+    for name in tool.REVIEWED:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b'reviewed fixture')
+        reviewed[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    monkeypatch.setattr(tool, 'REVIEWED', reviewed)
+    path = tmp_path / header
+    path.write_bytes(b'reviewed fixture\n#error Unreviewed compiled header\n')
+    with pytest.raises(ValueError, match='Unreviewed source bytes: ' + header):
+        tool.capture(tmp_path)
+    path.unlink()
+    with pytest.raises(ValueError, match='inventory changed'):
+        tool.capture(tmp_path)
+    path.write_bytes(b'reviewed fixture')
+    (tmp_path / 'src/added.h').write_bytes(b'new header')
+    with pytest.raises(ValueError, match='inventory changed'):
+        tool.capture(tmp_path)

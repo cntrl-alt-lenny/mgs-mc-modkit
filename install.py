@@ -2842,10 +2842,31 @@ def _uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
     if (root / "backups").is_symlink():
         return ["The backups folder is linked; files were left in place."], False
 
-    # Always clear the obsolete legacy unified .asi, manifest or not.
-    for name in LEGACY_M2FIX_FILES:
-        legacy = game_dir / name
-        if legacy.is_file():
+    def clear_legacy(record=None):
+        nonlocal errors
+        # Filename/directory labels alone do not identify a game. Require the
+        # MGS1 executable and exclude other known game layouts. A record must
+        # already have passed validation and agree; orphan records authorize
+        # no legacy cleanup. Tracked paths use normal restoration below.
+        if not (game_dir / GAMES["mgs1"]["exe"]).is_file():
+            return
+        other_exes = [g["exe"] for key, g in GAMES.items() if key != "mgs1"]
+        other_exes += ["mgspw/METAL GEAR SOLID PEACE WALKER.exe", "mgs4.exe",
+                       "Launcher/launcher.exe"]
+        if any((game_dir / name).exists() for name in other_exes):
+            return
+        if record is None:
+            if root.exists():
+                return
+            tracked = set()
+        else:
+            if record.get("game") != "mgs1":
+                return
+            tracked = set(record["added"]) | {o["path"] for o in record["overwritten"]}
+        for name in LEGACY_M2FIX_FILES:
+            legacy = game_dir / name
+            if name in tracked or legacy.is_symlink() or not legacy.is_file():
+                continue
             try:
                 legacy.unlink()
                 notes.append(f"removed legacy {name}")
@@ -2854,6 +2875,7 @@ def _uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
                 errors = True
 
     if not manifest.is_file():
+        clear_legacy()
         # No record — but backups may still be sitting there from a run whose
         # manifest was lost or damaged. Those are the user's original files, so
         # put them back rather than abandoning them.
@@ -2896,6 +2918,8 @@ def _uninstall_game(game_dir: Path, log) -> tuple[list[str], bool]:
     except (ValueError, OSError, RuntimeError) as e:
         notes.append(f"couldn't read manifest ({e}); left files in place")
         return notes, False
+
+    clear_legacy(data)
 
     # Restore originals FIRST (before removing added files), so a file that is
     # both added-by-us and has a stock backup ends up as the stock original.

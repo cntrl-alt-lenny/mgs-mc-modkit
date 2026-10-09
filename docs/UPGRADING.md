@@ -192,8 +192,11 @@ saving, embedded fields/constraints/defaults and capture fixture together.
 Do not change the MGS1–3 pins as part of a PatriotFix upgrade.
 
 Authenticate the upstream tag, then use `tools/capture_patriot_schema.py` on that
-exact source tree. Its whole-source byte allowlist/inventory deliberately refuses
-other versions or local edits; audit a changed source before extending it.
+exact source tree. Its byte allowlist authenticates the exact `.cpp`, `.hpp` and `.h` inventory
+under `src/` and `ConfigTool/`, refusing additions, omissions and byte drift.
+Build projects, resources, external dependencies and generated binaries are not
+authenticated; this does not establish build or binary reproducibility. Audit
+a changed input before extending this bounded allowlist.
 Inspect `MGS4/winmm.dll`, `MGS4/scripts/MGSPatriotFix.asi`,
 `Launcher/d3d11.dll`, `Launcher/scripts/MGSPatriotFix.asi` and root Config Tool.
 The installer requires the exact reviewed file inventory and skips upstream's

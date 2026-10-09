@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Capture the exact reviewed PatriotFix 0.2.2 source; refuse all source drift.
+"""Capture reviewed PatriotFix 0.2.2 C++ inputs in src/ and ConfigTool/.
 
 This is an explicit version-specific byte allowlist, not general C++ support.
 Authenticates the local Git HEAD separately from the reviewed source hashes.
+Build projects, resources, dependencies and binaries are outside this boundary.
 Hidden PW fields are included because Config Tool saves every control.
 """
 from __future__ import annotations
@@ -20,7 +21,10 @@ except ModuleNotFoundError:
     from capture_settings_schema import braced, split_items, without_comments
 
 TREE = "c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de"
-REVIEWED = {'ConfigTool/helper.cpp': '582783fdd792b092424dd12393daa3d17da36e31686b4dab415fcc72b3276cc8',
+REVIEWED = {'src/resources/version.h': '4d0aa01ea0535321dca13dd0ee34f8a0f090b815414f6ebbca4e6cdc22b1d842',
+ 'src/resources/stdafx.h': '7ccb5864dc90362a567c6a186b67dca7c0aa54118b4ec55c9754e83fffd79ca2',
+ 'ConfigTool/pch.h': '08d73a65243a408f5f171738ce8e08fb56becc9c7cddf8a006aa4ac4d6008d81',
+ 'ConfigTool/helper.cpp': '582783fdd792b092424dd12393daa3d17da36e31686b4dab415fcc72b3276cc8',
  'ConfigTool/helper.hpp': '987bbc63bbbe6fb09e6a3967db7a58b19300ee02fb4e07247369b23b258db5e9',
  'ConfigTool/main.cpp': '8ea2c96aebccb703847cf4af5602f79310c02e646a780c89bdb2ce3ceda2e7e7',
  'ConfigTool/pch.cpp': '767c147b79a2d6c6488f245d364e406bf927d83e92475247ce92792f71f0bb2d',
@@ -85,7 +89,7 @@ def capture(root):
     if head != TREE:
         raise ValueError("Unreviewed PatriotFix tree; source-format review required")
     actual = {p.relative_to(root).as_posix() for base in ("src", "ConfigTool")
-              for p in (root / base).rglob("*") if p.suffix in (".cpp", ".hpp")}
+              for p in (root / base).rglob("*") if p.suffix in (".cpp", ".hpp", ".h")}
     if actual != set(REVIEWED):
         raise ValueError("Source inventory changed; source-format review required")
     raw = {n: (root / n).read_bytes() for n in REVIEWED}
