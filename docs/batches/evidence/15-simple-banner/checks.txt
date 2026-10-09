@@ -57,3 +57,66 @@ exit=0
 Framework comparison: all six copies match immutable 4.0.0 source b036c761ac2af2d47e61a1b473c708f094bd4295 and manifest. exit=0
 
 SVG XML, dimensions, MGS1-4 labels, accessible title/description, no scripts/external images: exit=0. Sharp previews inspected at 1280x320 and 640x160.
+
+Review-status refresh (independent review now identifies corrections):
+$ git rev-parse HEAD
+c7cbf6ae452dc7a6db99af594538356b1278ad96
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/simple-banner (this machine's copy): 3 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 13 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch, 17-delivery-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 5 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/16-volume1-qol-upgrade: 2 commit(s), last 2026-10-09; batch 16-volume1-qol-upgrade: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 8 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 1 commit(s) after the Verifier's review -- Brain checks them
+  brain/simple-banner: 2 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/simple-banner; no uncommitted changes
+  not on GitHub yet: brain/simple-banner (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <user-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 15-simple-banner
+exit=0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 76%]
+...................................................................      [100%]
+283 passed in 6.22s
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py
+(no output)
+exit=0
+
+$ git diff --check
+(no output)
+exit=0
+
+$ git diff --exit-code origin/main -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop docs/agents tools/fw.py tests/test_framework.py
+(no output)
+exit=0
+
+Framework comparison: all six copies match immutable 4.0.0 source b036c761ac2af2d47e61a1b473c708f094bd4295 and manifest. exit=0
+
+SVG XML, dimensions, MGS1-4 labels, accessible title/description, no scripts/external images: exit=0. Sharp previews inspected at 1280x320 and 640x160.
