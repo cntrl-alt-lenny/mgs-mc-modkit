@@ -18,6 +18,8 @@ Dispatch independent Verifiers for 12 and 16 now. Continue 14 with the explicitl
 
 Both shortcut tags/hashes and CRLF/LF, Python 3.9 grammar, standalone embedding parity and six framework copies versus their pinned source pass. Independent official tag/blob/checkout comparison authenticates all 61 PatriotFix C++ inputs. Candidate validation passes all five authentic ZIPs and the 134-field source/runtime capture; shipping Batch 16 installer/template/shortcuts remain unchanged.
 
+Handoff check at `04b782e72848c93346d2d57e901a740a171a0592`: 283 tests, Ruff, compilation, framework check/status, whitespace and production equality pass; actual outputs are in `handoff-checks.txt`.
+
 ## Not checked
 
 No new independent Verifier acceptance exists at these deliveries. Native Config Tool exports, ASI initialization, Windows/Deck boots/gameplay, user audio compatibility and real repair/removal remain NOT RUN. Candidate preparation does not authorize shipping upgrades. Combined MGS4/engine behavior is not yet implemented or validated.
