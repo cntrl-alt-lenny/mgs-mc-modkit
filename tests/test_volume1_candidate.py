@@ -78,16 +78,53 @@ def test_bundle_rejects_missing_provenance_and_dynamic_evidence(tmp_path, mutati
         candidate.export_check(tmp_path, manifest, SCHEMA)
 
 
-@pytest.mark.parametrize("name", ["../outside", "/absolute", "C:/drive", "a\\b", "a/./b"])
+def raw_name_archive(path, name):
+    # Assign after construction: Windows ZipInfo.__init__ rewrites backslashes,
+    # and all platforms truncate at NUL. Both ZIP headers must retain raw bytes.
+    member = zipfile.ZipInfo("placeholder")
+    member.filename = member.orig_filename = name
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr(member, b"test")
+    assert path.read_bytes().count(name.encode("utf-8")) == 2
+    with zipfile.ZipFile(path) as archive:
+        assert archive.infolist()[0].orig_filename == name
+    return {"sha256": candidate.digest(path.read_bytes()), "size": path.stat().st_size,
+            "members": [name]}
+
+
+@pytest.mark.parametrize("name", ["../outside", "/absolute", "C:/drive", "a\\b", "a/./b",
+                                 "safe\x00/../outside", "safe\x00", "a\nb", "a\x7fb"])
 def test_archive_rejects_unsafe_paths_without_extraction(tmp_path, name):
     path = tmp_path / "archive.zip"
-    with zipfile.ZipFile(path, "w") as archive:
-        archive.writestr(name, b"test")
-    asset = {"sha256": candidate.digest(path.read_bytes()), "size": path.stat().st_size,
-             "members": [name]}
+    asset = raw_name_archive(path, name)
     with pytest.raises(ValueError, match="unsafe"):
         candidate.archive_check(path, asset)
     assert not (tmp_path.parent / "outside").exists()
+
+
+@pytest.mark.parametrize("name,normalized", [("a\\b", "a/b"),
+                                              ("safe\x00/../outside", "safe"),
+                                              ("original", "changed")])
+def test_archive_rejects_reader_normalization_even_with_matching_layout(
+        tmp_path, monkeypatch, name, normalized):
+    path = tmp_path / "archive.zip"
+    asset = raw_name_archive(path, name)
+    asset["members"] = [normalized]
+    original_init = zipfile.ZipInfo.__init__
+
+    def normalize(member, *args, **kwargs):
+        original_init(member, *args, **kwargs)
+        if member.orig_filename == name:
+            member.filename = normalized
+
+    monkeypatch.setattr(zipfile.ZipInfo, "__init__", normalize)
+    with zipfile.ZipFile(path) as archive:
+        member = archive.infolist()[0]
+        assert member.orig_filename == name
+        assert member.filename == normalized
+    with pytest.raises(ValueError, match="unsafe"):
+        candidate.archive_check(path, asset)
+
 
 
 def test_archive_verifies_digest_layout_and_payload(tmp_path):
@@ -161,3 +198,31 @@ def test_per_game_values_are_compared(tmp_path):
     result = candidate.export_check(tmp_path, manifest, SCHEMA)
     assert result["per_game_differences"]["default"]["Options"]["Name"] == {
         "mgs2": "Test", "mgs3": "Other"}
+
+
+def test_archive_rejects_symlink(tmp_path):
+    path = tmp_path / "archive.zip"
+    member = zipfile.ZipInfo("link")
+    member.create_system = 3
+    member.external_attr = 0o120777 << 16
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr(member, b"target")
+    asset = {"sha256": candidate.digest(path.read_bytes()), "size": path.stat().st_size,
+             "members": ["link"]}
+    with pytest.raises(ValueError, match="unsafe"):
+        candidate.archive_check(path, asset)
+
+
+@pytest.mark.parametrize("failure", ["size", "members", "required_members", "crc"])
+def test_archive_preserves_integrity_refusals(tmp_path, failure):
+    path = tmp_path / "archive.zip"
+    asset = raw_name_archive(path, "safe")
+    expected = {"size": "digest/size", "members": "layout", "required_members": "required",
+                "crc": "CRC"}[failure]
+    if failure == "crc":
+        path.write_bytes(path.read_bytes().replace(b"test", b"fail"))
+        asset["sha256"] = candidate.digest(path.read_bytes())
+    else:
+        asset[failure] = 0 if failure == "size" else ["missing"]
+    with pytest.raises(ValueError, match=expected):
+        candidate.archive_check(path, asset)

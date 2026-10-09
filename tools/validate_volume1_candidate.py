@@ -86,9 +86,12 @@ def archive_check(path, asset):
         names = []
         folded = set()
         for member in archive.infolist():
-            name = member.filename
+            # ZipInfo preserves the decoded central-directory name before Windows
+            # separator normalization and NUL truncation in orig_filename.
+            name = member.orig_filename
             parts = PurePosixPath(name).parts
-            if (not parts or name.startswith("/") or "\\" in name or ":" in name
+            if (name != member.filename or any(ord(c) < 32 or ord(c) == 127 for c in name)
+                    or not parts or name.startswith("/") or "\\" in name or ":" in name
                     or any(p in {"..", "."} for p in name.rstrip("/").split("/"))
                     or (member.external_attr >> 16) & 0o170000 == 0o120000):
                 raise ValueError("unsafe archive path: " + name)
