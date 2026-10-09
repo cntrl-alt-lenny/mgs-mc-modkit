@@ -172,3 +172,148 @@ Install-MGS-Mods.cmd: v2.3.0 / 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd
 Install-MGS-Mods.desktop: v2.3.0 / 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52; line endings OK
 desktop-file-validate: None
 exit=0
+
+Independent shortcut verification at 67c7bbf873ea6405519f3fb43f738541d4041044
+$ python3 inline assertions: SHA256(install.py), both TAG/SHA fields, CRLF/LF, ast.parse(feature_version=(3,9))
+Install-MGS-Mods.cmd: v2.3.0 / 64a8a44300b247796da988b40a0d37c734cdac6cb9d02389e0c99a041741e3ea; line endings OK
+Install-MGS-Mods.desktop: v2.3.0 / 64a8a44300b247796da988b40a0d37c734cdac6cb9d02389e0c99a041741e3ea; line endings OK
+Python LF / Python 3.9 syntax: OK
+desktop-file-validate: None
+exit=0; native desktop validation NOT RUN locally when unavailable
+
+Correction checks at 67c7bbf873ea6405519f3fb43f738541d4041044
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 21%]
+........................................................................ [ 42%]
+........................................................................ [ 64%]
+........................................................................ [ 85%]
+...............................................                          [100%]
+335 passed in 33.50s
+exit=0
+
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+
+$ python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py
+(no output)
+exit=0
+
+
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+exit=0
+
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+
+$ python3 tools/fw.py status
+fw: git rev-list --count refs/codex/turn-diffs/captures/1791547246766/da37ce60-4f12-493c-a40d-5ad491efdbf5/base --not --remotes=origin refs/tags/v1.0.0 refs/tags/v1.1.0 refs/tags/v1.10.0 refs/tags/v1.11.0 refs/tags/v1.11.1 refs/tags/v1.2.0 refs/tags/v1.3.0 refs/tags/v1.4.0 refs/tags/v1.5.0 refs/tags/v1.6.0 refs/tags/v1.7.0 refs/tags/v1.8.0 refs/tags/v1.9.0 refs/tags/v1.9.1 refs/tags/v2.0.0 refs/tags/v2.0.1 refs/tags/v2.1.0 refs/tags/v2.2.0 failed: fatal: ambiguous argument 'refs/codex/turn-diffs/captures/1791547246766/da37ce60-4f12-493c-a40d-5ad491efdbf5/base': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/12-install-plan-engine (this machine's copy): 6 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix (this machine's copy): 9 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 2 commit(s) after the Verifier's review -- Brain checks them
+  worker/16-volume1-qol-upgrade: 4 commit(s), last 2026-10-09; batch 16-volume1-qol-upgrade: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 4 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 13 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch, 17-delivery-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 5 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 8 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 1 commit(s) after the Verifier's review -- Brain checks them
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+exit=2
+
+
+$ git -c core.whitespace=cr-at-eol diff --check HEAD^ HEAD
+(no output)
+exit=0
+
+
+$ git diff 8297142978fc2b6932fc2c0af9485b4b074e09c5 -- docs/agents tools/fw.py
+(no output)
+exit=0
+
+Brain probe rerun at correction 67c7bbf873ea6405519f3fb43f738541d4041044
+$ git archive 8297142978fc2b6932fc2c0af9485b4b074e09c5 -o <temp>/old.tar; tar -xf <temp>/old.tar -C <temp>/old
+$ git show fbc360f7d820dc3795aa6c56bf2f778608ac62d7:docs/batches/evidence/12-14-16-brain-review/probes.py
+Invoke unchanged audio_identity(Path(seat)) in subprocess for archived old seat and corrected seat (skip main HEAD query for git archive snapshot).
+old delivery
+Replacement classification: missing_identity
+No uncertain-file confirmation requested; outcome: {'mgs2': 'installed and verified'}
+CONFIRMED P2: newly hashed replacement bypasses selection-time acceptance
+
+exit=0
+corrected delivery
+Replacement classification: missing_identity
+Traceback (most recent call last):
+  File "<temp>/probe.py", line 149, in <module>
+    audio_identity(Path(sys.argv[1]))
+  File "<temp>/probe.py", line 45, in audio_identity
+    plan = install.build_install_plan({"mgs2": (game, steam)}, {"mgs2": opts}, {"mgs2": components})
+  File "<worker-seat>/install.py", line 3961, in build_install_plan
+    _plan_json(per_game[key]), _plan_packages(key, components),
+  File "<worker-seat>/install.py", line 3927, in _plan_packages
+    raise ReplanRequired("Supplied audio acceptance changed; select and confirm again")
+install.ReplanRequired: Supplied audio acceptance changed; select and confirm again
+
+exit=1
+Corrected refusal is expected: original exploit is stopped before prepare/execute; real collection/all-game zero-mutation covered in regression suite.
+
+Retry transient disappearing app capture ref at 67c7bbf873ea6405519f3fb43f738541d4041044
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/12-install-plan-engine (this machine's copy): 6 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix (this machine's copy): 9 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 2 commit(s) after the Verifier's review -- Brain checks them
+  worker/16-volume1-qol-upgrade: 4 commit(s), last 2026-10-09; batch 16-volume1-qol-upgrade: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 4 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 13 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch, 17-delivery-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 5 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 8 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 1 commit(s) after the Verifier's review -- Brain checks them
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/12-install-plan-engine; 1 uncommitted change(s)
+  not on GitHub yet: worker/12-install-plan-engine (1 commit(s)), worker/14-mgs4-patriotfix (1 commit(s))
+  uncommitted changes in linked checkout <local>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-14-mgs4-patriotfix
+  finished checkouts (clean, and their work is merged) that can be removed: <local>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 12-install-plan-engine
+exit=0
+
+Correction initial attempts (working tree based on 8297142978fc2b6932fc2c0af9485b4b074e09c5):
+$ python3 -m pytest tests/test_audio.py tests/test_install_plan.py -q
+1 failed, 64 passed in 4.59s; exit=1
+Existing identity fixture bypassed collection and lacked acceptance metadata; changed fixture to use real collection.
+$ python3 -m pytest tests/test_audio_acceptance.py tests/test_install_plan.py tests/test_audio.py -q
+1 failed, 84 passed in 5.10s; exit=1
+Success assertion used generic archive member instead of confident fixture clip0000.sdt; corrected assertion.
+$ python3 -m pytest tests/test_audio_acceptance.py tests/test_install_plan.py tests/test_audio.py -q
+85 passed in 14.42s; exit=0
+$ python3 -m pytest tests/test_audio_acceptance.py -q
+2 failed, 21 passed in 3.63s; exit=1
+Unknown-mod filename lacked complete Nexus suffix; ambiguous fixture actually classified mismatch. Corrected fixture shapes without classifier changes.
+$ python3 -m pytest tests/test_audio_acceptance.py -q
+23 passed in 5.85s; exit=0
+$ git diff --check
+Install-MGS-Mods.cmd:5: trailing whitespace (required CRLF); exit=2
+CR-aware diff check at production commit passed; Windows shortcut line endings independently asserted.
