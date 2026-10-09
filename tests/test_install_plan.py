@@ -9,7 +9,7 @@ import sys
 import pytest
 
 import install
-from conftest import build_zip, make_steam_root
+from conftest import build_zip, make_steam_root, FakeUI
 
 
 def world(tmp_path):
@@ -128,12 +128,14 @@ def test_stale_inputs_refuse_all_game_writes(tmp_path, monkeypatch, patch_downlo
 def test_archive_identity_and_audio_incompatibility(tmp_path):
     found, options = world(tmp_path)
     archive = build_zip(tmp_path / "audio.zip", {"us/demo/demo.sdt": b"audio"})
-    components = install.order_audio_components("mgs3", {"base": archive})
+    components = install.collect_audio_archives(
+        FakeUI(checklist=[["mgs3:base"]], files=[str(archive)], yesno=[True]), ["mgs3"])["mgs3"]
     plan = install.build_install_plan(found, options, {"mgs3": components})
     archive.write_bytes(b"changed")
     with pytest.raises(install.ReplanRequired, match="archive changed"):
         install.CurrentRecipeAdapter(lambda _: None).recheck(plan)
-    components = install.order_audio_components("mgs3", {"base": archive}) * 2
+    build_zip(archive, {"us/demo/demo.sdt": b"audio"})
+    components = components * 2
     with pytest.raises(ValueError, match="Incompatible"):
         install.build_install_plan(found, options, {"mgs3": components})
 

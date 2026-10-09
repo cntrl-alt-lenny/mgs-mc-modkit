@@ -8,12 +8,23 @@ class ReplanRequired(RuntimeError):
 
 
 @dataclass(frozen=True)
+class AudioAcceptance:
+    source: str
+    sha256: str
+    game: str
+    role: str
+    classification: str
+    explicit: bool
+
+
+@dataclass(frozen=True)
 class PlanPackage:
     name: str
     version: str
     source: str
     sha256: str
     role: str = "package"
+    acceptance: object = None
 
 
 @dataclass(frozen=True)
@@ -49,6 +60,15 @@ class InstallPlan:
                 if len(package.sha256) != 64 or any(
                         c not in "0123456789abcdef" for c in package.sha256):
                     raise ValueError("Payload requires an exact SHA-256 identity")
+                if package.role != "package":
+                    accepted = package.acceptance
+                    if (not isinstance(accepted, AudioAcceptance) or
+                            (accepted.source, accepted.sha256, accepted.game, accepted.role) !=
+                            (package.source, package.sha256, game.key, package.role) or
+                            accepted.classification not in
+                            ("ok", "unknown_mod", "missing_identity", "mismatch", "ambiguous") or
+                            (accepted.classification != "ok" and accepted.explicit is not True)):
+                        raise ReplanRequired("Supplied audio acceptance is missing or changed; select and confirm again")
 
 
 @dataclass(frozen=True)
