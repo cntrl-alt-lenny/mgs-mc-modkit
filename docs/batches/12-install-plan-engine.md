@@ -12,11 +12,11 @@ Preserved entry points, independently selectable ordered audio components, mod-s
 
 ## Checked
 
-Production/test commit: `6a1e8765c6a991e8b71015d2600e1926dbaf3e81`. Actual commands, output excerpts and exit codes: [evidence](evidence/12-install-plan-engine.txt).
+Production/test commit: `ff10ab5629a8564692fb7379bcdba8f3513bb8cf`. Actual commands, output excerpts and exit codes: [evidence](evidence/12-install-plan-engine.txt).
 
 | Command | Actual output | Exit |
 |:--|:--|:--|
-| `python3 -m pytest tests/ -q` | `312 passed in 22.62s` | 0 |
+| `python3 -m pytest tests/ -q` | `312 passed in 9.95s` | 0 |
 | `python3 -m ruff check .` | `All checks passed!` | 0 |
 | `python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py` | no output | 0 |
 | `python3 tools/embed_install_plan.py --check` | standalone/source match | 0 |
@@ -28,8 +28,8 @@ Tests include late failure with zero earlier mutation, stale inputs/cache/recove
 
 ## Not checked
 
-NOT RUN: native Windows/Steam Deck game boots, real install→repair→remove, licensed/user-supplied audio, native Config Tool and GUI rendering. `desktop-file-validate` unavailable on this Mac. Cross-platform CI and independent Verifier review remain required. No MGS4 integration, new profile/game, release, merge or tag.
+NOT RUN: native Windows/Steam Deck game boots, real install→repair→remove, licensed/user-supplied audio, native Config Tool and GUI rendering. `desktop-file-validate` unavailable on this Mac. Independent Verifier review remains required; cross-platform CI results are on the draft PR. No MGS4 integration, new profile/game, release, merge or tag.
 
 ## Failed or blocked
 
-No implementation blocker. Initial fault-hook, exception-expectation and Ruff failures were corrected and retained in evidence. Framework 4.0.1 availability is Brain-owned; unrelated seats were preserved. Brain coordinates integration order with Worker 16 and exact-commit Checked review.
+No implementation blocker. Initial fault-hook, exception-expectation, Ruff and Windows UTF-8 parity-test failures were corrected and retained in evidence. Framework 4.0.1 availability is Brain-owned; unrelated seats were preserved. Brain coordinates integration order with Worker 16 and exact-commit Checked review.
