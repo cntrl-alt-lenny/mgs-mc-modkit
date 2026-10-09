@@ -96,12 +96,23 @@ class ReplanRequired(RuntimeError):
 
 
 @dataclass(frozen=True)
+class AudioAcceptance:
+    source: str
+    sha256: str
+    game: str
+    role: str
+    classification: str
+    explicit: bool
+
+
+@dataclass(frozen=True)
 class PlanPackage:
     name: str
     version: str
     source: str
     sha256: str
     role: str = "package"
+    acceptance: object = None
 
 
 @dataclass(frozen=True)
@@ -137,6 +148,15 @@ class InstallPlan:
                 if len(package.sha256) != 64 or any(
                         c not in "0123456789abcdef" for c in package.sha256):
                     raise ValueError("Payload requires an exact SHA-256 identity")
+                if package.role != "package":
+                    accepted = package.acceptance
+                    if (not isinstance(accepted, AudioAcceptance) or
+                            (accepted.source, accepted.sha256, accepted.game, accepted.role) !=
+                            (package.source, package.sha256, game.key, package.role) or
+                            accepted.classification not in
+                            ("ok", "unknown_mod", "missing_identity", "mismatch", "ambiguous") or
+                            (accepted.classification != "ok" and accepted.explicit is not True)):
+                        raise ReplanRequired("Supplied audio acceptance is missing or changed; select and confirm again")
 
 
 @dataclass(frozen=True)
@@ -3184,7 +3204,7 @@ def audio_recommendation_note(audio: dict) -> str:
 
 # -- interactive collection -------------------------------------------------
 def request_audio_archive(ui: UI, game_key: str, role: str,
-                          chosen: dict[str, tuple]) -> Path | None:
+                          chosen: dict[str, tuple], accepted=None) -> Path | None:
     """Ask for ONE component's archive: Select file / Open Nexus / Skip.
 
     `chosen` maps already-picked resolved-path -> (game, role) so the same file
@@ -3200,7 +3220,7 @@ def request_audio_archive(ui: UI, game_key: str, role: str,
     while True:
         if sel:
             p = Path(sel).resolve()
-            verdict = _accept_audio_file(ui, p, game_key, role, chosen, rspec)
+            verdict = _accept_audio_file(ui, p, game_key, role, chosen, rspec, accepted)
             if verdict is not None:
                 return verdict
         choice = ui.menu(
@@ -3223,7 +3243,7 @@ def request_audio_archive(ui: UI, game_key: str, role: str,
 
 
 def _accept_audio_file(ui: UI, p: Path, game_key: str, role: str,
-                       chosen: dict[str, tuple], rspec: dict) -> Path | None:
+                       chosen: dict[str, tuple], rspec: dict, accepted=None) -> Path | None:
     """Vet one chosen file. Returns it if usable, else None to re-ask.
 
     Files that are clearly not MGS audio, or belong to the other game, are
@@ -3237,24 +3257,36 @@ def _accept_audio_file(ui: UI, p: Path, game_key: str, role: str,
         ui.info(f"{p.name}\n\nThat file is already being used for {other}. "
                 "Please choose a different one.")
         return None
-    verdict, msg = validate_audio_for_role(p, game_key, role)
-    if verdict == "ok":
-        return p
-    if verdict in ("not_audio", "wrong_game"):
-        ui.info(f"{p.name}\n\nThis {msg}.\n\nPlease choose a different file.")
+    # Bracket both classification and user confirmation with the same digest.
+    # A path alone never proves which bytes the user selected or confirmed.
+    try:
+        if p.is_symlink() or not p.is_file():
+            raise OSError("not a regular archive")
+        digest = sha256_file(p)
+        verdict, msg = validate_audio_for_role(p, game_key, role)
+        if sha256_file(p) != digest:
+            raise OSError("archive changed during classification")
+        if verdict in ("not_audio", "wrong_game"):
+            ui.info(f"{p.name}\n\nThis {msg}.\n\nPlease choose a different file.")
+            return None
+        if verdict != "ok":
+            if verdict == "mismatch":
+                text = f"This {msg}, not {name}."
+            elif verdict == "ambiguous":
+                text = f"This appears to be {msg} could not be confirmed."
+            else:
+                text = f"This {msg}."
+            if not ui.yesno(f"{p.name}\n\n{text}\n\nUse it as your {name} file anyway?"):
+                return None
+        if p.is_symlink() or not p.is_file() or sha256_file(p) != digest:
+            raise OSError("archive changed during confirmation")
+    except OSError as e:
+        ui.info(f"{p.name}\n\nFile could not be accepted: {e}. Please select it again.")
         return None
-    if verdict == "unknown_mod":
-        return p if ui.yesno(f"{p.name}\n\nThis {msg}.\n\n"
-                             f"Use it as your {name} file anyway?") else None
-    if verdict == "missing_identity":
-        return p if ui.yesno(f"{p.name}\n\nThis {msg}.\n\n"
-                             f"Use it as your {name} file anyway?") else None
-    if verdict == "mismatch":
-        return p if ui.yesno(f"{p.name}\n\nThis {msg}, not {name}.\n\n"
-                             f"Use it as your {name} file anyway?") else None
-    # ambiguous — right game, but the exact file can't be confirmed
-    return p if ui.yesno(f"{p.name}\n\nThis appears to be {msg} could not be "
-                         f"confirmed.\n\nUse it as your {name} file?") else None
+    if accepted is not None:
+        accepted[str(p)] = AudioAcceptance(str(p.resolve()), digest, game_key,
+                                           role, verdict, verdict != "ok")
+    return p
 
 
 def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
@@ -3283,6 +3315,7 @@ def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
         return {}
     picked = set(picked)
     chosen: dict[str, tuple] = {}
+    accepted = {}
     audio: dict[str, list[dict]] = {}
     for game in ("mgs2", "mgs3"):
         if game not in hdfix_keys:
@@ -3290,12 +3323,14 @@ def collect_audio_archives(ui: UI, hdfix_keys) -> dict[str, list[dict]]:
         provided: dict[str, Path] = {}
         for role in AUDIO_SPECS[game]["order"]:     # base, hq, update
             if f"{game}:{role}" in picked:
-                p = request_audio_archive(ui, game, role, chosen)
+                p = request_audio_archive(ui, game, role, chosen, accepted)
                 if p is not None:
                     provided[role] = p
                     chosen[str(p)] = (game, role)
         if provided:
             audio[game] = order_audio_components(game, provided)
+            for component in audio[game]:
+                component["acceptance"] = accepted[str(component["path"])]
     return audio
 
 
@@ -3884,9 +3919,15 @@ def _plan_packages(key, components):
             path = Path(comp["path"])
             if path.is_symlink() or not path.is_file():
                 raise ValueError("Supplied audio must be a regular archive")
+            accepted = comp.get("acceptance")
+            if (not isinstance(accepted, AudioAcceptance) or
+                    (accepted.source, accepted.game, accepted.role) !=
+                    (str(path.resolve()), key, comp["role"]) or
+                    sha256_file(path) != accepted.sha256):
+                raise ReplanRequired("Supplied audio acceptance changed; select and confirm again")
             packages.append(PlanPackage(comp["status"], comp["filename"],
-                                        str(path.resolve()), sha256_file(path),
-                                        comp["role"]))
+                                        accepted.source, accepted.sha256,
+                                        comp["role"], accepted))
         packages.append(PlanPackage(f"{g['short']} Community Bugfix Compilation",
                                     g["bugfix_version"], g["bugfix_url"],
                                     g["bugfix_sha256"]))
@@ -4046,8 +4087,8 @@ class CurrentRecipeAdapter:
             for package in game.packages:
                 if package.role != "package":
                     status, reason = validate_audio_for_role(Path(package.source), game.key, package.role)
-                    if status in ("not_audio", "wrong_game", "mismatch"):
-                        raise ValueError(reason)
+                    if status != package.acceptance.classification:
+                        raise ReplanRequired("Supplied audio classification changed; select and confirm again")
                     # Existing audio recipe/record naming stays unchanged.
                     install_better_audio(tx, [{"path": package.source, "log": package.name,
                                                "status": package.name, "filename": package.version}], self.log)
