@@ -20,6 +20,8 @@ Confirmed unchanged mod-specific recipes, transaction/removal correction, 61-inp
 
 Candidate source/five authentic archives and independent raw-header refusal pass again. The Verifier's synthetic-provenance NOTE is valid: structural success explicitly retains independent native review and does not authorize adoption. Shipping values remain unchanged.
 
+Handoff commit `dad60c882713fddb08075bf49d478807be67aefa`: 283 tests, lint, compilation, framework checks, production isolation and six-copy pinned-source comparisons pass; see `handoff-checks.txt` and `handoff-guidance-checks.txt`.
+
 ## Not checked
 
 Final independent review of combined commit remains pending. Native exports, GUI/ASI initialization, licensed Windows/Deck boots/gameplay, real user audio and real-device repair/removal remain NOT RUN. No shipping upgrade or release is approved.

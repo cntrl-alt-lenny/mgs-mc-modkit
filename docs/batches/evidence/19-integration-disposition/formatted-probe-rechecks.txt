@@ -1,0 +1,17 @@
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/19-integration-disposition/findings.py .worktrees/verifier-12-install-plan-engine original
+Reviewed SHA: 73d7b4582e85ac6a0f358c8666553d83ad814f05
+staging ORIGINAL FAILURE: NotADirectoryError {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "previous setup restored"}
+rollback ORIGINAL FAILURE: NotADirectoryError {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "previous setup restored"}
+backups ORIGINAL FAILURE: NotADirectoryError {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "previous setup restored"}
+cache ORIGINAL FAILURE: unconfirmed ASI installed {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "installed and verified"}
+All fixtures disposable; native games NOT RUN
+exit 0
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/19-integration-disposition/findings.py .worktrees/worker-14-mgs4-patriotfix corrected
+Reviewed SHA: 868bebf712a7c11edcecd8b3afc636291a379cc4
+staging REFUSED BEFORE ANY GAME WRITE: Invalid transaction directory; backups kept
+rollback REFUSED BEFORE ANY GAME WRITE: Invalid transaction directory; backups kept
+backups REFUSED BEFORE ANY GAME WRITE: Invalid transaction directory; backups kept
+cache REFUSED BEFORE TARGET TRANSACTION: Prepared payload changed; prepare a fresh plan {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "not changed; inspect recovery record / lock"}
+during-use PASS: original cached bytes replaced; private replay remains authenticated
+All fixtures disposable; native games NOT RUN
+exit 0
