@@ -1,0 +1,15 @@
+$ git rev-parse HEAD
+ae062b82eb016e46635f833b59e3f1083ec74a10
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ git diff --exit-code origin/main -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop docs/agents tools/fw.py tests/test_framework.py
+
+exit 0
+
+$ git diff --check
+
+exit 0
