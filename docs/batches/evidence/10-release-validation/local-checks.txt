@@ -1,0 +1,74 @@
+Candidate: 15d9277196e7bd1cfbd45fe280a230050b276bed
+Captured UTC: 2026-10-07T13:15:00.883501Z
+Host: Darwin; Python 3.9.6
+Commands run from repository root. Local checkout paths are replaced by <checkout>; output trailing whitespace removed.
+
+$ git rev-parse HEAD
+15d9277196e7bd1cfbd45fe280a230050b276bed
+exit=0
+
+$ uname -s
+Darwin
+exit=0
+
+$ python3 --version
+Python 3.9.6
+exit=0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 26%]
+........................................................................ [ 52%]
+........................................................................ [ 79%]
+.........................................................                [100%]
+273 passed in 5.98s
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  up to date with the latest release (4.0.0)
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/09-framework-pin: 2 commit(s), last 2026-10-07; Brain's own change (Small path): ready for your yes, or still being written
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/10-release-validation; 2 uncommitted change(s)
+  not on GitHub yet: brain/09-framework-pin (2 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <linked-checkout> -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain whether brain/09-framework-pin is ready for your yes
+exit=0
+
+$ python3 docs/batches/evidence/10-release-validation/verify-pins.py
+MODKIT_VERSION=2.3.0
+install.py SHA-256=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5
+install.py: LF only
+Install-MGS-Mods.desktop: TAG=v2.3.0, SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5, LF only
+Install-MGS-Mods.cmd: TAG=v2.3.0, SHA=a0bed642eb5b8c7a2c6521876e498f71ef8359b20927b5733e83fdb7eb22d7e5, CRLF only
+Versioned release notes exist; both shortcut pins match
+exit=0
+
+$ sh -c 'command -v desktop-file-validate'
+exit=1
+
+$ bsdtar --version
+bsdtar 3.5.3 - libarchive 3.7.4 zlib/1.2.12 liblzma/5.4.3 bz2lib/1.0.8
+exit=0
+
+$ sh -c 'test -f "$HOME/.ssh/config"'
+exit=1

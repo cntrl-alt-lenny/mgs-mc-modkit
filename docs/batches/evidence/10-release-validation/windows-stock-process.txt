@@ -1,0 +1,36 @@
+$ Get-Content $STEAM/logs/gameprocess_log.txt | Select-String AppID2131650 (target records only; $STEAM replaces default library prefix)
+[2026-10-07 14:58:53] AppID 2131650 adding PID 11788 as a tracked process ""$STEAM\steamapps\common\MGS3\launcher.exe""
+[2026-10-07 14:58:54] SSGL: change [2131650] LCT 256247744->0
+[2026-10-07 15:00:03] AppID 2131650 adding PID 52744 as a tracked process ""METAL GEAR SOLID3.exe" -region us -lan en -selfregion EU -launcherpath launcher.exe -ctrltype XBOX"
+[2026-10-07 15:04:39] AppID 2131650 no longer tracking PID 52744, exit code -1073741819
+[2026-10-07 15:04:39] AppID 2131650 no longer tracking PID 11788, exit code 0
+[2026-10-07 15:04:39] Remove 2131650 from running list
+exit=0
+$ Get-WinEvent Application, last10minutes, provider Application Error, message METAL GEAR (target Id1000 only)
+TimeCreated: 2026-10-07T15:04:13.5815388+01:00 Id: 1000
+Faulting application name: METAL GEAR SOLID3.exe, version: 3.0.0.0, time stamp: 0x6980b92f
+Faulting module name: METAL GEAR SOLID3.exe, version: 3.0.0.0, time stamp: 0x6980b92f
+Exception code: 0xc0000005
+Fault offset: 0x0000000000115f64
+Faulting process id: 0xCE08
+Faulting application start time: 0x1DD5664260564BF
+Faulting application path: $STEAM\steamapps\common\MGS3\METAL GEAR SOLID3.exe
+Faulting module path: $STEAM\steamapps\common\MGS3\METAL GEAR SOLID3.exe
+Report Id: e1630290-c5f5-4c13-8740-beaedf3c619a
+Faulting package full name: 
+Faulting package-relative application ID: 
+exit=0
+$ Get-Content $STEAM/logs/gameprocess_log.txt | Select-String AppID2131640 (target records only)
+[2026-10-07 15:05:27] AppID 2131640 adding PID 70076 as a tracked process ""$STEAM\steamapps\common\MGS2\launcher.exe""
+[2026-10-07 15:05:28] SSGL: change [2131640] LCT 245436064->0
+[2026-10-07 15:07:56] AppID 2131640 adding PID 62704 as a tracked process ""METAL GEAR SOLID2.exe" -region eu -lan en -selfregion EU -launcherpath launcher.exe -ctrltype XBOX"
+[2026-10-07 15:11:51] AppID 2131640 no longer tracking PID 62704, exit code 0
+[2026-10-07 15:11:51] AppID 2131640 no longer tracking PID 70076, exit code 0
+[2026-10-07 15:11:51] Remove 2131640 from running list
+exit=0
+$ Get-Content $STEAM/logs/gameprocess_log.txt | Select-String AppID2131630 (target records only)
+[2026-10-07 15:12:27] AppID 2131630 adding PID 45004 as a tracked process ""$STEAM\steamapps\common\MGS1\METAL GEAR SOLID.exe""
+[2026-10-07 15:12:28] SSGL: change [2131630] LCT 245432640->0
+[2026-10-07 15:13:44] AppID 2131630 no longer tracking PID 45004, exit code 0
+[2026-10-07 15:13:44] Remove 2131630 from running list
+exit=0

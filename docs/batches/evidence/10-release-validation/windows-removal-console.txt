@@ -1,0 +1,41 @@
+Actual session61064 terminal output; ANSI cursor sequences omitted and personal paths replaced by $STEAM/$USERPROFILE. Input lines preserved. This is the backend-selection harness, not a completed native-GUI smoke run.
+
+$ py -3 -u -c "import runpy,sys;sys.modules['tkinter']=None;sys.argv=['install.py','--uninstall'];runpy.run_path('install.py',run_name='__main__')"
+MGS Mod Kit 2.3.0; platform=win32; Python=3.12.10
+Diagnostic log: $USERPROFILE\AppData\Local\MGSModKit\logs\20261007T151504Z-e85a664e.log
+
+MGS Mod Kit — Uninstall
+Remove this kit's mods from:
+  [0] x Metal Gear Solid 2: Sons of Liberty  ($STEAM\steamapps\common\MGS2)
+  [1] x Metal Gear Solid 3: Snake Eater  ($STEAM\steamapps\common\MGS3)
+  [2] x Metal Gear Solid (1)  ($STEAM\steamapps\common\MGS1)
+Enter numbers to toggle (space-separated, blank=keep defaults, 'c'=cancel):
+[actual input: Return, blank]
+Uninstall this kit's mods from MGS2, MGS3, MGS1?
+
+Files this kit added will be removed and any originals it backed up restored. Your game saves are untouched.
+
+Make sure THE GAMES AND STEAM'S DOWNLOADS ARE CLOSED. Proceed? [y/N] y
+
+=== Uninstalling Metal Gear Solid 2: Sons of Liberty ===
+    • removed 486 installed file(s)
+    • restored 9875 original file(s) from backup
+    • removed the mgs-modkit backup/manifest folder
+
+=== Uninstalling Metal Gear Solid 3: Snake Eater ===
+    • removed 672 installed file(s)
+    • restored 3790 original file(s) from backup
+    • removed the mgs-modkit backup/manifest folder
+
+=== Uninstalling Metal Gear Solid (1) ===
+    • removed 7 installed file(s)
+    • removed the mgs-modkit backup/manifest folder
+
+=== MGS Mod Kit ===
+✅ Mods removed from MGS2, MGS3, MGS1.
+
+The mods leave behind a 'logs' folder and steam_appid.txt — delete those if you want the folder spotless.
+
+(Steam's Verify integrity restores original game files, but it will not delete leftover mod files.)
+
+Actual process exit=0. No verification-required note; read-only hash/presence audit follows separately.

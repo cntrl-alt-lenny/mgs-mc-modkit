@@ -1,0 +1,24 @@
+[
+    {
+        "phase":  "initial",
+        "copy_files":  14,
+        "copy_bytes":  17796551,
+        "protected_copy_hash_mismatch_count":  0,
+        "protected_copy_hash_mismatches":  [
+
+                                           ],
+        "current_source_copy_all_equal":  false,
+        "inventory_command_exit":  1
+    },
+    {
+        "phase":  "prekit",
+        "copy_files":  16,
+        "copy_bytes":  17799742,
+        "protected_copy_hash_mismatch_count":  0,
+        "protected_copy_hash_mismatches":  [
+
+                                           ],
+        "current_source_copy_all_equal":  false,
+        "inventory_command_exit":  1
+    }
+]

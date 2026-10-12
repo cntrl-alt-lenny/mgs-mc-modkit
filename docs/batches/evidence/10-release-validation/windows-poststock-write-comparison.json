@@ -1,0 +1,62 @@
+{
+  "before_phase": "removed-before-stock-boots",
+  "after_phase": "closed-after-poststock-boots",
+  "before_scope": "all common files + userdata",
+  "after_scope": "managed + saves + executables",
+  "games": [
+    {
+      "game": "MGS1",
+      "before_files": 7,
+      "after_files": 1,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "restored_originals_compared": null,
+      "restored_original_mismatches": null,
+      "save_changes": [],
+      "userdata_changes": [],
+      "shared_file_changes": [],
+      "before_only_snapshot_files": null,
+      "added_files": []
+    },
+    {
+      "game": "MGS2",
+      "before_files": 34584,
+      "after_files": 9,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "restored_originals_compared": null,
+      "restored_original_mismatches": null,
+      "save_changes": [
+        "mgs2_savedata_win/<account>/launcher/usersv"
+      ],
+      "userdata_changes": [
+        "userdata/<account>/2131640/remotecache.vdf"
+      ],
+      "shared_file_changes": [
+        "mgs2_savedata_win/<account>/launcher/usersv"
+      ],
+      "before_only_snapshot_files": null,
+      "added_files": []
+    },
+    {
+      "game": "MGS3",
+      "before_files": 54933,
+      "after_files": 7,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "restored_originals_compared": null,
+      "restored_original_mismatches": null,
+      "save_changes": [
+        "mgs3_savedata_win/<account>/launcher/usersv"
+      ],
+      "userdata_changes": [
+        "userdata/<account>/2131650/remotecache.vdf"
+      ],
+      "shared_file_changes": [
+        "mgs3_savedata_win/<account>/launcher/usersv"
+      ],
+      "before_only_snapshot_files": null,
+      "added_files": []
+    }
+  ]
+}

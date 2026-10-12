@@ -1,0 +1,74 @@
+{
+  "before_phase": "pre-kit-after-stock",
+  "after_phase": "removed-before-stock-boots",
+  "before_scope": "all common files + userdata",
+  "after_scope": "all common files + userdata",
+  "games": [
+    {
+      "game": "MGS1",
+      "before_files": 5,
+      "after_files": 7,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "restored_originals_compared": null,
+      "restored_original_mismatches": null,
+      "save_changes": [],
+      "userdata_changes": [
+        "userdata/<account>/2131630/remote/data_008_0000.bin",
+        "userdata/<account>/2131630/remotecache.vdf"
+      ],
+      "shared_file_changes": [],
+      "before_only_snapshot_files": [],
+      "added_files": [
+        "MGSM2Fix.log",
+        "winbackup/meta_008_0000.bin"
+      ]
+    },
+    {
+      "game": "MGS2",
+      "before_files": 34583,
+      "after_files": 34584,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "restored_originals_compared": null,
+      "restored_original_mismatches": null,
+      "save_changes": [
+        "mgs2_savedata_win/<account>/launcher/usersv",
+        "mgs2_savedata_win/MGS2-Community-Bugfix-Compilation_version_check.txt"
+      ],
+      "userdata_changes": [
+        "userdata/<account>/2131640/remotecache.vdf"
+      ],
+      "shared_file_changes": [
+        "mgs2_savedata_win/<account>/launcher/usersv"
+      ],
+      "before_only_snapshot_files": [],
+      "added_files": [
+        "mgs2_savedata_win/MGS2-Community-Bugfix-Compilation_version_check.txt"
+      ]
+    },
+    {
+      "game": "MGS3",
+      "before_files": 54932,
+      "after_files": 54933,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "restored_originals_compared": null,
+      "restored_original_mismatches": null,
+      "save_changes": [
+        "mgs3_savedata_win/<account>/launcher/usersv",
+        "mgs3_savedata_win/MGS3-Community-Bugfix-Compilation_version_check.txt"
+      ],
+      "userdata_changes": [
+        "userdata/<account>/2131650/remotecache.vdf"
+      ],
+      "shared_file_changes": [
+        "mgs3_savedata_win/<account>/launcher/usersv"
+      ],
+      "before_only_snapshot_files": [],
+      "added_files": [
+        "mgs3_savedata_win/MGS3-Community-Bugfix-Compilation_version_check.txt"
+      ]
+    }
+  ]
+}

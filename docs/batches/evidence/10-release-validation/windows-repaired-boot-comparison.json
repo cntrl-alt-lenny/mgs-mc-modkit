@@ -1,0 +1,49 @@
+{
+  "before_phase": "repaired-before-boots",
+  "after_phase": "closed-before-removal",
+  "before_scope": "managed + saves + executables",
+  "after_scope": "managed + saves + executables",
+  "games": [
+    {
+      "game": "MGS1",
+      "before_files": 9,
+      "after_files": 9,
+      "original_backups": 0,
+      "backup_mismatches_against_before": [],
+      "save_changes": [],
+      "userdata_changes": [
+        "userdata/<account>/2131630/remote/data_008_0000.bin",
+        "userdata/<account>/2131630/remotecache.vdf"
+      ],
+      "shared_file_changes": [
+        "MGSM2Fix.ini"
+      ],
+      "before_only_snapshot_files": [],
+      "added_files": []
+    },
+    {
+      "game": "MGS2",
+      "before_files": 20245,
+      "after_files": 20245,
+      "original_backups": 9875,
+      "backup_mismatches_against_before": [],
+      "save_changes": [],
+      "userdata_changes": [],
+      "shared_file_changes": [],
+      "before_only_snapshot_files": [],
+      "added_files": []
+    },
+    {
+      "game": "MGS3",
+      "before_files": 8259,
+      "after_files": 8259,
+      "original_backups": 3790,
+      "backup_mismatches_against_before": [],
+      "save_changes": [],
+      "userdata_changes": [],
+      "shared_file_changes": [],
+      "before_only_snapshot_files": [],
+      "added_files": []
+    }
+  ]
+}

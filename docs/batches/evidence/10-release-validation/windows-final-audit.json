@@ -1,0 +1,83 @@
+{
+  "utc": "2026-10-07T15:48:46.079225+00:00",
+  "games": [
+    {
+      "game": "MGS1",
+      "appid": "2131630",
+      "buildid": "20872173",
+      "StateFlags": "4",
+      "exe_sha256": "e320062847ec71a52292e9931bcf2ee33ea6586429ecb2a38e567ab37b66c373",
+      "paths_present": {
+        "winhttp.dll": false,
+        "wininet.dll": false,
+        "d3d11.dll": false,
+        "dinput8.dll": false,
+        "MGSM2Fix64.asi": false,
+        "MGSM2Fix.ini": false,
+        "plugins/MGSHDFix.asi": false,
+        "plugins/MGSHDFix.settings": false,
+        "mgs-modkit": false,
+        "mgs-modkit/manifest.json": false,
+        "mgs-modkit/journal.json": false,
+        "mgs-modkit/backups": false,
+        "mgs-modkit/rollback": false,
+        "mgs-modkit/staging": false,
+        "logs": false,
+        "steam_appid.txt": false,
+        "MGSM2Fix.log": true
+      }
+    },
+    {
+      "game": "MGS2",
+      "appid": "2131640",
+      "buildid": "21578573",
+      "StateFlags": "4",
+      "exe_sha256": "9c8575e6b2d6449636d1a04b63ef8c9e44c3aecf84cadddc27b4874c62688f2b",
+      "paths_present": {
+        "winhttp.dll": false,
+        "wininet.dll": false,
+        "d3d11.dll": false,
+        "dinput8.dll": false,
+        "MGSM2Fix64.asi": false,
+        "MGSM2Fix.ini": false,
+        "plugins/MGSHDFix.asi": false,
+        "plugins/MGSHDFix.settings": false,
+        "mgs-modkit": false,
+        "mgs-modkit/manifest.json": false,
+        "mgs-modkit/journal.json": false,
+        "mgs-modkit/backups": false,
+        "mgs-modkit/rollback": false,
+        "mgs-modkit/staging": false,
+        "logs": false,
+        "steam_appid.txt": false,
+        "MGSM2Fix.log": false
+      }
+    },
+    {
+      "game": "MGS3",
+      "appid": "2131650",
+      "buildid": "22192289",
+      "StateFlags": "4",
+      "exe_sha256": "81596a6a670263da6ee59c959b65cbf833be985e64fa0332ad926271aa060bfe",
+      "paths_present": {
+        "winhttp.dll": false,
+        "wininet.dll": false,
+        "d3d11.dll": false,
+        "dinput8.dll": false,
+        "MGSM2Fix64.asi": false,
+        "MGSM2Fix.ini": false,
+        "plugins/MGSHDFix.asi": false,
+        "plugins/MGSHDFix.settings": false,
+        "mgs-modkit": false,
+        "mgs-modkit/manifest.json": false,
+        "mgs-modkit/journal.json": false,
+        "mgs-modkit/backups": false,
+        "mgs-modkit/rollback": false,
+        "mgs-modkit/staging": false,
+        "logs": false,
+        "steam_appid.txt": false,
+        "MGSM2Fix.log": false
+      }
+    }
+  ]
+}

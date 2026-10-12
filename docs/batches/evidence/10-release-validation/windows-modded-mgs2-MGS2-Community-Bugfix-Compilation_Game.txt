@@ -1,0 +1,52 @@
+﻿[2026-10-07 15:46:52.747] [info] ---------- Logging initialization started ----------
+[2026-10-07 15:46:52.747] [info] Checking for duplicate intallations of MGS2-Community-Bugfix-Compilation.
+[2026-10-07 15:46:52.747] [info] MGS2-Community-Bugfix-Compilation v3.0.0 loaded.
+[2026-10-07 15:46:52.748] [info] ASI plugin location: $STEAM\steamapps\common\MGS2\plugins\MGS2-Community-Bugfix-Compilation.asi
+[2026-10-07 15:46:52.748] [info] ----------
+[2026-10-07 15:46:52.748] [info] Log file: $STEAM\steamapps\common\MGS2\logs\MGS2-Community-Bugfix-Compilation_Game.log
+[2026-10-07 15:46:52.748] [info] ----------
+[2026-10-07 15:46:52.748] [info] Module Name: METAL GEAR SOLID2.exe
+[2026-10-07 15:46:52.748] [info] Module Path: $STEAM\steamapps\common\MGS2\
+[2026-10-07 15:46:52.748] [info] Module Address: 0x7ff776c80000
+[2026-10-07 15:46:52.750] [info] Module Version: 2.1.0
+[2026-10-07 15:46:52.751] [info] ---------- Logging loaded in: 4 ms ----------
+[2026-10-07 15:46:52.751] [info] ---------- Subsystem initialization started ----------
+[2026-10-07 15:46:52.751] [info] ---------- Loading: g_Logging.LogSysInfo() ----------
+[2026-10-07 15:46:52.751] [info] System Details - CPU: AMD Ryzen 7 5800X 8-Core Processor             
+[2026-10-07 15:46:52.751] [info] System Details - GPU 1: NVIDIA GeForce RTX 2060
+[2026-10-07 15:46:52.752] [info] System Details - GPU 5: Virtual Display Driver
+[2026-10-07 15:46:52.752] [info] System Details - RAM: 15.93 GB (16305 MB)
+[2026-10-07 15:46:52.752] [info] System Details - OS:  Windows 11 Pro (26300.9550)
+[2026-10-07 15:46:52.752] [info] ---------- g_Logging.LogSysInfo() loaded in: 1 ms.	Now loading: DetectGame() ----------
+[2026-10-07 15:46:52.752] [info] Detected game: Metal Gear Solid 2 MC (app 2131640)
+[2026-10-07 15:46:52.752] [info] Game Save Path: $STEAM\steamapps\common\MGS2\mgs2_savedata_win
+[2026-10-07 15:46:52.753] [info] ---------- DetectGame() loaded in: 0 ms.	Now loading: Config::Read() ----------
+[2026-10-07 15:46:52.753] [info] Config file: $STEAM\steamapps\common\MGS2\plugins\MGS2-Community-Bugfix-Compilation.ini
+[2026-10-07 15:46:52.753] [info] ---------- Config Parse Results ----------
+[2026-10-07 15:46:52.753] [info] [Update Notifications]
+[2026-10-07 15:46:52.753] [info]     Check For MGS2 Commmunity Bugfix Updates = true
+[2026-10-07 15:46:52.753] [info] ---------- End Config Parse ----------
+[2026-10-07 15:46:52.753] [info] ---------- Config::Read() loaded in: 0 ms.	Now loading: VerifyInstallation::Check() ----------
+[2026-10-07 15:46:53.017] [info] ---------- VerifyInstallation::Check() loaded in: 263 ms.	Now loading: CleanupOutdatedModfiles::Check() ----------
+[2026-10-07 15:46:53.018] [info] Checking for presence of leftover 4x upscaled textures from v2.0.2 -> v2.1.2 update in: $STEAM\steamapps\common\MGS2\textures\flatlist\ovr_stm\_win
+[2026-10-07 15:46:53.019] [info] No leftover 4x upscaled textures from v2.0.2 -> v2.1.2 update found, skipping cleanup.
+[2026-10-07 15:46:53.019] [info] Checking for presence of leftover 2x upscaled textures from v2.0.2 -> v2.1.2 update in: $STEAM\steamapps\common\MGS2\textures\flatlist\ovr_stm\_win
+[2026-10-07 15:46:53.019] [info] No leftover 2x upscaled textures from v2.0.2 -> v2.1.2 update found, skipping cleanup.
+[2026-10-07 15:46:53.020] [info] Checking for presence of leftover 4x upscaled textures from v2.1.0 -> v2.1.1 update in: $STEAM\steamapps\common\MGS2\textures\flatlist\ovr_stm\_win
+[2026-10-07 15:46:53.020] [info] No leftover 4x upscaled textures from v2.1.0 -> v2.1.1 update found, skipping cleanup.
+[2026-10-07 15:46:53.020] [info] Checking for presence of leftover 2x upscaled textures from v2.1.0 -> v2.1.1 update in: $STEAM\steamapps\common\MGS2\textures\flatlist\ovr_stm\_win
+[2026-10-07 15:46:53.020] [info] No leftover 2x upscaled textures from v2.1.0 -> v2.1.1 update found, skipping cleanup.
+[2026-10-07 15:46:53.021] [info] Checking for presence of leftover 4x upscaled textures from v2.1.1 -> v2.1.2 update in: $STEAM\steamapps\common\MGS2\textures\flatlist\ovr_stm\_win
+[2026-10-07 15:46:53.021] [info] No leftover 4x upscaled textures from v2.1.1 -> v2.1.2 update found, skipping cleanup.
+[2026-10-07 15:46:53.022] [info] Checking for presence of leftover 2x upscaled textures from v2.1.1 -> v2.1.2 update in: $STEAM\steamapps\common\MGS2\textures\flatlist\ovr_stm\_win
+[2026-10-07 15:46:53.022] [info] No leftover 2x upscaled textures from v2.1.1 -> v2.1.2 update found, skipping cleanup.
+[2026-10-07 15:46:53.023] [info] ---------- CleanupOutdatedModfiles::Check() loaded in: 5 ms.	Now loading: CheckForUpdates() ----------
+[2026-10-07 15:46:53.024] [info] Version Check: No cache found. Contacting GitHub.com API for latest version.
+[2026-10-07 15:46:53.024] [info] Version Check: Contacting GitHub.com API...
+[2026-10-07 15:46:53.407] [info] Version Check: MGS2-Community-Bugfix-Compilation is up to date.
+[2026-10-07 15:46:53.407] [info] ---------- CheckForUpdates() loaded in: 384 ms.	Now loading: Util::ShutdownSHA1Provider() ----------
+[2026-10-07 15:46:53.407] [info] SHA1Check: SHA-1 provider shut down.
+[2026-10-07 15:46:53.408] [info] ---------- Util::ShutdownSHA1Provider() loaded in: 0 ms. ----------
+[2026-10-07 15:46:53.408] [info] ---------- All initial systems completed loading in: 661 ms. ----------
+[2026-10-07 15:46:53.408] [info] All systems initialized. shutting down MGS2-Community-Bugfix-Compilation.
+

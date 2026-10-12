@@ -1,0 +1,10 @@
+[2026-10-07 16:32:24] AppID 2131630 adding PID 9376 as a tracked process ""$STEAM\steamapps\common\MGS1\METAL GEAR SOLID.exe""
+[2026-10-07 16:33:09] AppID 2131630 no longer tracking PID 9376, exit code 0
+[2026-10-07 16:34:36] AppID 2131640 adding PID 30292 as a tracked process ""$STEAM\steamapps\common\MGS2\launcher.exe""
+[2026-10-07 16:35:35] AppID 2131640 adding PID 29724 as a tracked process ""METAL GEAR SOLID2.exe" -region eu -lan en -selfregion EU -launcherpath launcher.exe -ctrltype XBOX"
+[2026-10-07 16:39:47] AppID 2131640 no longer tracking PID 29724, exit code 0
+[2026-10-07 16:39:47] AppID 2131640 no longer tracking PID 30292, exit code 0
+[2026-10-07 16:40:07] AppID 2131650 adding PID 11428 as a tracked process ""$STEAM\steamapps\common\MGS3\launcher.exe""
+[2026-10-07 16:41:06] AppID 2131650 adding PID 45580 as a tracked process ""METAL GEAR SOLID3.exe" -region us -lan en -selfregion EU -launcherpath launcher.exe -ctrltype XBOX"
+[2026-10-07 16:47:32] AppID 2131650 no longer tracking PID 45580, exit code -1073741819
+[2026-10-07 16:47:32] AppID 2131650 no longer tracking PID 11428, exit code 0
