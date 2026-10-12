@@ -1,0 +1,5 @@
+Local prospective integration only; not an accepted merge or CI.
+$ git merge-tree --write-tree 20a199fc1c64cb3b0ccf453f0656686d4e9b8e49 2844fa25cfda89301def7996a93a2ab6f2dec403
+2473b8a289e2150e6b622b3c90de0ac7d512fe98
+exit 0
+The disposable local commit fa714affc09ff8e7b91e358cb81026c89a2ed1a2 named this tree and parents for testing. It was not pushed. Recreate the same tree with the command above; a recreated commit may differ in timestamp/hash.

@@ -1,0 +1,49 @@
+import ast
+import hashlib
+from pathlib import Path
+import re
+import subprocess
+
+old = '03c58903d386c1c9bc0c9671e8c4b60c69ae30b6'
+production = 'd9f13f4a02c3d894689bc21eac9911d619344c2c'
+review = '2844fa25cfda89301def7996a93a2ab6f2dec403'
+main = '20a199fc1c64cb3b0ccf453f0656686d4e9b8e49'
+ci_merge = 'cdb682825cd8560b763ff67509a115e38963f1db'
+prospective = 'fa714affc09ff8e7b91e358cb81026c89a2ed1a2'
+
+def blob(ref, name):
+    return subprocess.check_output(['git', 'show', ref + ':' + name])
+
+a = ast.parse(blob(old, 'install.py'))
+b = ast.parse(blob(review, 'install.py'))
+for tree in (a, b):
+    tree.body = [node for node in tree.body if not isinstance(node, ast.FunctionDef) or node.name != '_plan_validate_record']
+assert ast.dump(a) == ast.dump(b)
+assert subprocess.check_output(['git', 'diff', '--name-only', production, review], text=True).splitlines() == ['docs/batches/14-mgs4-patriotfix-review.md']
+assert blob(review, 'docs/batches/14-mgs4-patriotfix-review.md').endswith(blob(old, 'docs/batches/14-mgs4-patriotfix-review.md'))
+print('PASS production correction limited to validator; review-only delivery; exact historical suffix retained')
+for name in ['install.py', 'install_plan.py', 'Install-MGS-Mods.cmd', 'Install-MGS-Mods.desktop', 'tools/embed_install_plan.py', 'tools/capture_patriot_schema.py']:
+    for ref in [review, ci_merge, prospective]:
+        assert blob(ref, name) == blob(production, name), (ref, name)
+print('PASS reviewed production = delivery = actual CI merge = prospective current-main merge product bytes')
+for name in ['tools/capture_settings_schema.py', 'tools/validate_volume1_candidate.py', 'tools/fw.py', 'docs/agents/framework.json']:
+    assert blob(prospective, name) == blob(main, name), name
+print('PASS prospective merge retains merged candidate tooling and official Framework 4.0.1')
+body = blob(review, 'install.py')
+digest = hashlib.sha256(body).hexdigest()
+for name in ['Install-MGS-Mods.cmd', 'Install-MGS-Mods.desktop']:
+    data = blob(review, name)
+    assert re.search(rb'TAG=v2\.3\.0', data)
+    assert re.search(rb'SHA=' + digest.encode(), data)
+    if name.endswith('.cmd'):
+        assert b'\n' not in data.replace(b'\r\n', b'')
+    else:
+        assert b'\r' not in data
+for name in ['install.py', 'install_plan.py', 'tools/embed_install_plan.py', 'tools/capture_patriot_schema.py']:
+    data = blob(review, name)
+    assert b'\r' not in data
+    ast.parse(data, feature_version=(3, 9))
+print('PASS both unpublished v2.3.0 shortcut tags and SHA ' + digest + '; CMD CRLF; Python/desktop LF; Python 3.9 grammar')
+assert subprocess.check_output(['git', 'show', '-s', '--format=%P', ci_merge], text=True).split() == ['bd8546524886614a04f5629b1fbbf1f741b73163', review]
+assert subprocess.check_output(['git', 'show', '-s', '--format=%P', prospective], text=True).split() == [main, review]
+print('PASS actual CI parents authenticated; local prospective merge uses current main. Local result is not CI.')

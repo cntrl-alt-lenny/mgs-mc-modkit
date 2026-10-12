@@ -1,0 +1,101 @@
+$ git rev-parse HEAD
+fa714affc09ff8e7b91e358cb81026c89a2ed1a2
+exit 0
+
+$ git show -s --format=%H %P HEAD
+fa714affc09ff8e7b91e358cb81026c89a2ed1a2 20a199fc1c64cb3b0ccf453f0656686d4e9b8e49 2844fa25cfda89301def7996a93a2ab6f2dec403
+exit 0
+
+$ python3 /tmp/mgs-brain-acceptance-20261012/identity-current.py
+PASS production correction limited to validator; review-only delivery; exact historical suffix retained
+PASS reviewed production = delivery = actual CI merge = prospective current-main merge product bytes
+PASS prospective merge retains merged candidate tooling and official Framework 4.0.1
+PASS both unpublished v2.3.0 shortcut tags and SHA 3f2b0049358d31679aa5db63d630e74383be771957cf6d3edce3e32e64a39e75; CMD CRLF; Python/desktop LF; Python 3.9 grammar
+PASS actual CI parents authenticated; local prospective merge uses current main. Local result is not CI.
+exit 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 14%]
+........................................................................ [ 29%]
+........................................................................ [ 44%]
+........................................................................ [ 59%]
+........................................................................ [ 74%]
+........................................................................ [ 89%]
+..................................................                       [100%]
+482 passed in 23.17s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py tools/capture_patriot_schema.py
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.1 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  up to date with the latest release (4.0.1)
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 29 commit(s), last 2026-10-12; batch 14-mgs4-patriotfix: Verifier review in -- Brain judges it
+  brain/11-12-briefs: 22 commit(s), last 2026-10-12; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-engine-verifier-dispatch, 12-install-plan-interface, 14-combined-verifier-dispatch, 14-manifest-preflight-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch, 16-volume1-qol-upgrade-verifier-dispatch, 17-delivery-disposition, 18-correction-disposition, 19-integration-disposition, 20-merge-and-record-disposition, 21-manifest-correction-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 10 commit(s), last 2026-10-12; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 9 commit(s), last 2026-10-12; batch 12-install-plan-engine: Verifier review in -- Brain judges it
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on (detached HEAD); no uncommitted changes
+  not on GitHub yet: the detached HEAD (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <local-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to judge batch 14-mgs4-patriotfix
+exit 0
+
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+exit 0
+
+$ python3 /tmp/mgs14-final-verifier/probes.py
+staging CorruptManifestError zero game writes
+rollback CorruptManifestError zero game writes
+backups CorruptManifestError zero game writes
+live-parent ValueError zero game writes
+backup-parent CorruptManifestError zero game writes
+cache-after-commit {'mgs1': 'installed and verified', 'mgs2': 'installed and verified', 'mgs3': 'installed and verified', 'mgs4': 'not changed; inspect recovery record / lock'}
+copy-race {'mgs1': 'installed and verified', 'mgs2': 'installed and verified', 'mgs3': 'installed and verified', 'mgs4': 'not changed; inspect recovery record / lock'}
+source-during-extract {'mgs1': 'installed and verified', 'mgs2': 'installed and verified', 'mgs3': 'installed and verified', 'mgs4': 'installed and verified'}
+late-settings RuntimeError zero game writes
+late-loader RuntimeError zero game writes
+cancel {'mgs1': 'installed and verified', 'mgs2': 'previous setup restored', 'mgs3': 'not started', 'mgs4': 'not started'}
+PASS 11 independent failure/identity/outcome probes
+exit 0
+
+$ python3 /tmp/mgs14-final-verifier/audio.py
+PASS confident selection replacement refuses for combined four-game plan
+PASS explicit uncertain selection replacement refuses for combined four-game plan
+exit 0
+
+$ python3 /tmp/mgs14-final-verifier/space.py
+space 1 visited [1] requirements {1: 536898688, 2: 536874993}
+space 2 visited [1, 2] requirements {1: 536898688, 2: 536874993}
+space None visited [1, 2] requirements {1: 536898688, 2: 536874993}
+PASS independent shared-game and separate-cache volume thresholds; simulated devices, no mounted-device claim
+exit 0
+
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/actual-archive.py /tmp/mgs14-final-verifier/patriot.zip
+PASS official ZIP: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+PASS all four games prepared with actual authenticated PatriotFix ZIP; zero live writes
+PASS mixed execution replays cached actual payload/settings with no network or writer calls
+PASS actual MGS4 repair/removal keeps oldest custom settings, save bytes and unowned legacy ASI
+Native exports/ASI initialization/licensed boots/gameplay/real-device restoration: NOT RUN
+exit 0
+

@@ -1,0 +1,9 @@
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py
+PASS original recipes/writers/InstallTxn/locks/recovery/removal/layout validation unchanged
+PASS authoritative engine/embed tool/audio acceptance tests equal literal Batch 12 input
+Traceback (most recent call last):
+  File "<local-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/brain-14-acceptance/docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py", line 33, in <module>
+    assert (ROOT / name).read_bytes() == git('show', 'c2e7ea470d5c38390238fc8854f31187499ff330:' + name)
+AssertionError
+exit 1
+PASS documented NOTE reproduced: original report predicate fails; latest prior report bytes remain unchanged and original c2e7ea4 report remains readable in Git
