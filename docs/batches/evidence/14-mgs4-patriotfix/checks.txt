@@ -1,0 +1,385 @@
+Evidence portability: local macOS account paths replaced with /Users/<user>/; commands, output and exits otherwise preserved.
+
+$ git rev-parse HEAD
+e5075fb6c0f57bff663937d34aa88b02949f87cf
+exit 0
+
+$ python3 --version
+Python 3.9.6
+exit 0
+
+$ git -C /tmp/mgs-worker14-patriotfix rev-parse HEAD
+c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de
+exit 0
+
+$ git -C /tmp/mgs-worker14-patriotfix ls-remote origin refs/tags/0.2.2
+c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de	refs/tags/0.2.2
+exit 0
+
+$ git -C /tmp/mgs-worker14-patriotfix status --porcelain
+exit 0
+
+$ gh api repos/ShizCalev/MGSPatriotFix/releases/tags/0.2.2 --jq .assets[] | [.name,.size,.browser_download_url]
+["MGS4_MGSPatriotFix_0.2.2.zip",10098924,"https://github.com/ShizCalev/MGSPatriotFix/releases/download/0.2.2/MGS4_MGSPatriotFix_0.2.2.zip"]
+["PW_MGSPatriotFix_0.2.2.zip",10098934,"https://github.com/ShizCalev/MGSPatriotFix/releases/download/0.2.2/PW_MGSPatriotFix_0.2.2.zip"]
+exit 0
+
+$ shasum -a 256 /tmp/mgs-worker14-patriotfix.zip
+4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1  /tmp/mgs-worker14-patriotfix.zip
+exit 0
+
+$ bsdtar -tf /tmp/mgs-worker14-patriotfix.zip
+Launcher/
+Launcher/d3d11.dll
+Launcher/scripts/
+Launcher/scripts/MGSPatriotFix.asi
+logs/
+logs/MGSPatriotFix_Game.log
+logs/MGSPatriotFix_Launcher.log
+logs/UltimateASILoader_LICENSE.md
+MGS4/
+MGS4/scripts/
+MGS4/scripts/MGSPatriotFix.asi
+MGS4/scripts/MGSPatriotFix_LICENSE.md
+MGS4/winmm.dll
+MGSPatriotFix Config Tool.exe
+MGSPatriotFix_README.md
+exit 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 68%]
+........................................................................ [ 91%]
+..........................                                               [100%]
+314 passed in 7.29s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py tools/capture_patriot_schema.py
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 1 commit(s), last 2026-10-08; no summary yet: still working, or stopped without one
+  brain/readme-scope-status: 5 commit(s), last 2026-10-08; batch 13-readme-scope-status: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 4 commit(s), last 2026-10-08; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/14-mgs4-patriotfix; 1 uncommitted change(s)
+  not on GitHub yet: worker/14-mgs4-patriotfix (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: /Users/<user>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 13-readme-scope-status
+exit 0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs-brain13-framework-4.0.0
+Install-MGS-Mods.cmd v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+Install-MGS-Mods.desktop v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+Traceback (most recent call last):
+  File "/Users/<user>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-14-mgs4-patriotfix/docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py", line 37, in <module>
+    old = constants(subprocess.check_output(['git', 'show', base + ':install.py'], cwd=root))
+  File "/Users/<user>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-14-mgs4-patriotfix/docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py", line 30, in constants
+    return {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(body).body
+  File "/Users/<user>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-14-mgs4-patriotfix/docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py", line 30, in <dictcomp>
+    return {n.targets[0].id: ast.literal_eval(n.value) for n in ast.parse(body).body
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ast.py", line 105, in literal_eval
+    return _convert(node_or_string)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ast.py", line 104, in _convert
+    return _convert_signed_num(node)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ast.py", line 78, in _convert_signed_num
+    return _convert_num(node)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ast.py", line 69, in _convert_num
+    _raise_malformed_node(node)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ast.py", line 66, in _raise_malformed_node
+    raise ValueError(f'malformed node or string: {node!r}')
+ValueError: malformed node or string: <ast.JoinedStr object at 0x10734dc70>
+exit 1
+
+
+Corrected final evidence run:
+$ git rev-parse HEAD
+4566bf10b39914bdbe7b0a0b02e5e5f1100f8afb
+exit 0
+
+$ python3 -m pytest tests/ -q
+..........................................................F............. [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 68%]
+........................................................................ [ 91%]
+..........................                                               [100%]
+=================================== FAILURES ===================================
+_____________________ FrameworkHygiene.test_project_checks _____________________
+
+self = <test_framework.FrameworkHygiene testMethod=test_project_checks>
+
+    def test_project_checks(self) -> None:
+        errors = [message for level, message in fw.check_project(ROOT) if level == "error"]
+>       self.assertEqual(errors, [], "\n" + "\n".join(errors))
+E       AssertionError: Lists differ: ['docs/batches/evidence/14-mgs4-patriotfix[1201 chars]lic'] != []
+E
+E       First list contains 4 additional elements.
+E       First extra element 0:
+E       'docs/batches/evidence/14-mgs4-patriotfix/checks.txt:82 contains a macOS home folder; the documents agents read (AGENTS.md, CLAUDE.md, GEMINI.md, docs/state.md, docs/agents/**/*.md, docs/batches/**, and 3.x rounds: docs/rounds/*/*.md and docs/rounds/*/attachments/**) must work on every machine and are public'
+E
+E       Diff is 1361 characters long. Set self.maxDiff to None to see it. :
+E       docs/batches/evidence/14-mgs4-patriotfix/checks.txt:82 contains a macOS home folder; the documents agents read (AGENTS.md, CLAUDE.md, GEMINI.md, docs/state.md, docs/agents/**/*.md, docs/batches/**, and 3.x rounds: docs/rounds/*/*.md and docs/rounds/*/attachments/**) must work on every machine and are public
+E       docs/batches/evidence/14-mgs4-patriotfix/checks.txt:95 contains a macOS home folder; the documents agents read (AGENTS.md, CLAUDE.md, GEMINI.md, docs/state.md, docs/agents/**/*.md, docs/batches/**, and 3.x rounds: docs/rounds/*/*.md and docs/rounds/*/attachments/**) must work on every machine and are public
+E       docs/batches/evidence/14-mgs4-patriotfix/checks.txt:97 contains a macOS home folder; the documents agents read (AGENTS.md, CLAUDE.md, GEMINI.md, docs/state.md, docs/agents/**/*.md, docs/batches/**, and 3.x rounds: docs/rounds/*/*.md and docs/rounds/*/attachments/**) must work on every machine and are public
+E       docs/batches/evidence/14-mgs4-patriotfix/checks.txt:99 contains a macOS home folder; the documents agents read (AGENTS.md, CLAUDE.md, GEMINI.md, docs/state.md, docs/agents/**/*.md, docs/batches/**, and 3.x rounds: docs/rounds/*/*.md and docs/rounds/*/attachments/**) must work on every machine and are public
+
+tests/test_framework.py:27: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_framework.py::FrameworkHygiene::test_project_checks - Asser...
+1 failed, 313 passed in 7.89s
+exit 1
+
+
+Portable final evidence run:
+$ git rev-parse HEAD
+4566bf10b39914bdbe7b0a0b02e5e5f1100f8afb
+exit 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 68%]
+........................................................................ [ 91%]
+..........................                                               [100%]
+314 passed in 7.33s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py tools/capture_patriot_schema.py
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 2 commit(s), last 2026-10-08; no summary yet: still working, or stopped without one
+  brain/readme-scope-status: 5 commit(s), last 2026-10-08; batch 13-readme-scope-status: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 4 commit(s), last 2026-10-08; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/14-mgs4-patriotfix; 2 uncommitted change(s)
+  not on GitHub yet: worker/14-mgs4-patriotfix (2 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: /Users/<user>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 13-readme-scope-status
+exit 0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs-brain13-framework-4.0.0
+Install-MGS-Mods.cmd v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+Install-MGS-Mods.desktop v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: 4566bf10b39914bdbe7b0a0b02e5e5f1100f8afb
+exit 0
+
+$ git -c core.whitespace=cr-at-eol diff --check 67d1406..HEAD
+exit 0
+
+$ capture_patriot_schema.capture(authenticated upstream) == committed JSON fixture
+58 source files matched; 28 fields, 24 runtime reads; full fixture equality
+exit 0
+
+$ Python hashlib.sha256(official downloaded archive) == PATRIOT_SHA256
+4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+exit 0
+
+desktop-file-validate: NOT RUN (not installed on Mac host)
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/real-archive-smoke.py /tmp/mgs-worker14-patriotfix.zip
+  ↓ (verified, already downloaded) MGS4_MGSPatriotFix_0.2.2.zip
+    ✓ MGSPatriotFix.settings (complete pinned schema validated)
+Actual pinned archive extraction/verification/removal passed; native exports/boots NOT RUN
+exit 0
+
+$ python3 tools/refresh_checksums.py
+
+PATRIOT_SHA256
+  https://github.com/ShizCalev/MGSPatriotFix/releases/download/0.2.2/MGS4_MGSPatriotFix_0.2.2.zip
+  pinned: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+  actual: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1   ✓ match
+
+HDFIX_SHA256
+  https://github.com/ShizCalev/MGSHDFix/releases/download/4.1.0/MGSHDFix_4.1.0.zip
+  pinned: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523
+  actual: 413171222e1292092cf879508917a19e0bcac03f34993f31b521ce7b2e4b3523   ✓ match
+
+M2FIX_SHA256
+  https://github.com/nuggslet/MGSM2Fix/releases/download/v3.6/MGSM2Fix_3.6.0.zip
+  pinned: a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d
+  actual: a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d   ✓ match
+
+GAMES['mgs2']['bugfix_sha256']
+  https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/download/3.0.0/MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip
+  pinned: a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003
+  actual: a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003   ✓ match
+
+GAMES['mgs3']['bugfix_sha256']
+  https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/download/2.0.1/MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip
+  pinned: a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769
+  actual: a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769   ✓ match
+
+All pinned checksums match the live release assets.
+exit 0
+
+Portable final evidence run:
+$ git rev-parse HEAD
+c2d23029f3fec78a778724189eb406b46027484c
+exit 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 68%]
+........................................................................ [ 91%]
+..........................                                               [100%]
+314 passed in 16.55s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py tools/capture_patriot_schema.py
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 4 commit(s), last 2026-10-08; batch 14-mgs4-patriotfix: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/readme-scope-status: 5 commit(s), last 2026-10-08; batch 13-readme-scope-status: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 4 commit(s), last 2026-10-08; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/14-mgs4-patriotfix; 1 uncommitted change(s)
+  finished checkouts (clean, and their work is merged) that can be removed: /Users/<user>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 14-mgs4-patriotfix
+exit 0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs-brain13-framework-4.0.0
+Install-MGS-Mods.cmd v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+Install-MGS-Mods.desktop v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: c2d23029f3fec78a778724189eb406b46027484c
+exit 0
+
+$ git -c core.whitespace=cr-at-eol diff --check 67d1406..HEAD
+docs/batches/evidence/14-mgs4-patriotfix/checks.txt:137: trailing whitespace.
++E
+docs/batches/evidence/14-mgs4-patriotfix/checks.txt:141: trailing whitespace.
++E
+docs/batches/evidence/14-mgs4-patriotfix/checks.txt:142: trailing whitespace.
++E       Diff is 1361 characters long. Set self.maxDiff to None to see it. :
+docs/batches/evidence/14-mgs4-patriotfix/ci-first-run.txt:30: trailing whitespace.
++test-windows	Run the test-suite	2026-10-08T14:21:50.0237046Z
+docs/batches/evidence/14-mgs4-patriotfix/ci-first-run.txt:39: trailing whitespace.
++test-windows	Run the test-suite	2026-10-08T14:22:20.5208536Z
+docs/batches/evidence/14-mgs4-patriotfix/ci-first-run.txt:42: trailing whitespace.
++test-windows	Run the test-suite	2026-10-08T14:22:20.5211984Z
+docs/batches/evidence/14-mgs4-patriotfix/ci-first-run.txt:55: trailing whitespace.
++test-windows	Run the test-suite	2026-10-08T14:22:20.5224215Z
+exit 2
+
+
+Final evidence hygiene and CI:
+$ git rev-parse HEAD
+c2d23029f3fec78a778724189eb406b46027484c
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py
+
+exit 0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs-brain13-framework-4.0.0
+Install-MGS-Mods.cmd v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+Install-MGS-Mods.desktop v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: c2d23029f3fec78a778724189eb406b46027484c
+exit 0
+
+$ gh run view 37792113349 --json headSha,conclusion,jobs,url
+{"conclusion":"success","headSha":"c2d23029f3fec78a778724189eb406b46027484c","jobs":[{"completedAt":"2026-10-08T14:24:39Z","conclusion":"success","databaseId":113361944269,"name":"test-windows","startedAt":"2026-10-08T14:23:54Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:23:55Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:23:55Z","status":"completed"},{"completedAt":"2026-10-08T14:24:00Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:23:55Z","status":"completed"},{"completedAt":"2026-10-08T14:24:00Z","conclusion":"success","name":"Set up Python","number":3,"startedAt":"2026-10-08T14:24:00Z","status":"completed"},{"completedAt":"2026-10-08T14:24:00Z","conclusion":"success","name":"Confirm Windows tar is bsdtar","number":4,"startedAt":"2026-10-08T14:24:00Z","status":"completed"},{"completedAt":"2026-10-08T14:24:35Z","conclusion":"success","name":"Run the test-suite","number":5,"startedAt":"2026-10-08T14:24:00Z","status":"completed"},{"completedAt":"2026-10-08T14:24:35Z","conclusion":"success","name":"Post Set up Python","number":9,"startedAt":"2026-10-08T14:24:35Z","status":"completed"},{"completedAt":"2026-10-08T14:24:37Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":10,"startedAt":"2026-10-08T14:24:35Z","status":"completed"},{"completedAt":"2026-10-08T14:24:37Z","conclusion":"success","name":"Complete job","number":11,"startedAt":"2026-10-08T14:24:37Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792113349/job/113361944269"},{"completedAt":"2026-10-08T14:24:30Z","conclusion":"success","databaseId":113361944694,"name":"test (3.12)","startedAt":"2026-10-08T14:23:54Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:23:56Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:23:55Z","status":"completed"},{"completedAt":"2026-10-08T14:23:57Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:23:56Z","status":"completed"},{"completedAt":"2026-10-08T14:23:57Z","conclusion":"success","name":"Set up Python 3.12","number":3,"startedAt":"2026-10-08T14:23:57Z","status":"completed"},{"completedAt":"2026-10-08T14:24:17Z","conclusion":"success","name":"Install bsdtar, desktop validator + test tools","number":4,"startedAt":"2026-10-08T14:23:57Z","status":"completed"},{"completedAt":"2026-10-08T14:24:17Z","conclusion":"success","name":"Byte-compile the installer","number":5,"startedAt":"2026-10-08T14:24:17Z","status":"completed"},{"completedAt":"2026-10-08T14:24:17Z","conclusion":"success","name":"Run lint","number":6,"startedAt":"2026-10-08T14:24:17Z","status":"completed"},{"completedAt":"2026-10-08T14:24:27Z","conclusion":"success","name":"Run the test-suite","number":7,"startedAt":"2026-10-08T14:24:17Z","status":"completed"},{"completedAt":"2026-10-08T14:24:27Z","conclusion":"success","name":"Post Set up Python 3.12","number":13,"startedAt":"2026-10-08T14:24:27Z","status":"completed"},{"completedAt":"2026-10-08T14:24:28Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":14,"startedAt":"2026-10-08T14:24:27Z","status":"completed"},{"completedAt":"2026-10-08T14:24:28Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-10-08T14:24:28Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792113349/job/113361944694"},{"completedAt":"2026-10-08T14:24:27Z","conclusion":"success","databaseId":113361944756,"name":"test (3.9)","startedAt":"2026-10-08T14:23:54Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:23:55Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:23:55Z","status":"completed"},{"completedAt":"2026-10-08T14:23:56Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:23:55Z","status":"completed"},{"completedAt":"2026-10-08T14:24:02Z","conclusion":"success","name":"Set up Python 3.9","number":3,"startedAt":"2026-10-08T14:23:56Z","status":"completed"},{"completedAt":"2026-10-08T14:24:17Z","conclusion":"success","name":"Install bsdtar, desktop validator + test tools","number":4,"startedAt":"2026-10-08T14:24:02Z","status":"completed"},{"completedAt":"2026-10-08T14:24:17Z","conclusion":"success","name":"Byte-compile the installer","number":5,"startedAt":"2026-10-08T14:24:17Z","status":"completed"},{"completedAt":"2026-10-08T14:24:17Z","conclusion":"success","name":"Run lint","number":6,"startedAt":"2026-10-08T14:24:17Z","status":"completed"},{"completedAt":"2026-10-08T14:24:24Z","conclusion":"success","name":"Run the test-suite","number":7,"startedAt":"2026-10-08T14:24:17Z","status":"completed"},{"completedAt":"2026-10-08T14:24:24Z","conclusion":"success","name":"Post Set up Python 3.9","number":13,"startedAt":"2026-10-08T14:24:24Z","status":"completed"},{"completedAt":"2026-10-08T14:24:24Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":14,"startedAt":"2026-10-08T14:24:24Z","status":"completed"},{"completedAt":"2026-10-08T14:24:24Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-10-08T14:24:24Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792113349/job/113361944756"},{"completedAt":"2026-10-08T14:24:25Z","conclusion":"success","databaseId":113361944767,"name":"test (3.11)","startedAt":"2026-10-08T14:23:54Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:23:56Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:23:55Z","status":"completed"},{"completedAt":"2026-10-08T14:23:57Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:23:56Z","status":"completed"},{"completedAt":"2026-10-08T14:23:57Z","conclusion":"success","name":"Set up Python 3.11","number":3,"startedAt":"2026-10-08T14:23:57Z","status":"completed"},{"completedAt":"2026-10-08T14:24:16Z","conclusion":"success","name":"Install bsdtar, desktop validator + test tools","number":4,"startedAt":"2026-10-08T14:23:57Z","status":"completed"},{"completedAt":"2026-10-08T14:24:16Z","conclusion":"success","name":"Byte-compile the installer","number":5,"startedAt":"2026-10-08T14:24:16Z","status":"completed"},{"completedAt":"2026-10-08T14:24:16Z","conclusion":"success","name":"Run lint","number":6,"startedAt":"2026-10-08T14:24:16Z","status":"completed"},{"completedAt":"2026-10-08T14:24:23Z","conclusion":"success","name":"Run the test-suite","number":7,"startedAt":"2026-10-08T14:24:16Z","status":"completed"},{"completedAt":"2026-10-08T14:24:23Z","conclusion":"success","name":"Post Set up Python 3.11","number":13,"startedAt":"2026-10-08T14:24:23Z","status":"completed"},{"completedAt":"2026-10-08T14:24:24Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":14,"startedAt":"2026-10-08T14:24:23Z","status":"completed"},{"completedAt":"2026-10-08T14:24:24Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-10-08T14:24:24Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792113349/job/113361944767"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792113349"}
+exit 0
+
+$ git -c core.whitespace=cr-at-eol diff --check 67d1406
+docs/batches/evidence/14-mgs4-patriotfix/checks.txt:379: new blank line at EOF.
+exit 2
+
+
+Final diff check: removed blank lines at EOF introduced by log appending; see subsequent git diff --check result.

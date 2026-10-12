@@ -1,0 +1,101 @@
+$ git rev-parse HEAD
+05e9b8a63a80448856fe67c96e1f8837fff0cd41
+Exit: 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 17%]
+........................................................................ [ 35%]
+........................................................................ [ 52%]
+........................................................................ [ 70%]
+........................................................................ [ 88%]
+................................................                         [100%]
+408 passed in 53.02s
+Exit: 0
+
+$ python3 -m ruff check .
+All checks passed!
+Exit: 0
+
+$ python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py tools/capture_patriot_schema.py
+Exit: 0
+
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+Exit: 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+Exit: 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix (this machine's copy): 22 commit(s), last 2026-10-12; batch 14-mgs4-patriotfix: 21 commit(s) after the Verifier's review -- Brain checks them
+  worker/16-volume1-qol-upgrade: 5 commit(s), last 2026-10-12; batch 16-volume1-qol-upgrade: Verifier review in -- Brain judges it
+  worker/12-install-plan-engine: 9 commit(s), last 2026-10-12; batch 12-install-plan-engine: Verifier review in -- Brain judges it
+  brain/simple-banner: 6 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/11-12-briefs: 15 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-engine-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch, 16-volume1-qol-upgrade-verifier-dispatch, 17-delivery-disposition, 18-correction-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 10 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 3 commit(s) after the Verifier's review -- Brain checks them
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on worker/14-mgs4-patriotfix; 1 uncommitted change(s)
+  not on GitHub yet: worker/14-mgs4-patriotfix (12 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <local-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to check the fixes in batch 14-mgs4-patriotfix
+Exit: 0
+
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py
+PASS original recipes/writers/InstallTxn/locks/recovery/removal/layout validation unchanged
+PASS authoritative engine/embed tool/audio acceptance tests equal literal Batch 12 input
+PASS original independent review/capture/61 source hashes/28 fields/24 reads preserved
+PASS one MGS4 README row; dated upstream candidates and unpublished checkout instructions
+Checked commit: 05e9b8a63a80448856fe67c96e1f8837fff0cd41
+Exit: 0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs14-integration-audit/framework
+Install-MGS-Mods.cmd v2.3.0 f797e85222e85f521dee199bacdc01dd2764259c531bed5100f8879704cea06c line endings OK
+Install-MGS-Mods.desktop v2.3.0 f797e85222e85f521dee199bacdc01dd2764259c531bed5100f8879704cea06c line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: 05e9b8a63a80448856fe67c96e1f8837fff0cd41
+Exit: 0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix-correction/source-audit.py /tmp/mgs14-integration-audit/patriot
+ConfigTool/pch.h authenticated Git blob + CRLF attribute: 08d73a65243a408f5f171738ce8e08fb56becc9c7cddf8a006aa4ac4d6008d81
+src/resources/stdafx.h authenticated Git blob + CRLF attribute: 7ccb5864dc90362a567c6a186b67dca7c0aa54118b4ec55c9754e83fffd79ca2
+src/resources/version.h authenticated Git blob + CRLF attribute: 4d0aa01ea0535321dca13dd0ee34f8a0f090b815414f6ebbca4e6cdc22b1d842
+PASS independently enumerated/hashes verified 61 reviewed C++ files; clean capture reproduces fixture
+PASS only three header hashes added; settings fields/runtime reads/constraints and old hashes unchanged
+Boundary excludes build projects, resources, external dependencies and binaries; no build reproducibility claim
+Exit: 0
+
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/actual-archive.py /tmp/mgs14-integration-audit/patriot.zip
+PASS official ZIP: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+PASS all four games prepared with actual authenticated PatriotFix ZIP; zero live writes
+PASS mixed execution replays cached actual payload/settings with no network or writer calls
+PASS actual MGS4 repair/removal keeps oldest custom settings, save bytes and unowned legacy ASI
+Native exports/ASI initialization/licensed boots/gameplay/real-device restoration: NOT RUN
+Exit: 0
+
+$ git -c core.whitespace=cr-at-eol diff --check
+Exit: 0
+
+$ git merge-base --is-ancestor origin/main HEAD
+Exit: 0
+
+desktop-file-validate unavailable on local macOS; exact delivery Linux CI required.

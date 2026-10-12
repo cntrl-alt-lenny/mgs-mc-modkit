@@ -1,0 +1,41 @@
+Correction setup, 9 October 2026, starting from preserved review head 38ef1b6.
+
+Fresh source command:
+$ git clone --depth 1 --branch 0.2.2 https://github.com/ShizCalev/MGSPatriotFix.git /tmp/mgs14-correction-source
+Cloning completed; detached at c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de
+exit 0
+
+Initial header-authentication assertion in the edit helper:
+raw = subprocess.check_output(['git', '-C', str(source), 'show', 'HEAD:' + rel])
+assert raw == name.read_bytes()
+Traceback (most recent call last):
+  File "<stdin>", line 45, in <module>
+AssertionError
+Subcommand exit not separately captured; composite shell returned exit 0 after subsequent commands.
+Git blobs use LF; official .gitattributes checks out the reviewed inputs as CRLF.
+No capture-tool/header-hash edit was written by this failed helper. Later source
+hashes authenticate literal blobs plus the declared CRLF checkout transformation.
+The source-audit.py command independently verifies this for all 61 inputs.
+
+$ git diff --check
+Install-MGS-Mods.cmd:5: trailing whitespace.
++set "SHA=3e489e55a3ec55ddb4f13396f7d0366b96d9b601b0ad6344b225f4dc9653f0e3" [CRLF]
+Subcommand exit not separately captured; composite inspection shell subsequently returned exit 0.
+The Windows shortcut deliberately preserves CRLF under project rules.
+$ git -c core.whitespace=cr-at-eol diff --check
+(no output)
+exit 0
+
+$ python3 -m pytest tests/test_transaction.py tests/test_patriot.py -q
+66 passed in 2.30s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ gh workflow run ci.yml --ref worker/14-mgs4-patriotfix
+https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625
+exit 0
+Draft PR had no automatic check run after the production push; used the existing
+workflow_dispatch. Only CI was dispatched, not the Release workflow.

@@ -24,7 +24,7 @@ def test_pins_read_from_install_not_hardcoded():
 
 def test_every_pinned_repo_matches_its_download_url():
     """Guards against checking a repo we don't actually install from."""
-    urls = " ".join([install.HDFIX_URL, install.M2FIX_URL,
+    urls = " ".join([install.PATRIOT_URL, install.HDFIX_URL, install.M2FIX_URL,
                      install.GAMES["mgs2"]["bugfix_url"],
                      install.GAMES["mgs3"]["bugfix_url"]])
     for row in check_pins.pinned():
@@ -60,5 +60,5 @@ def test_api_failure_is_never_mistaken_for_clean(monkeypatch):
         raise TimeoutError("api down")
     monkeypatch.setattr(check_pins, "latest_tag", boom)
     rows, errors = check_pins.check()
-    assert rows == [] and len(errors) == 4
+    assert rows == [] and len(errors) == len(check_pins.pinned())
     assert check_pins.main() == 2                         # exit 2 = check failed

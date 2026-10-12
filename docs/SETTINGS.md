@@ -49,3 +49,41 @@ installer's embedded schema together after authenticating the source and reviewi
 Native per-game exports and Windows/Deck initialization remain required release
 evidence; static completeness does not prove a successful game boot.
 Upstream Config Tool definitions are by Afevis and contributors, under MIT.
+
+## MGS4 / PatriotFix 0.2.2
+
+The independent capture has 8 sections / 28 exact keys, including hidden PW
+controls. `ConfigTool/main.cpp` creates every non-spacer control and saves all
+of them; game flags control visibility. Runtime readers include conditional
+launcher/controller keys and PW values. No PW game support is installed.
+`tools/capture_patriot_schema.py` checks the exact Git tree plus a byte allowlist
+and inventory of all reviewed upstream C++ source before deriving keys, defaults,
+choices, integer/float bounds and language pairs. Any source change refuses and
+requires a new source review. Capture never reads this installer's defaults.
+
+```bash
+python3 tools/capture_patriot_schema.py /path/to/MGSPatriotFix
+```
+
+The kit uses one transactional writer for root `MGSPatriotFix.settings`, with
+CRLF. Defaults differ deliberately from upstream: filtering **8** (the hooks only
+replace existing values of 8, making 8 a no-op), pause on focus loss **on**, skip
+launcher and in-game logos **on**, update checks **off**. Motion blur and dynamic
+resolution remain enabled, shadows use **0 / original**, mouse sensitivity **1.0**,
+raw mouse and DS3 **off**, button icons **AUTO**, menu buttons **Default**, language
+**eu/en**. Hidden PW fields retain upstream defaults. No frame-rate override exists.
+
+Before installing, Change settings offers MGS4 button icons, menu buttons, shadow
+resolution, filtering, logo skipping, raw mouse, DS3 and visual overrides.
+Repair preserves all supported values, including manual languages, float mouse
+sensitivities, diagnostic toggles and hidden PW choices. Only explicitly selected
+options change, and update checks always remain off. Reset discards custom mod
+settings separately. Unknown/missing/duplicate keys, invalid region/language pairs,
+unsupported choices, non-finite floats and out-of-range values refuse.
+
+MGS4 game saves at `mgs4_savedata_win` and launcher saves are never edited or
+synthesized. Language/controller/launcher choices are handled by PatriotFix itself.
+The Config Tool's fullscreen optimization setting also writes Windows registry
+compatibility flags when it saves; the kit does not reproduce or remove those
+registry effects. Native exports and boots are pending; source completeness is
+not proof of runtime compatibility.

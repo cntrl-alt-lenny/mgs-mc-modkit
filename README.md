@@ -11,48 +11,55 @@
 ![Python](https://img.shields.io/badge/python3-no_deps-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Licence](https://img.shields.io/badge/licence-MIT-green?style=for-the-badge)
 
-**The essential MGS 1 / 2 / 3 fixes, installed for you.**
+**The essential MGS 1 / 2 / 3 / 4 fixes, installed for you.**
 
 Steam Deck · Linux · Windows — vanilla-faithful fixes and restorations.
 
 </div>
 
-The installer currently covers **Master Collection Volume 1: MGS1, MGS2 and MGS3**. MGS4 integration with [MGSPatriotFix](https://github.com/ShizCalev/MGSPatriotFix) is planned but is not available in the installer yet. Peace Walker is not currently supported.
-
-**Development validation is pending.** Automated tests do not establish successful Windows or Steam Deck game boots, audio compatibility, or complete restoration. See the [native release validation requirements](docs/RELEASING.md).
+The unpublished 2.3.0 candidate implements MGS4 installation, repair and removal.
+Windows/Steam Deck Config Tool exports, game boots and gameplay remain **NOT RUN**;
+MGS4 is not available through an older published shortcut. Candidate testing uses
+`python install.py` from the reviewed checkout. Publication requires separate
+owner approval and the [native release checks](docs/RELEASING.md).
 
 ## Install
 
+For the unpublished MGS1–4 candidate, run `python3 install.py` (Windows: `py -3 install.py`) from the reviewed checkout. The checkout shortcuts pin unpublished `v2.3.0` and must wait for that release asset. The published shortcut steps below use the published installer and do not provide this MGS4 candidate.
+
 1. Install MGS1, MGS2 and/or MGS3 through Steam. Close the games and finish Steam downloads.
 2. Download the shortcut from the [latest release](https://github.com/cntrl-alt-lenny/mgs-mc-modkit/releases/latest): **Windows:** `Install-MGS-Mods.cmd` (requires [Python 3](https://www.python.org/downloads/)); **Deck/Linux:** `Install-MGS-Mods.desktop` (put it on your Desktop and enable **Properties → Permissions → Is executable**).
-3. Run it, choose your games and optional audio files, review the settings, then select **Install now**. Internet access and sufficient staging/backup space are required.
+3. Run it, choose your games and optional audio files, review the settings, then select **Install now**. Internet access and sufficient staging/backup space are required. The candidate prepares and validates all selected games before writing any live game files.
 4. **Deck/Linux:** paste each game's line into Steam → **Properties → Launch Options**:
 
 ```text
 MGS1:        WINEDLLOVERRIDES="dinput8=n,b;d3d11=n,b" %command%
 MGS2 & MGS3: WINEDLLOVERRIDES="wininet,winhttp=n,b" %command%
+MGS4 candidate: WINEDLLOVERRIDES="winmm=n,b" %command%
 ```
 
 The installer saves these lines on your Desktop and offers clipboard copying. Windows needs no launch options. Keep the shortcut for repairs and removal; each release downloads a fixed installer and verifies its SHA-256.
 
 ## What you get
 
-| Game | Installer pins | Latest stable upstream | Result |
+| Game | Installer pins | Upstream candidates (8 October snapshot) | Result |
 |:--|:--|:--|:--|
 | MGS1 | [MGSM2Fix](https://github.com/nuggslet/MGSM2Fix) 3.6.0 | [MGSM2Fix 3.7.3](https://github.com/nuggslet/MGSM2Fix/releases/tag/v3.7.3) | Resolution, texture restoration and analog fixes |
 | MGS2 | [MGSHDFix](https://github.com/ShizCalev/MGSHDFix) 4.1.0 + [Bugfix](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation) 3.0.0 | [MGSHDFix 4.1.2](https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.2) + [Bugfix 3.0.0](https://github.com/ShizCalev/MGS2-Community-Bugfix-Compilation/releases/tag/3.0.0) | Aspect ratio, CPU, visual and asset fixes |
 | MGS3 | MGSHDFix 4.1.0 + [Bugfix](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation) 2.0.1 | [MGSHDFix 4.1.2](https://github.com/ShizCalev/MGSHDFix/releases/tag/4.1.2) + [Bugfix 2.0.1](https://github.com/ShizCalev/MGS3-Community-Bugfix-Compilation/releases/tag/2.0.1) | Aspect ratio, CPU, visual and asset fixes |
-| MGS4 | Integration in progress; not installed yet | [MGSPatriotFix 0.2.2](https://github.com/ShizCalev/MGSPatriotFix/releases/tag/0.2.2) | Planned fixes and QoL support |
+| MGS4 | [MGSPatriotFix](https://github.com/ShizCalev/MGSPatriotFix/releases/tag/0.2.2) 0.2.2 (unpublished checkout) | [MGSPatriotFix 0.2.2](https://github.com/ShizCalev/MGSPatriotFix/releases/tag/0.2.2) | Bug fixes and optional QoL; native validation pending |
 
-Latest upstream versions were checked on **8 October 2026**. The installer uses the pinned versions above. Newer releases require a coordinated settings, archive checksum and compatibility review before adoption; see [upgrading](docs/UPGRADING.md).
+Upstream candidates were checked on **8 October 2026**. The reviewed checkout uses the installer pins above; published shortcuts download their own fixed release installer. Newer releases require a coordinated settings, archive checksum and compatibility review before adoption; see [upgrading](docs/UPGRADING.md).
 
 Mods come from their authors' official releases. AI-upscaled textures and gameplay changes are excluded. MGS1's first boot: choose **US**, **Max**, **4:3**, **Smoothing Off**.
 
 ## Settings and optional audio
 
-Defaults are stereo, HQ cutscenes, skipped logos and launcher skipping; button prompts match Deck/Xbox. **Change settings…** applies selected options across your selection. Repairs preserve valid custom settings independently for each game. **Reset to recommended settings** is a separate choice. See [settings](docs/SETTINGS.md).
+MGS2/3 defaults are stereo, HQ cutscenes, skipped logos and launcher skipping; button prompts match Deck/Xbox. MGS4 keeps motion blur, dynamic resolution, original shadows, 8× sampler filtering and normal pause-on-focus-loss; its buttons use AUTO. MGS4 skips the launcher and in-game logos. Visual overrides and DS3 support are explicit choices. **Change settings…** applies selected options across your selection. Repairs preserve valid custom settings independently for each game. **Reset to recommended settings** is a separate choice. See [settings](docs/SETTINGS.md).
 
-Better Audio requires downloading the author's Nexus files yourself. Components are optional and independently selectable; MGS3 HQ ending scenes can require a button press. See [audio downloads and supported layouts](docs/AUDIO.md).
+MGS4 audio, Peace Walker, ClarityFix, FPS unlockers and standalone MGS4 flashback MGSM2Fix are excluded. DS3 drivers/setup are optional and user-managed; see [upstream instructions](https://github.com/ShizCalev/MGSPatriotFix/tree/0.2.2#dualshock-3-setup).
+
+Better Audio for MGS2/3 requires downloading the author's Nexus files yourself. Components are optional and independently selectable; MGS3 HQ ending scenes can require a button press. See [audio downloads and supported layouts](docs/AUDIO.md).
 
 ## Repair, remove and recover
 

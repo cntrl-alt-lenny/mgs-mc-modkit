@@ -15,7 +15,7 @@
 
 ## Real-machine smoke checks
 
-- Windows: fresh install → start all three games → change an option → repair →
+- Windows: fresh install → start all four games → change an option → repair →
   confirm custom language/resolution survives → remove → start stock games.
 - Steam Deck/Linux: repeat with Proton launch options and optional audio; cancel
   during extraction and confirm restoration. Check the progress window and logs.
@@ -25,3 +25,10 @@
 Record hardware, game version, mod pins and results in the release/PR. The 2.3.0
 implementation was verified with synthetic archives on Linux; real game boots
 and Windows execution are release checks, not results claimed by that local run.
+
+MGS4 requires the separate [batch 14 native handoff](batches/evidence/14-mgs4-patriotfix/native-handoff.md),
+including root/subfolder discovery, both launcher and direct game start, pinned
+Config Tool export, conservative rendering, option selection, saves, repair,
+cancellation, mixed outcomes, lock refusal and removal. These checks are **NOT RUN**
+on the Mac development seat. The candidate remains unpublished kit 2.3.0; no tag
+or publication is authorized by this batch.

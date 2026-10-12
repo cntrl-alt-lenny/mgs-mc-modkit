@@ -193,6 +193,7 @@ def test_m2fix_ini_patched_and_tracked(tmp_path, patch_download):
 def test_uninstall_removes_legacy_asi(tmp_path):
     game_dir = tmp_path / "MGS1"
     game_dir.mkdir()
+    (game_dir / "METAL GEAR SOLID.exe").write_bytes(b"game fixture")
     (game_dir / "MGSM2Fix.asi").write_bytes(b"legacy-unified-asi")
 
     notes, ok = install.uninstall_game(game_dir, _noop)
@@ -539,3 +540,74 @@ def test_uninstall_offered_when_only_backups_remain(tmp_path, game_dir,
     (game_dir / install.MODKIT_DIRNAME / install.MANIFEST_NAME).write_text("{bad")
     # A damaged manifest still leaves the folder -> the game stays recoverable.
     assert (game_dir / install.MODKIT_DIRNAME).is_dir()
+
+
+def test_uninstall_preserves_unowned_legacy_in_other_roots(tmp_path):
+    for key in ('mgs2', 'mgs3', 'mgs4', 'unknown', 'ambiguous'):
+        root = tmp_path / key
+        root.mkdir()
+        exes = ([install.GAMES[key]['exe']] if key in install.GAMES else
+                [install.GAMES['mgs1']['exe'], install.GAMES['mgs2']['exe']]
+                if key == 'ambiguous' else [])
+        for exe in exes:
+            path = root / exe
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'game fixture')
+        legacy = root / 'MGSM2Fix.asi'
+        legacy.write_bytes(b'unowned user bytes')
+        # Check both no-record and valid tracked-file removal.
+        install.uninstall_game(root, _noop)
+        assert legacy.read_bytes() == b'unowned user bytes'
+        tx = install.InstallTxn(root, key if key in install.GAMES else 'mgs2', _noop)
+        tracked = 'MGSPatriotFix.settings' if key == 'mgs4' else 'tracked.dll'
+        tx.write_bytes(tracked, b'kit bytes')
+        tx.commit()
+        notes, ok = install.uninstall_game(root, _noop)
+        assert ok, notes
+        assert not (root / tracked).exists()
+        assert legacy.read_bytes() == b'unowned user bytes'
+
+
+def test_uninstall_legacy_tracked_restore_keeps_oldest_backup(tmp_path):
+    root = tmp_path / 'mgs1'
+    root.mkdir()
+    (root / install.GAMES['mgs1']['exe']).write_bytes(b'game fixture')
+    legacy = root / 'MGSM2Fix.asi'
+    legacy.write_bytes(b'oldest original')
+    for data in (b'first kit bytes', b'repaired kit bytes'):
+        tx = install.InstallTxn(root, 'mgs1', _noop)
+        tx.write_bytes('MGSM2Fix.asi', data)
+        tx.commit()
+    notes, ok = install.uninstall_game(root, _noop)
+    assert ok, notes
+    assert legacy.read_bytes() == b'oldest original'
+    legacy.unlink()
+    tx = install.InstallTxn(root, 'mgs1', _noop)
+    tx.write_bytes('MGSM2Fix.asi', b'tracked addition')
+    tx.commit()
+    assert install.uninstall_game(root, _noop)[1]
+    assert not legacy.exists()
+
+
+def test_uninstall_malformed_or_unknown_record_preserves_legacy(tmp_path):
+    for key, content in (
+        ('broken-json', '{'),
+        ('bad-path', '{"game":"mgs1","added":["../escape"],"overwritten":[]}'),
+        ('unknown-game', '{"added":[],"overwritten":[]}'),
+        ('wrong-game', '{"game":"mgs2","added":[],"overwritten":[]}'),
+        ('orphan', None),
+    ):
+        root = tmp_path / key
+        root.mkdir()
+        (root / install.GAMES['mgs1']['exe']).write_bytes(b'game fixture')
+        legacy = root / 'MGSM2Fix.asi'
+        legacy.write_bytes(b'unowned user bytes')
+        records = root / install.MODKIT_DIRNAME
+        records.mkdir()
+        if content is not None:
+            (records / install.MANIFEST_NAME).write_text(content)
+        notes, ok = install.uninstall_game(root, _noop)
+        assert legacy.read_bytes() == b'unowned user bytes'
+        if key in ('broken-json', 'bad-path', 'orphan'):
+            assert not ok, notes
+            assert records.exists()

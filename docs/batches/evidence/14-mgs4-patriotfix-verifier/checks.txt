@@ -1,0 +1,578 @@
+$ git rev-parse HEAD
+48cfa4127a4f77080cec55263c2477166826b67b
+
+exit=0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 22%]
+........................................................................ [ 45%]
+........................................................................ [ 68%]
+........................................................................ [ 91%]
+..........................                                               [100%]
+314 passed in 20.52s
+
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py
+
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/11-12-briefs: 7 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 2 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 6 commit(s), last 2026-10-08; batch 14-mgs4-patriotfix: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on (detached HEAD); 1 uncommitted change(s)
+  finished checkouts (clean, and their work is merged) that can be removed: <HOME>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to review batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch
+
+exit=0
+
+$ command -v desktop-file-validate
+
+exit=1
+
+$ gh run list --commit 48cfa4127a4f77080cec55263c2477166826b67b --json databaseId,headSha,status,conclusion
+[{"conclusion":"success","databaseId":37792516531,"headSha":"48cfa4127a4f77080cec55263c2477166826b67b","status":"completed"}]
+
+exit=0
+
+$ python3 tools/capture_patriot_schema.py /tmp/mgs14-verifier-patriot
+{
+  "fields": {
+    "Controller Settings": {
+      "Button Icons": {
+        "choices": [
+          "AUTO",
+          "Xbox",
+          "PlayStation 4",
+          "PlayStation 5",
+          "Nintendo Switch"
+        ],
+        "default": "AUTO",
+        "flags": "(MGS4)",
+        "type": "Choice"
+      },
+      "Button Icons (PW)": {
+        "choices": [
+          "Keyboard",
+          "Xbox",
+          "PlayStation 4",
+          "PlayStation 5",
+          "Nintendo Switch"
+        ],
+        "default": "Keyboard",
+        "flags": "(MGSPW)",
+        "type": "Choice"
+      },
+      "Enable DualShock 3 Support": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      },
+      "Set Menu OK && Cancel Button": {
+        "choices": [
+          "Default",
+          "East for OK",
+          "South for OK"
+        ],
+        "default": "Default",
+        "flags": "(MGS4)",
+        "type": "Choice"
+      }
+    },
+    "Debugging": {
+      "Debug Logging": {
+        "default": 0,
+        "flags": "(MGS4|MGSPW)",
+        "type": "Bool"
+      },
+      "Log Create Results": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      },
+      "Log Framebuffers": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      },
+      "MSAA Log Targets": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      }
+    },
+    "Enhancements && Tweaks": {
+      "Anisotropic Filtering Level": {
+        "default": 16,
+        "flags": "(MGS4)",
+        "range": [
+          1,
+          16
+        ],
+        "type": "Int"
+      },
+      "Custom Shadow Resolution": {
+        "choices": [
+          "0",
+          "512",
+          "1024",
+          "2048",
+          "4096"
+        ],
+        "default": "0",
+        "flags": "(MGS4)",
+        "type": "Choice"
+      },
+      "Disable Dynamic Resolution": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      },
+      "Disable Motion Blur": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      },
+      "Pause On Focus Loss": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      }
+    },
+    "Language Settings": {
+      "Game Language": {
+        "choices": [
+          "en",
+          "fr",
+          "gr",
+          "it",
+          "jp",
+          "pt",
+          "sp"
+        ],
+        "default": "en",
+        "flags": "(MGS4|MGSPW)",
+        "type": "Choice"
+      },
+      "Game Region": {
+        "choices": [
+          "eu",
+          "jp"
+        ],
+        "default": "eu",
+        "flags": "(MGS4|MGSPW)",
+        "type": "Choice"
+      }
+    },
+    "Launcher and Splashscreens": {
+      "Cutscenes (PW)": {
+        "choices": [
+          "Original",
+          "High-Resolution"
+        ],
+        "default": "Original",
+        "flags": "(MGSPW)",
+        "type": "Choice"
+      },
+      "Internal Resolution (PW)": {
+        "choices": [
+          "Original",
+          "FHD"
+        ],
+        "default": "Original",
+        "flags": "(MGSPW)",
+        "type": "Choice"
+      },
+      "Internal Upscaling (PW)": {
+        "choices": [
+          "Original",
+          "FHD",
+          "WQHD",
+          "4K"
+        ],
+        "default": "Original",
+        "flags": "(MGSPW)",
+        "type": "Choice"
+      },
+      "Skip In-Game Splashscreens": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      },
+      "Skip Launcher": {
+        "default": 0,
+        "flags": "(MGS4 | MGSPW)",
+        "type": "Bool"
+      },
+      "Skip Launcher Splashscreens": {
+        "choices": [
+          "Disabled",
+          "Game Start",
+          "Main Menu"
+        ],
+        "default": "Disabled",
+        "flags": "(MGS4)",
+        "type": "Choice"
+      },
+      "Skip Launcher Splashscreens (PW)": {
+        "choices": [
+          "Disabled",
+          "Game Start"
+        ],
+        "default": "Disabled",
+        "flags": "(MGSPW)",
+        "type": "Choice"
+      }
+    },
+    "Mouse Settings": {
+      "Mouse Horizontal Sensitivity": {
+        "default": 1.0,
+        "flags": "(MGS4)",
+        "range": [
+          0.05,
+          10.0
+        ],
+        "type": "Float"
+      },
+      "Mouse Vertical Sensitivity": {
+        "default": 1.0,
+        "flags": "(MGS4)",
+        "range": [
+          0.05,
+          10.0
+        ],
+        "type": "Float"
+      },
+      "Use Raw Mouse Input": {
+        "default": 0,
+        "flags": "(MGS4)",
+        "type": "Bool"
+      }
+    },
+    "System Specific Fixes": {
+      "Disable Windows Fullscreen Optimization": {
+        "default": 0,
+        "flags": "(MGS4|MGSPW)",
+        "type": "Bool"
+      }
+    },
+    "Update Notifications": {
+      "Check For MGSPatriotFix Updates": {
+        "default": 1,
+        "flags": "(MGS4|MGSPW)",
+        "type": "Bool"
+      },
+      "In-Game Update Notifications": {
+        "default": 1,
+        "flags": "(MGS4|MGSPW)",
+        "type": "Bool"
+      }
+    }
+  },
+  "language_pairs": [
+    [
+      "eu",
+      "en"
+    ],
+    [
+      "eu",
+      "fr"
+    ],
+    [
+      "eu",
+      "it"
+    ],
+    [
+      "eu",
+      "gr"
+    ],
+    [
+      "eu",
+      "sp"
+    ],
+    [
+      "eu",
+      "pt"
+    ],
+    [
+      "jp",
+      "jp"
+    ]
+  ],
+  "runtime_reads": [
+    [
+      "Controller Settings",
+      "Button Icons"
+    ],
+    [
+      "Controller Settings",
+      "Button Icons (PW)"
+    ],
+    [
+      "Controller Settings",
+      "Enable DualShock 3 Support"
+    ],
+    [
+      "Controller Settings",
+      "Set Menu OK && Cancel Button"
+    ],
+    [
+      "Debugging",
+      "Debug Logging"
+    ],
+    [
+      "Enhancements && Tweaks",
+      "Anisotropic Filtering Level"
+    ],
+    [
+      "Enhancements && Tweaks",
+      "Custom Shadow Resolution"
+    ],
+    [
+      "Enhancements && Tweaks",
+      "Disable Dynamic Resolution"
+    ],
+    [
+      "Enhancements && Tweaks",
+      "Disable Motion Blur"
+    ],
+    [
+      "Enhancements && Tweaks",
+      "Pause On Focus Loss"
+    ],
+    [
+      "Language Settings",
+      "Game Language"
+    ],
+    [
+      "Language Settings",
+      "Game Region"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Cutscenes (PW)"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Internal Resolution (PW)"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Internal Upscaling (PW)"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Skip In-Game Splashscreens"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Skip Launcher"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Skip Launcher Splashscreens"
+    ],
+    [
+      "Launcher and Splashscreens",
+      "Skip Launcher Splashscreens (PW)"
+    ],
+    [
+      "Mouse Settings",
+      "Mouse Horizontal Sensitivity"
+    ],
+    [
+      "Mouse Settings",
+      "Mouse Vertical Sensitivity"
+    ],
+    [
+      "Mouse Settings",
+      "Use Raw Mouse Input"
+    ],
+    [
+      "Update Notifications",
+      "Check For MGSPatriotFix Updates"
+    ],
+    [
+      "Update Notifications",
+      "In-Game Update Notifications"
+    ]
+  ],
+  "source_sha256": {
+    "ConfigTool/helper.cpp": "582783fdd792b092424dd12393daa3d17da36e31686b4dab415fcc72b3276cc8",
+    "ConfigTool/helper.hpp": "987bbc63bbbe6fb09e6a3967db7a58b19300ee02fb4e07247369b23b258db5e9",
+    "ConfigTool/main.cpp": "8ea2c96aebccb703847cf4af5602f79310c02e646a780c89bdb2ce3ceda2e7e7",
+    "ConfigTool/pch.cpp": "767c147b79a2d6c6488f245d364e406bf927d83e92475247ce92792f71f0bb2d",
+    "ConfigTool/tab_data.cpp": "5c260638480db24544ef7cac4fae6980b495a6dbef0c0cc87a7b05c81ac0972c",
+    "ConfigTool/tab_data.hpp": "c091b63a1b53534cc964798a781ecd5060adccf3c163a20310a276cf46b6814e",
+    "ConfigTool/updater.cpp": "f7ee2d0f029fba65c9eb834c811439ae49d8292580519c09d6da7b756b6b9cb6",
+    "ConfigTool/updater.hpp": "234751080b7d5d39da3f239a532e5c72e12204f27c725c9de58930d9310bf0a1",
+    "ConfigTool/windows_fullscreen_optimization.cpp": "cf4ea7258d85abd9d5a7e3698bf9ab5248fb848bc98250710219ae1effc3e29e",
+    "ConfigTool/windows_fullscreen_optimization.hpp": "3ba2b6564f69a89169704ba0f1ef3ca63dcb3f4d9961e6a2f33e4b9612fb27e3",
+    "ConfigTool/windows_preferred_gpu.cpp": "db02d074c2337fe40e6a9bd648555c763799566ce455c984c5d9f6858bffce74",
+    "ConfigTool/windows_preferred_gpu.hpp": "d46b6680fa24e61d84b2ea41b768ee150fbc82ef53396436d14aea4c79e98040",
+    "src/dllmain.cpp": "af0dd5d93b54358645c55da2b4bc2193461bd3dfded99e9df9d23d3c4d218d72",
+    "src/features/launcher_skips_and_starts.cpp": "4800ba4eaf30ecdf0056b5fe54e30aecd0c3c59e8fd43d1b7e015154df23d207",
+    "src/features/launcher_skips_and_starts.hpp": "07f6ffe24133fb1c104fb329bafcc2c0b8f7ed90eb56b06fd3d96c3f1758ce00",
+    "src/features/skip_splashscreens.cpp": "b2aeb8d3fece096bf46dc1a3f28d0261ff3a328d32bcb0f70e0eeb83537db960",
+    "src/features/skip_splashscreens.hpp": "e61a7bcf48420fa38ab8e76173f022596abfdb326df81f43704174578b9f4dc8",
+    "src/fixes/ds3_rumble.cpp": "95db8146faf3c0d100d305d6678f7afd428a43e8f7ff35b47a12cfc9dc7a4e0e",
+    "src/fixes/ds3_rumble.hpp": "35232a43989616d64ea47f8225ed54341db11576c261ee7a344a90de7f1aa985",
+    "src/fixes/graphics_tuning.cpp": "12d028419be90bfbf717d05cee8e821aac437bb240113de6585a1e9ca3e16762",
+    "src/fixes/graphics_tuning.hpp": "ce57138a5fe65e40b3ee1ed9ca472e50d62dafa84d56a481648ba1184169db3a",
+    "src/fixes/mgs4_mouse.cpp": "b2bff6c9e22a6314426828e2d4439a91cf22e440da5d079819cd610d80d74cb6",
+    "src/fixes/mgs4_mouse.hpp": "fc18aebca94b6f5882698354509201eda0ae1744cf4b8ec13ecda576d9ae69c5",
+    "src/fixes/pad_motion.cpp": "90211271c5cc1a06e87812ddc7107a34084871ceaa6d8734dbfe98472436ea48",
+    "src/fixes/pad_motion.hpp": "bf12727721726f58544a9263d667133d083b2f076f16aa6d56fc2f52ced623d0",
+    "src/fixes/pressure_inputs.cpp": "c5f9d98762ce3b09cda95c2bbc38cd440ca745d2fb1ad2e7988c2dfafd19ff79",
+    "src/fixes/pressure_inputs.hpp": "25ed854cefce73648ec379802b6c6357c71438eb4812051f9ec92cbc67baeca0",
+    "src/fixes/resolution_scaling_fixes.cpp": "e6312212ef095c00e4825c74dd83446165914c85ee9f76e7881162fd2de6b92c",
+    "src/fixes/resolution_scaling_fixes.hpp": "ad6955e708fab02d6ee2aae420cd08d483e4d6625893e4bb4725c5166c39471a",
+    "src/fixes/swap_menu_buttons.cpp": "baf7c3784a3b7f3cf5be5f22a8187134ceef1f9ff29c755fef03c5d202e11036",
+    "src/fixes/swap_menu_buttons.hpp": "e54c249eddf99650d6d77c2dd2e611bea5f2efb0a4c70c88dc1a84e01b849cfc",
+    "src/fixes/various_tweaks.cpp": "9a25143cf04b722b25ef6dfc06cbb95a07231447da615bf1cc06322cd9dc4987",
+    "src/fixes/various_tweaks.hpp": "5f70adeb8087e0d64bb561c60e3afbd7295f248269aa4aa1d44639a89c00616c",
+    "src/resources/RegStateHelpers.hpp": "718cbbd0eeff76949b91c2e2ea4fafc46bc6d28b170cb9e6f76972ea03dad405",
+    "src/resources/common.hpp": "3aac103eaf5deab1cf6db8a7421dedf84cdac0ff6c4d629bf7f3bb2dbf6ec186",
+    "src/resources/config.cpp": "4d2a32c4161e5802c7887c9a7557c4f42957c8b01286ca87d36609885f2be8b1",
+    "src/resources/config.hpp": "469e7a729bd6c66a6692f26c0873344a23c2e20b3bd8077fa062a1da999303fb",
+    "src/resources/config_keys.hpp": "aded2e07ae05610140db3f0c26f02c0c635c176addb8947a79582f03c4bb0277",
+    "src/resources/game_defines.hpp": "b2183aacb22c4725db20129157fad7d466b652e0135a2b49da520b927bb5210d",
+    "src/resources/game_stages.hpp": "586e5c870c28a3b845a00f9d4b1fd693f5adb7de46b9dcd6ba7336127268268d",
+    "src/resources/gamevars.cpp": "8c2801a5e258d9c6529ec6b495e4343386cd97c88a18cf2a6c32804b7db2a122",
+    "src/resources/gamevars.hpp": "0141248fb5deb056774c59394b5810c91e50e17ce242367155332af7c69100aa",
+    "src/resources/gpu_check.cpp": "e7471ea3f754bed6c306955174e6a380f25fcb527d3a5cc287640a7183f6652b",
+    "src/resources/gpu_check.hpp": "9197fb0516c7befe28d891f1bee56cb74299d6dff258b0d605b6cbab9c32f19a",
+    "src/resources/helper.cpp": "07d504f58806aa82cf1135be4a89ecbe28a6ec0261ce1bd003adf38b0c62df46",
+    "src/resources/helper.hpp": "3c2d86cce6eb175f4ced3c756af2cc533914801ec191cfe5cda9926e60c79c13",
+    "src/resources/logging.cpp": "9dbd680b57fb8c88dce37a89c874dedaa44b9921601dcec9b9747cdcc3cdd339",
+    "src/resources/logging.hpp": "ea61e3ef689ec08cc5e8468e1ea0596d07d53b785a598b73797a2d621c81c2bf",
+    "src/resources/mgs4_linkvarbuf.hpp": "c99474f329221148952bd3be3a8e5da192f2899e865050def08b1e06f9f533c7",
+    "src/resources/mgspw_linkvarbuf.hpp": "119ea5c94b904e57fc4420e13de0f29db4ef639859434e2c0c8e4c38b6a7603b",
+    "src/resources/stdafx.cpp": "c2f8cfd8ea9f8110e9710a0f045c0670d202190cb1078cc3ced08d7309187bd9",
+    "src/resources/submodule_initiailization.hpp": "4f434cc0897ef7b582f5aa02c47383c31d27f8f9a87719773536d2760f3cc78a",
+    "src/resources/unit_tests.cpp": "04db3abec346eaebf519d8105b1d0a95de9a97ea64f3fe5f1089068ca5578ce9",
+    "src/resources/unit_tests.hpp": "645242745a7035111e3749436176b84fd494b86dde13cc671cca250ad740afc5",
+    "src/resources/version_checking.cpp": "ee10225b45b332d39ff71ba14341276589eea446a53e6e7e86cc998b17e18961",
+    "src/resources/version_checking.hpp": "664bd6709690d4d45724e833ee8014c50a5e435b350c612f0652b38b41e60cec",
+    "src/warnings/asi_loader_checks.cpp": "e54dc9b433b3f6dc5d5c23713e04b368425a79463db6f6134b396f77927ab1bd",
+    "src/warnings/asi_loader_checks.hpp": "b47d93b3b60ccc7930824f9818890e41652f7d164a5f621ce1c3ebd8ce1a6fe2"
+  },
+  "tag": "0.2.2",
+  "tree": "c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de"
+}
+
+exit=0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs14-verifier-framework
+Install-MGS-Mods.cmd v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+Install-MGS-Mods.desktop v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: 48cfa4127a4f77080cec55263c2477166826b67b
+
+exit=0
+
+$ gh run view 37792516531 --json headSha,conclusion,jobs
+{"conclusion":"success","headSha":"48cfa4127a4f77080cec55263c2477166826b67b","jobs":[{"completedAt":"2026-10-08T14:27:33Z","conclusion":"success","databaseId":113363347162,"name":"test-windows","startedAt":"2026-10-08T14:26:49Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:26:51Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:26:50Z","status":"completed"},{"completedAt":"2026-10-08T14:26:56Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:26:51Z","status":"completed"},{"completedAt":"2026-10-08T14:26:56Z","conclusion":"success","name":"Set up Python","number":3,"startedAt":"2026-10-08T14:26:56Z","status":"completed"},{"completedAt":"2026-10-08T14:26:56Z","conclusion":"success","name":"Confirm Windows tar is bsdtar","number":4,"startedAt":"2026-10-08T14:26:56Z","status":"completed"},{"completedAt":"2026-10-08T14:27:29Z","conclusion":"success","name":"Run the test-suite","number":5,"startedAt":"2026-10-08T14:26:56Z","status":"completed"},{"completedAt":"2026-10-08T14:27:29Z","conclusion":"success","name":"Post Set up Python","number":9,"startedAt":"2026-10-08T14:27:29Z","status":"completed"},{"completedAt":"2026-10-08T14:27:31Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":10,"startedAt":"2026-10-08T14:27:29Z","status":"completed"},{"completedAt":"2026-10-08T14:27:31Z","conclusion":"success","name":"Complete job","number":11,"startedAt":"2026-10-08T14:27:31Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792516531/job/113363347162"},{"completedAt":"2026-10-08T14:27:22Z","conclusion":"success","databaseId":113363347339,"name":"test (3.9)","startedAt":"2026-10-08T14:26:49Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:26:50Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:26:50Z","status":"completed"},{"completedAt":"2026-10-08T14:26:51Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:26:50Z","status":"completed"},{"completedAt":"2026-10-08T14:27:00Z","conclusion":"success","name":"Set up Python 3.9","number":3,"startedAt":"2026-10-08T14:26:51Z","status":"completed"},{"completedAt":"2026-10-08T14:27:11Z","conclusion":"success","name":"Install bsdtar, desktop validator + test tools","number":4,"startedAt":"2026-10-08T14:27:00Z","status":"completed"},{"completedAt":"2026-10-08T14:27:12Z","conclusion":"success","name":"Byte-compile the installer","number":5,"startedAt":"2026-10-08T14:27:11Z","status":"completed"},{"completedAt":"2026-10-08T14:27:12Z","conclusion":"success","name":"Run lint","number":6,"startedAt":"2026-10-08T14:27:12Z","status":"completed"},{"completedAt":"2026-10-08T14:27:20Z","conclusion":"success","name":"Run the test-suite","number":7,"startedAt":"2026-10-08T14:27:12Z","status":"completed"},{"completedAt":"2026-10-08T14:27:20Z","conclusion":"success","name":"Post Set up Python 3.9","number":13,"startedAt":"2026-10-08T14:27:20Z","status":"completed"},{"completedAt":"2026-10-08T14:27:20Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":14,"startedAt":"2026-10-08T14:27:20Z","status":"completed"},{"completedAt":"2026-10-08T14:27:20Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-10-08T14:27:20Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792516531/job/113363347339"},{"completedAt":"2026-10-08T14:27:14Z","conclusion":"success","databaseId":113363347720,"name":"test (3.11)","startedAt":"2026-10-08T14:26:49Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:26:51Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:26:50Z","status":"completed"},{"completedAt":"2026-10-08T14:26:52Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:26:51Z","status":"completed"},{"completedAt":"2026-10-08T14:26:52Z","conclusion":"success","name":"Set up Python 3.11","number":3,"startedAt":"2026-10-08T14:26:52Z","status":"completed"},{"completedAt":"2026-10-08T14:27:04Z","conclusion":"success","name":"Install bsdtar, desktop validator + test tools","number":4,"startedAt":"2026-10-08T14:26:52Z","status":"completed"},{"completedAt":"2026-10-08T14:27:04Z","conclusion":"success","name":"Byte-compile the installer","number":5,"startedAt":"2026-10-08T14:27:04Z","status":"completed"},{"completedAt":"2026-10-08T14:27:04Z","conclusion":"success","name":"Run lint","number":6,"startedAt":"2026-10-08T14:27:04Z","status":"completed"},{"completedAt":"2026-10-08T14:27:11Z","conclusion":"success","name":"Run the test-suite","number":7,"startedAt":"2026-10-08T14:27:04Z","status":"completed"},{"completedAt":"2026-10-08T14:27:11Z","conclusion":"success","name":"Post Set up Python 3.11","number":13,"startedAt":"2026-10-08T14:27:11Z","status":"completed"},{"completedAt":"2026-10-08T14:27:12Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":14,"startedAt":"2026-10-08T14:27:11Z","status":"completed"},{"completedAt":"2026-10-08T14:27:12Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-10-08T14:27:12Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792516531/job/113363347720"},{"completedAt":"2026-10-08T14:27:17Z","conclusion":"success","databaseId":113363347752,"name":"test (3.12)","startedAt":"2026-10-08T14:26:49Z","status":"completed","steps":[{"completedAt":"2026-10-08T14:26:51Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-08T14:26:50Z","status":"completed"},{"completedAt":"2026-10-08T14:26:52Z","conclusion":"success","name":"Run actions/checkout@v7","number":2,"startedAt":"2026-10-08T14:26:51Z","status":"completed"},{"completedAt":"2026-10-08T14:26:52Z","conclusion":"success","name":"Set up Python 3.12","number":3,"startedAt":"2026-10-08T14:26:52Z","status":"completed"},{"completedAt":"2026-10-08T14:27:06Z","conclusion":"success","name":"Install bsdtar, desktop validator + test tools","number":4,"startedAt":"2026-10-08T14:26:52Z","status":"completed"},{"completedAt":"2026-10-08T14:27:06Z","conclusion":"success","name":"Byte-compile the installer","number":5,"startedAt":"2026-10-08T14:27:06Z","status":"completed"},{"completedAt":"2026-10-08T14:27:06Z","conclusion":"success","name":"Run lint","number":6,"startedAt":"2026-10-08T14:27:06Z","status":"completed"},{"completedAt":"2026-10-08T14:27:14Z","conclusion":"success","name":"Run the test-suite","number":7,"startedAt":"2026-10-08T14:27:06Z","status":"completed"},{"completedAt":"2026-10-08T14:27:14Z","conclusion":"success","name":"Post Set up Python 3.12","number":13,"startedAt":"2026-10-08T14:27:14Z","status":"completed"},{"completedAt":"2026-10-08T14:27:14Z","conclusion":"success","name":"Post Run actions/checkout@v7","number":14,"startedAt":"2026-10-08T14:27:14Z","status":"completed"},{"completedAt":"2026-10-08T14:27:14Z","conclusion":"success","name":"Complete job","number":15,"startedAt":"2026-10-08T14:27:14Z","status":"completed"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37792516531/job/113363347752"}]}
+
+exit=0
+
+$ git -C /tmp/mgs14-verifier-patriot rev-parse HEAD
+c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de
+
+exit=0
+
+$ git -C /tmp/mgs14-verifier-patriot status --porcelain
+
+exit=0
+
+$ unzip -Z1 /tmp/mgs14-verifier.zip
+Launcher/
+Launcher/d3d11.dll
+Launcher/scripts/
+Launcher/scripts/MGSPatriotFix.asi
+logs/
+logs/MGSPatriotFix_Game.log
+logs/MGSPatriotFix_Launcher.log
+logs/UltimateASILoader_LICENSE.md
+MGS4/
+MGS4/scripts/
+MGS4/scripts/MGSPatriotFix.asi
+MGS4/scripts/MGSPatriotFix_LICENSE.md
+MGS4/winmm.dll
+MGSPatriotFix Config Tool.exe
+MGSPatriotFix_README.md
+
+exit=0
+
+$ shasum -a 256 /tmp/mgs14-verifier.zip
+4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1  /tmp/mgs14-verifier.zip
+
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+
+exit=0
+
+$ python3 -m py_compile docs/batches/evidence/14-mgs4-patriotfix-verifier/probes.py
+
+exit=0
+
+$ git diff --check
+
+exit=0
+
+$ git diff 48cfa4127a4f77080cec55263c2477166826b67b --stat
+
+exit=0
+
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs14-verifier-framework
+Install-MGS-Mods.cmd v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+Install-MGS-Mods.desktop v2.3.0 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: 48cfa4127a4f77080cec55263c2477166826b67b
+
+exit=0

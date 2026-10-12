@@ -1,0 +1,51 @@
+$ python3 docs/batches/evidence/14-mgs4-patriotfix-verifier/probes.py /tmp/mgs14-verifier-patriot /tmp/mgs14-verifier.zip
+Reviewed SHA: 48cfa4127a4f77080cec55263c2477166826b67b
+PASS fresh official source capture equals fixture: 28 fields / 24 reads
+FINDING capture accepts modified compiled stdafx.h at unchanged HEAD
+PASS official ZIP hash 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+PASS each of 28 missing keys refused
+    ✓ MGSPatriotFix.settings (complete pinned schema validated)
+
+=== Metal Gear Solid 4: Guns of the Patriots ===
+    ✓ restored the interrupted run
+  … MGS4 — Installing MGSPatriotFix  (40%)
+    ✓ MGSPatriotFix.settings (complete pinned schema validated)
+  … MGS4 — Complete  (100%)
+PASS full UI interrupted-repair recovery retains custom and hidden values
+    ✓ restored the interrupted run
+PASS corrupt save journal and linked settings refusal
+PASS actual archive install/repair/removal restores oldest settings and save bytes
+  ↓ (verified, already downloaded) MGS4_MGSPatriotFix_0.2.2.zip
+    ✓ MGSPatriotFix.settings (complete pinned schema validated)
+FINDING MGS4 removal deletes untracked root MGSM2Fix.asi without backup: ['removed legacy MGSM2Fix.asi', 'removed 9 installed file(s)', 'removed the mgs-modkit backup/manifest folder']
+
+=== Metal Gear Solid (1) ===
+  Installing MGSM2Fix 3.6.0 …
+    ✓ d3d11.dll + dinput8.dll + MGSM2Fix (vanilla-faithful shipped defaults; auto-boots your last-picked version)
+
+=== Metal Gear Solid 4: Guns of the Patriots ===
+  ✗ MGS4 interrupted — restoring pre-run files …
+  … MGS4 — Installing MGSPatriotFix  (70%)
+Traceback (most recent call last):
+  File "<CHECKOUT>/install.py", line 4325, in _main
+    run_with_progress(prog, install_selected)
+  File "<CHECKOUT>/install.py", line 3974, in run_with_progress
+    raise failure[0]
+  File "<CHECKOUT>/install.py", line 3957, in worker
+    result.append(operation())
+  File "<CHECKOUT>/install.py", line 4277, in install_selected
+    install_patriot(tx, tmp, game_opts, log)
+  File "<CHECKOUT>/install.py", line 2339, in install_patriot
+    fetch(PATRIOT_URL, archive, log, sha256=PATRIOT_SHA256)
+  File "<CHECKOUT>/install.py", line 1599, in fetch
+    download(url, dest, log, sha256=sha256)
+  File "<CHECKOUT>/docs/batches/evidence/14-mgs4-patriotfix-verifier/probes.py", line 155, in mixed_download
+    install.check_cancelled()
+  File "<CHECKOUT>/install.py", line 1474, in check_cancelled
+    raise CancelledInstall("Installation cancelled. Recovery is finishing before the window closes.")
+install.CancelledInstall: Installation cancelled. Recovery is finishing before the window closes.
+
+PASS mixed-game cancellation retains prior committed success
+Native exports/ASI initialization/GUI/gameplay/real licensed restoration: NOT RUN
+
+exit=0

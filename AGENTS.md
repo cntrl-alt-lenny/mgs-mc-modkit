@@ -10,7 +10,8 @@ Merge rule: owner-approves
 ## What this project is
 
 The kit installs vanilla-faithful fixes and restorations for Metal Gear Solid
-Master Collection Volume 1 (MGS1, MGS2 and MGS3) on Windows and Steam Deck/Linux.
+Master Collection MGS1–3 (Volume 1) and MGS4 (Volume 2) on Windows and Steam
+Deck/Linux. MGS4 uses MGSPatriotFix; Peace Walker is outside the standing scope.
 It automates official upstream mod downloads and optional user-supplied audio,
 with repair and removal through the same installer (README.md).
 
@@ -30,8 +31,11 @@ conversations as framework batches (adoption brief).
 
 - Only the owner approves a merge or release; Brain alone merges accepted work.
   Workers and Verifiers never merge, tag or publish (owner instructions and framework).
-- Keep the vanilla-faithful scope: fixes and restorations, excluding AI-upscaled
-  textures and gameplay changes (README.md).
+- Keep the vanilla-faithful scope: fixes and restorations for MGS1–4, excluding
+  Peace Walker, ClarityFix, FPS unlockers, AI-upscaled textures, gameplay changes,
+  MGS4 audio and standalone MGS4 flashback MGSM2Fix. Preserve MGS4 original
+  rendering/frame-rate defaults; visual overrides require explicit choices.
+  Native Windows/Deck compatibility remains pending (README.md).
 - Review mod pins, archive checksums and the matched configuration schema as a
   coupled set; never make isolated numeric bumps (docs/UPGRADING.md).
 - Protect user saves, original files, backups and recovery records during

@@ -1,0 +1,356 @@
+{
+  "conclusion": "success",
+  "headSha": "1aebf38b82680cefe777b474921a19670a2d774a",
+  "jobs": [
+    {
+      "completedAt": "2026-10-09T12:11:08Z",
+      "conclusion": "success",
+      "databaseId": 113812510495,
+      "name": "test-windows",
+      "startedAt": "2026-10-09T12:10:30Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-09T12:10:31Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-09T12:10:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:36Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v7",
+          "number": 2,
+          "startedAt": "2026-10-09T12:10:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:36Z",
+          "conclusion": "success",
+          "name": "Set up Python",
+          "number": 3,
+          "startedAt": "2026-10-09T12:10:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:36Z",
+          "conclusion": "success",
+          "name": "Confirm Windows tar is bsdtar",
+          "number": 4,
+          "startedAt": "2026-10-09T12:10:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:11:04Z",
+          "conclusion": "success",
+          "name": "Run the test-suite",
+          "number": 5,
+          "startedAt": "2026-10-09T12:10:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:11:05Z",
+          "conclusion": "success",
+          "name": "Post Set up Python",
+          "number": 9,
+          "startedAt": "2026-10-09T12:11:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:11:06Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v7",
+          "number": 10,
+          "startedAt": "2026-10-09T12:11:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:11:06Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 11,
+          "startedAt": "2026-10-09T12:11:06Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625/job/113812510495"
+    },
+    {
+      "completedAt": "2026-10-09T12:10:58Z",
+      "conclusion": "success",
+      "databaseId": 113812510692,
+      "name": "test (3.9)",
+      "startedAt": "2026-10-09T12:10:31Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-09T12:10:32Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-09T12:10:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:32Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v7",
+          "number": 2,
+          "startedAt": "2026-10-09T12:10:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:38Z",
+          "conclusion": "success",
+          "name": "Set up Python 3.9",
+          "number": 3,
+          "startedAt": "2026-10-09T12:10:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:48Z",
+          "conclusion": "success",
+          "name": "Install bsdtar, desktop validator + test tools",
+          "number": 4,
+          "startedAt": "2026-10-09T12:10:38Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:48Z",
+          "conclusion": "success",
+          "name": "Byte-compile the installer",
+          "number": 5,
+          "startedAt": "2026-10-09T12:10:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:48Z",
+          "conclusion": "success",
+          "name": "Run lint",
+          "number": 6,
+          "startedAt": "2026-10-09T12:10:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:56Z",
+          "conclusion": "success",
+          "name": "Run the test-suite",
+          "number": 7,
+          "startedAt": "2026-10-09T12:10:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:56Z",
+          "conclusion": "success",
+          "name": "Post Set up Python 3.9",
+          "number": 13,
+          "startedAt": "2026-10-09T12:10:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:56Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v7",
+          "number": 14,
+          "startedAt": "2026-10-09T12:10:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:56Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-10-09T12:10:56Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625/job/113812510692"
+    },
+    {
+      "completedAt": "2026-10-09T12:11:00Z",
+      "conclusion": "success",
+      "databaseId": 113812510711,
+      "name": "test (3.12)",
+      "startedAt": "2026-10-09T12:10:30Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-09T12:10:31Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-09T12:10:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:32Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v7",
+          "number": 2,
+          "startedAt": "2026-10-09T12:10:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:32Z",
+          "conclusion": "success",
+          "name": "Set up Python 3.12",
+          "number": 3,
+          "startedAt": "2026-10-09T12:10:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:50Z",
+          "conclusion": "success",
+          "name": "Install bsdtar, desktop validator + test tools",
+          "number": 4,
+          "startedAt": "2026-10-09T12:10:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:50Z",
+          "conclusion": "success",
+          "name": "Byte-compile the installer",
+          "number": 5,
+          "startedAt": "2026-10-09T12:10:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:50Z",
+          "conclusion": "success",
+          "name": "Run lint",
+          "number": 6,
+          "startedAt": "2026-10-09T12:10:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Run the test-suite",
+          "number": 7,
+          "startedAt": "2026-10-09T12:10:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Post Set up Python 3.12",
+          "number": 13,
+          "startedAt": "2026-10-09T12:10:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v7",
+          "number": 14,
+          "startedAt": "2026-10-09T12:10:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-10-09T12:10:59Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625/job/113812510711"
+    },
+    {
+      "completedAt": "2026-10-09T12:11:01Z",
+      "conclusion": "success",
+      "databaseId": 113812510726,
+      "name": "test (3.11)",
+      "startedAt": "2026-10-09T12:10:31Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-09T12:10:32Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-09T12:10:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:33Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@v7",
+          "number": 2,
+          "startedAt": "2026-10-09T12:10:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:33Z",
+          "conclusion": "success",
+          "name": "Set up Python 3.11",
+          "number": 3,
+          "startedAt": "2026-10-09T12:10:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:51Z",
+          "conclusion": "success",
+          "name": "Install bsdtar, desktop validator + test tools",
+          "number": 4,
+          "startedAt": "2026-10-09T12:10:33Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:52Z",
+          "conclusion": "success",
+          "name": "Byte-compile the installer",
+          "number": 5,
+          "startedAt": "2026-10-09T12:10:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:52Z",
+          "conclusion": "success",
+          "name": "Run lint",
+          "number": 6,
+          "startedAt": "2026-10-09T12:10:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Run the test-suite",
+          "number": 7,
+          "startedAt": "2026-10-09T12:10:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Post Set up Python 3.11",
+          "number": 13,
+          "startedAt": "2026-10-09T12:10:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@v7",
+          "number": 14,
+          "startedAt": "2026-10-09T12:10:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-09T12:10:59Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 15,
+          "startedAt": "2026-10-09T12:10:59Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625/job/113812510726"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37928302625"
+}
