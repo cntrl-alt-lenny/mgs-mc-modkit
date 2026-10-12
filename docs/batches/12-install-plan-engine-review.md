@@ -39,7 +39,9 @@ Commands ran in the isolated repository root. Outputs below are actual; scripts 
 | Same identity script, AST comparison with `git show 85697bd:install.py` | 47 uppercase constants (pins/GAMES/template/schema included) and 11 transaction/lock/recovery/removal/recipe definitions unchanged | 0 |
 | `gh pr view 22 --json headRefOid,headRefName,baseRefName,url,statusCheckRollup` | head matches literal reviewed SHA; four CI jobs SUCCESS | 0 |
 | `gh api repos/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/37927964314` | `head_sha` matches reviewed SHA; `conclusion: success` | 0 |
-| `gh run view 37927964314 --log` | Linux 3.9/3.11/3.12: 335 passed; desktop validation command passed; Windows job SUCCESS | 0 |
+| `gh run view 37927964314 --log` | Linux 3.9/3.11/3.12: 335 passed; desktop validation command passed; Windows `333 passed, 2 skipped in 46.01s`, job SUCCESS | 0 |
+
+| `git diff --cached --check`; `python3 tools/fw.py check` (review document) | no whitespace errors; `0 error(s), 0 warning(s)` | 0 |
 
 Native licensed game boots, real audio compatibility, real install/repair/removal, GUI and Config Tool exports: **NOT RUN**. Local Python 3.9 runtime and `desktop-file-validate` unavailable; exact-head CI supplies those checks. UPGRADING archive/layout/settings checks were synthetic; no pin upgrade or live archive authentication claimed. MGS4 integration is separate.
 
