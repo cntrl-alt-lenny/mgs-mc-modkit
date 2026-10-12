@@ -45,8 +45,8 @@ Work not merged yet
 This machine
   on worker/14-mgs4-patriotfix; 1 uncommitted change(s)
   not on GitHub yet: worker/14-mgs4-patriotfix (9 commit(s))
-  uncommitted changes in linked checkout /Users/leo/Dev/GitHub/mgs-mc-modkit/.worktrees/verifier-16-volume1-qol-upgrade
-  finished checkouts (clean, and their work is merged) that can be removed: /Users/leo/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  uncommitted changes in linked checkout <local-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/verifier-16-volume1-qol-upgrade
+  finished checkouts (clean, and their work is merged) that can be removed: <local-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
   safe to leave this machine: NO -- push or deal with the items above first
 Checks
   all project checks pass

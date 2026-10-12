@@ -36,3 +36,8 @@ Plain git diff --check reports expected CMD CRLF as trailing whitespace (exit 2)
 git -c core.whitespace=cr-at-eol diff --check is the project-correct check.
 Advisory tools/check_pins.py: 2 updates available (HDFix 4.1.2, M2Fix v3.7.3),
 exit 1. Shipping pins are intentionally unchanged. Native checks remain NOT RUN.
+
+Full post-correction suite first run: 1 failed, 407 passed (exit 1), framework
+hygiene detected local home paths in captured framework status from the earlier
+evidence log. Replaced local home prefix with <local-home>; the command/output
+content and exit codes remain intact. Future captured status uses that redaction.
