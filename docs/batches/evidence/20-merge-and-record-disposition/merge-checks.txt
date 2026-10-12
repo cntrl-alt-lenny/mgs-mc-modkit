@@ -1,0 +1,24 @@
+$ gh pr view 21 --json state,mergeCommit,mergedAt,headRefOid,url
+{"headRefOid":"e410523f34c82bf25266adba6e55c9c1616562ec","mergeCommit":{"oid":"bd8546524886614a04f5629b1fbbf1f741b73163"},"mergedAt":"2026-10-12T09:27:09Z","state":"MERGED","url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/pull/21"}
+exit 0
+
+$ git rev-parse HEAD
+bd8546524886614a04f5629b1fbbf1f741b73163
+exit 0
+
+$ git diff --exit-code e410523f34c82bf25266adba6e55c9c1616562ec HEAD
+
+exit 0
+
+$ git diff --exit-code 85697bd5a18ddb43acd3b121184b3624871781e4 HEAD -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop tests/fixtures/hdfix-4.1.0-schema.json docs/agents tools/fw.py
+
+exit 0
+
+$ python3 -m pytest tests/test_volume1_candidate.py -q
+...........................................                              [100%]
+43 passed in 0.07s
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
