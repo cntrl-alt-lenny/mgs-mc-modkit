@@ -1,0 +1,24 @@
+$ gh run view 38232687896 --log
+exit 0; selected checkout/test/lint/desktop lines:
+test-windows	Run actions/checkout@v7	2026-10-12T09:52:34.9814063Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ab4cbe666af085f1ad39ac62fe46402f236055d4:refs/remotes/pull/19/merge
+test-windows	Run actions/checkout@v7	2026-10-12T09:52:36.1980043Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force refs/remotes/pull/19/merge
+test-windows	Run actions/checkout@v7	2026-10-12T09:52:36.3041623Z Note: switching to 'refs/remotes/pull/19/merge'.
+test-windows	Run the test-suite	2026-10-12T09:54:08.7321785Z 480 passed, 2 skipped in 83.24s (0:01:23)
+test (3.12)	Run actions/checkout@v7	2026-10-12T09:52:30.7680802Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ab4cbe666af085f1ad39ac62fe46402f236055d4:refs/remotes/pull/19/merge
+test (3.12)	Run actions/checkout@v7	2026-10-12T09:52:31.0694451Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/19/merge
+test (3.12)	Run actions/checkout@v7	2026-10-12T09:52:31.0885470Z Note: switching to 'refs/remotes/pull/19/merge'.
+test (3.12)	Install bsdtar, desktop validator + test tools	2026-10-12T09:52:31.2820265Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.12)	Run lint	2026-10-12T09:52:43.0536298Z All checks passed!
+test (3.12)	Run the test-suite	2026-10-12T09:53:04.9373348Z 482 passed in 21.52s
+test (3.11)	Run actions/checkout@v7	2026-10-12T09:52:30.9034946Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ab4cbe666af085f1ad39ac62fe46402f236055d4:refs/remotes/pull/19/merge
+test (3.11)	Run actions/checkout@v7	2026-10-12T09:52:31.3935466Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/19/merge
+test (3.11)	Run actions/checkout@v7	2026-10-12T09:52:31.4079236Z Note: switching to 'refs/remotes/pull/19/merge'.
+test (3.11)	Install bsdtar, desktop validator + test tools	2026-10-12T09:52:31.5610543Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.11)	Run lint	2026-10-12T09:52:50.6078083Z All checks passed!
+test (3.11)	Run the test-suite	2026-10-12T09:53:07.6018078Z 482 passed in 15.85s
+test (3.9)	Run actions/checkout@v7	2026-10-12T09:52:30.8433649Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ab4cbe666af085f1ad39ac62fe46402f236055d4:refs/remotes/pull/19/merge
+test (3.9)	Run actions/checkout@v7	2026-10-12T09:52:31.1349591Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/19/merge
+test (3.9)	Run actions/checkout@v7	2026-10-12T09:52:31.1542386Z Note: switching to 'refs/remotes/pull/19/merge'.
+test (3.9)	Install bsdtar, desktop validator + test tools	2026-10-12T09:52:38.7726088Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.9)	Run lint	2026-10-12T09:52:50.9908565Z All checks passed!
+test (3.9)	Run the test-suite	2026-10-12T09:53:15.9670043Z 482 passed in 24.68s
