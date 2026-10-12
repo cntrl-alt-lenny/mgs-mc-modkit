@@ -215,7 +215,7 @@ def test_mgs4_plan_settings_identity_is_immutable(tmp_path, patch_download):
 
 
 @pytest.mark.parametrize('key', ['mgs3', 'mgs4'])
-@pytest.mark.parametrize('obstruction', ['root', 'staging', 'rollback', 'backups', 'backup-parent', 'backup-destination'])
+@pytest.mark.parametrize('obstruction', ['root', 'staging', 'rollback', 'backups', 'backup-parent', 'backup-destination', 'game-parent'])
 def test_transaction_obstructions_refuse_before_any_game_commits(
         tmp_path, patch_download, key, obstruction):
     found, options = combined(tmp_path)
@@ -223,6 +223,9 @@ def test_transaction_obstructions_refuse_before_any_game_commits(
     recovery = root / install.MODKIT_DIRNAME
     if obstruction == 'root':
         recovery.write_bytes(b'obstruction')
+    elif obstruction == 'game-parent':
+        parent = root / ('plugins' if key == 'mgs3' else 'MGS4/scripts')
+        parent.write_bytes(b'obstructed game destination parent')
     else:
         recovery.mkdir()
         if obstruction.startswith('backup-'):

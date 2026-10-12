@@ -4461,6 +4461,11 @@ class CurrentRecipeAdapter:
             dest = _safe_game_path(Path(game.path), rel)
             if dest.is_symlink() or (dest.exists() and not dest.is_file()):
                 raise ValueError("Destination is not a regular file: " + rel)
+            for parent in dest.parents:
+                if parent.exists() and not parent.is_dir():
+                    raise ValueError("Destination ancestor is not a directory: " + rel)
+                if parent == Path(game.path):
+                    break
             # Transaction backup ancestors must be usable before any game runs.
             backup_root = Path(game.path) / MODKIT_DIRNAME / "backups"
             backup = _safe_game_path(backup_root, rel)
