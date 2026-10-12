@@ -1,0 +1,18 @@
+Actual GitHub CI log, run 38258964488, review head 2844fa25cfda89301def7996a93a2ab6f2dec403
+$ gh run view 38258964488 --log
+exit 0
+Selected literal lines follow:
+test-windows	Run actions/checkout@v7	2026-10-12T13:54:12.9054842Z HEAD is now at cdb6828 Merge 2844fa25cfda89301def7996a93a2ab6f2dec403 into bd8546524886614a04f5629b1fbbf1f741b73163
+test-windows	Run the test-suite	2026-10-12T13:55:55.8344748Z 480 passed, 2 skipped in 93.25s (0:01:33)
+test (3.11)	Run actions/checkout@v7	2026-10-12T13:54:08.9061877Z HEAD is now at cdb6828 Merge 2844fa25cfda89301def7996a93a2ab6f2dec403 into bd8546524886614a04f5629b1fbbf1f741b73163
+test (3.11)	Install bsdtar, desktop validator + test tools	2026-10-12T13:54:09.1057329Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.11)	Run lint	2026-10-12T13:54:22.5757400Z All checks passed!
+test (3.11)	Run the test-suite	2026-10-12T13:54:42.4325007Z 482 passed in 19.42s
+test (3.9)	Run actions/checkout@v7	2026-10-12T13:54:09.9473076Z HEAD is now at cdb6828 Merge 2844fa25cfda89301def7996a93a2ab6f2dec403 into bd8546524886614a04f5629b1fbbf1f741b73163
+test (3.9)	Install bsdtar, desktop validator + test tools	2026-10-12T13:54:19.0194921Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.9)	Run lint	2026-10-12T13:54:34.4803190Z All checks passed!
+test (3.9)	Run the test-suite	2026-10-12T13:54:57.5599680Z 482 passed in 22.80s
+test (3.12)	Run actions/checkout@v7	2026-10-12T13:54:09.9338834Z HEAD is now at cdb6828 Merge 2844fa25cfda89301def7996a93a2ab6f2dec403 into bd8546524886614a04f5629b1fbbf1f741b73163
+test (3.12)	Install bsdtar, desktop validator + test tools	2026-10-12T13:54:10.1387846Z ^[[36;1mdesktop-file-validate Install-MGS-Mods.desktop^[[0m
+test (3.12)	Run lint	2026-10-12T13:54:22.1292849Z All checks passed!
+test (3.12)	Run the test-suite	2026-10-12T13:54:43.1740554Z 482 passed in 20.72s

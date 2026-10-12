@@ -1,0 +1,42 @@
+$ git rev-parse HEAD
+2844fa25cfda89301def7996a93a2ab6f2dec403
+exit 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 49%]
+........................................................................ [ 65%]
+........................................................................ [ 82%]
+........................................................................ [ 98%]
+.......                                                                  [100%]
+439 passed in 23.66s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py tools/capture_patriot_schema.py
+exit 0
+
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 /tmp/mgs-brain-acceptance-20261012/records.py
+PASS 128 schema-1/2 late settings/mods refusals; real collection/preparation; zero live constructors; all files/directories/records/backups unchanged
+exit 0
+
+$ python3 /tmp/mgs-brain-acceptance-20261012/legacy.py .
+Reviewed SHA: 2844fa25cfda89301def7996a93a2ab6f2dec403
+PASS schema 1 settings missing False all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+PASS schema 1 settings missing True all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+PASS schema 2 settings missing False all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+PASS schema 2 settings missing True all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+All fixtures disposable; native compatibility NOT RUN
+exit 0

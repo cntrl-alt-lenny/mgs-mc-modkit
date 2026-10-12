@@ -1,0 +1,11 @@
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/18-correction-disposition/identities.py . ../agentic-framework /tmp/mgs14-verifier-patriot
+Reviewed SHA: c3ecd64a7a3a3a3e8994a77511bb1585b3ec04a9
+worker-12-install-plan-engine six pinned framework copies unchanged: PASS
+Reviewed SHA: c2e7ea470d5c38390238fc8854f31187499ff330
+worker-14-mgs4-patriotfix six pinned framework copies unchanged: PASS
+Reviewed SHA: b0d6a83a2d8e5551c0d78407929c6286854e7192
+worker-16-volume1-qol-upgrade six pinned framework copies unchanged: PASS
+Batch 16 shipping installer, shortcuts and template unchanged: PASS
+PatriotFix live official tag + 61 checkout/blob hashes incl all three headers: PASS
+
+exit 0

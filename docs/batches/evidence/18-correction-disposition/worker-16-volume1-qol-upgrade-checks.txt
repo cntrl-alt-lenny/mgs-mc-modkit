@@ -1,0 +1,31 @@
+$ git rev-parse HEAD
+b0d6a83a2d8e5551c0d78407929c6286854e7192
+
+exit 0
+$ git status --short
+
+exit 0
+$ python3 -m pytest tests/ -q
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+......................................                                   [100%]
+326 passed in 9.05s
+
+exit 0
+$ python3 -m ruff check .
+All checks passed!
+
+exit 0
+$ python3 -m py_compile tools/fw.py install.py
+
+exit 0
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+
+exit 0
+$ git -c core.whitespace=cr-at-eol diff --check
+
+exit 0
+Shortcut tags/SHA/line endings/Python 3.9: PASS e3732996b09db0ffd7b38597b1d3e08552701aa0d6078ce7e4093816ba9c308a

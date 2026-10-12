@@ -1,6 +1,6 @@
 # 14-mgs4-patriotfix
 
-Checked: new upstream archive/settings and installation/removal require independent review. The owner requested MGS4 integration; the earlier handoff omitted its concrete implementation batch. This brief closes that gap. Start after batch 11 is merged, before batch 12. Source authentication supports planning, not native compatibility.
+Checked: new upstream archive/settings and installation/removal require independent review. The owner requested MGS4 integration; the earlier handoff omitted its concrete implementation batch. This brief closes that gap. Start after batch 11 is merged. Batch 12 can independently start from current main; its later MGS4 adapter depends on accepted batch 14. Source authentication supports planning, not native compatibility.
 
 ## Worker prompt
 

@@ -1,0 +1,56 @@
+Brain handoff documents only; this existing seat retains its older pin. Main is already Framework 4.0.1.
+$ git rev-parse HEAD
+62602c60845621972f032b9a9b0f8453a9e8b5d9
+exit 0
+
+$ python3 --version
+Python 3.9.6
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 29 commit(s), last 2026-10-12; batch 14-mgs4-patriotfix: Verifier review in -- Brain judges it
+  brain/11-12-briefs: 22 commit(s), last 2026-10-12; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-engine-verifier-dispatch, 12-install-plan-interface, 14-combined-verifier-dispatch, 14-manifest-preflight-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch, 16-volume1-qol-upgrade-verifier-dispatch, 17-delivery-disposition, 18-correction-disposition, 19-integration-disposition, 20-merge-and-record-disposition, 21-manifest-correction-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 10 commit(s), last 2026-10-12; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 9 commit(s), last 2026-10-12; batch 12-install-plan-engine: Verifier review in -- Brain judges it
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/11-12-briefs; 12 uncommitted change(s)
+  finished checkouts (clean, and their work is merged) that can be removed: <local-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to judge batch 14-mgs4-patriotfix
+exit 0
+
+$ python3 -m pytest tests/test_framework.py -q
+.                                                                        [100%]
+1 passed in 0.09s
+exit 0
+
+$ python3 /tmp/mgs14-final-verifier/framework.py
+PASS pinned source copy docs/agents/FRAMEWORK.md
+PASS pinned source copy docs/agents/roles/brain.md
+PASS pinned source copy docs/agents/roles/verifier.md
+PASS pinned source copy docs/agents/roles/worker.md
+PASS pinned source copy tests/test_framework.py
+PASS pinned source copy tools/fw.py
+exit 0
+
+$ git diff --check
+exit 0
+
+$ gh pr view 19 --json headRefOid,state,mergeable,statusCheckRollup,url
+{"headRefOid":"2844fa25cfda89301def7996a93a2ab6f2dec403","mergeable":"MERGEABLE","state":"OPEN","statusCheckRollup":[{"__typename":"CheckRun","completedAt":"2026-10-12T13:55:00Z","conclusion":"SUCCESS","detailsUrl":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38258964488/job/114844252675","name":"test (3.9)","startedAt":"2026-10-12T13:54:06Z","status":"COMPLETED","workflowName":"CI"},{"__typename":"CheckRun","completedAt":"2026-10-12T13:54:44Z","conclusion":"SUCCESS","detailsUrl":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38258964488/job/114844252595","name":"test (3.11)","startedAt":"2026-10-12T13:54:06Z","status":"COMPLETED","workflowName":"CI"},{"__typename":"CheckRun","completedAt":"2026-10-12T13:54:46Z","conclusion":"SUCCESS","detailsUrl":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38258964488/job/114844252708","name":"test (3.12)","startedAt":"2026-10-12T13:54:07Z","status":"COMPLETED","workflowName":"CI"},{"__typename":"CheckRun","completedAt":"2026-10-12T13:56:00Z","conclusion":"SUCCESS","detailsUrl":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38258964488/job/114844252274","name":"test-windows","startedAt":"2026-10-12T13:54:06Z","status":"COMPLETED","workflowName":"CI"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/pull/19"}
+exit 0

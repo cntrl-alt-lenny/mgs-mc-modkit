@@ -1,0 +1,61 @@
+Delivery check output excerpts from the actual tool runs on 9 October 2026.
+Production/evidence state was unchanged during checks. Commands below are the
+original shell sequences; exit codes refer to the full sequence. Rerun metadata
+assertions separately confirmed both shortcut tags/SHA256, LF/CRLF, Python 3.9
+AST and all six copies against immutable framework 4.0.0 source
+b036c761ac2af2d47e61a1b473c708f094bd4295.
+
+Batch 12 SHA 8297142978fc2b6932fc2c0af9485b4b074e09c5
+$ python3 -m pytest tests/ -q; python3 -m ruff check .; python3 tools/embed_install_plan.py --check; python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py
+312 passed in 11.36s
+All checks passed!
+OK: standalone plan matches authoritative source
+exit=0
+Shortcut SHA 5639d83c64f8bfbe41f88c57495701f6dba23a26d704cb5cd9e5b947f1245f52; both v2.3.0 pins and CRLF/LF match. Six framework copies and Python 3.9 grammar pass.
+
+Batch 14 SHA 38ef1b6a679411d48b784a8142aed797ae170117
+$ python3 -m pytest tests/ -q; python3 -m ruff check .; python3 -m py_compile tools/fw.py install.py tools/capture_patriot_schema.py; git diff 48cfa4127a4f77080cec55263c2477166826b67b HEAD -- install.py tools/capture_patriot_schema.py tests/test_patriot.py
+314 passed in 8.25s
+All checks passed!
+Production/test diff: no output
+exit=0
+Shortcut SHA 4443ca863ba87e7d84aa2b66d09225ee6135dfc182f839eb5e694a4b1771c996; both v2.3.0 pins and CRLF/LF match. Six framework copies and Python 3.9 grammar pass.
+
+Batch 16 SHA 0e909f639f7687839c4fe3e3af37c551b3b36467
+$ python3 -m pytest tests/ -q; python3 -m ruff check .; python3 -m py_compile tools/fw.py install.py tools/validate_volume1_candidate.py
+314 passed in 7.43s
+All checks passed!
+exit=0
+Shortcut SHA e3732996b09db0ffd7b38597b1d3e08552701aa0d6078ce7e4093816ba9c308a; both v2.3.0 pins and CRLF/LF match. Six framework copies and Python 3.9 grammar pass.
+$ git diff origin/main -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop docs/agents tools/fw.py
+(no output)
+exit=0
+
+$ python3 tools/validate_volume1_candidate.py --source /tmp/mgs-batch16/hdfix --archives /tmp/mgs-batch16
+All five exact archive hashes/layouts/CRCs pass, matching the committed manifest:
+MGSHDFix_4.1.2.zip: 13 members
+MGSM2Fix_3.7.3.zip: 7 members
+MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip: 10441 members
+MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip: 4514 members
+MGSM2Fix_3.6.0.zip: 7 members
+Authenticated source 33e80bf4d2223f6866b0b92e06c3c9b85efab652; 134 fields
+native_exports: not established by source
+exit=0
+
+CI snapshot (gh pr view 19/21/22 --json headRefOid,statusCheckRollup):
+PR22 at 8297142978fc2b6932fc2c0af9485b4b074e09c5: four SUCCESS jobs, run 37920652402.
+PR21 at 0e909f639f7687839c4fe3e3af37c551b3b36467: three Linux SUCCESS jobs; Windows FAILURE, run 37920207041.
+PR19 at 38ef1b6a679411d48b784a8142aed797ae170117: no jobs (review/evidence-only updates); production at 48cfa4127a4f77080cec55263c2477166826b67b passed all four jobs in run 37792516531.
+
+$ gh run view 37920207041 --log-failed
+Windows output excerpt:
+FAILED tests/test_volume1_candidate.py::test_archive_rejects_unsafe_paths_without_extraction[a\b]
+AssertionError: Regex pattern did not match.
+Expected regex: unsafe
+Actual message: archive layout mismatch: archive.zip
+1 failed, 311 passed, 2 skipped in 18.79s
+Test command exit=1; log retrieval exit=0.
+
+No native Config Tool, licensed game, real repair/removal or user audio run.
+Windows ZIP reader normalization probe on macOS is a deterministic stdlib
+platform-separator simulation, not a claim of a native Windows reproduction.

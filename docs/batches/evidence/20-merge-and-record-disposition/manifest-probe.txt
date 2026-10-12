@@ -1,0 +1,7 @@
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/20-merge-and-record-disposition/manifest_probe.py .worktrees/worker-14-mgs4-patriotfix
+Reviewed production SHA: 868bebf712a7c11edcecd8b3afc636291a379cc4
+settings None CorruptManifestError {'mgs1': 'installed and verified', 'mgs2': 'installed and verified', 'mgs3': 'installed and verified', 'mgs4': 'not changed; inspect recovery record / lock'}
+settings 42 CorruptManifestError {'mgs1': 'installed and verified', 'mgs2': 'installed and verified', 'mgs3': 'installed and verified', 'mgs4': 'not changed; inspect recovery record / lock'}
+settings ['invalid'] CorruptManifestError {'mgs1': 'installed and verified', 'mgs2': 'installed and verified', 'mgs3': 'installed and verified', 'mgs4': 'not changed; inspect recovery record / lock'}
+CONFIRMED: malformed late manifest settings escape preparation; no native games run
+exit 0

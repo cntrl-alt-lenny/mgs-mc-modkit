@@ -1,0 +1,92 @@
+Brain evidence at 613c08ec07f2c89e7cdc101270ab6da8664018d9
+Probe seat SHAs are printed by each invocation. Windows ZIP normalization is simulated on macOS; actual Windows CI failure is recorded separately.
+
+$ python3 docs/batches/evidence/12-14-16-brain-review/probes.py audio --seat <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-12-install-plan-engine
+Reviewed SHA: 8297142978fc2b6932fc2c0af9485b4b074e09c5
+Replacement classification: missing_identity
+No uncertain-file confirmation requested; outcome: {'mgs2': 'installed and verified'}
+CONFIRMED P2: newly hashed replacement bypasses selection-time acceptance
+All fixtures disposable; native games/exports/binaries NOT RUN
+exit=0
+
+$ python3 docs/batches/evidence/12-14-16-brain-review/probes.py removal --seat <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/verifier-14-mgs4-patriotfix --archive /tmp/mgs14-verifier.zip
+Reviewed SHA: 38ef1b6a679411d48b784a8142aed797ae170117
+Removal returns success: True
+Unowned MGSM2Fix.asi preserved: False
+Save bytes preserved: True
+Removal notes: ['removed legacy MGSM2Fix.asi', 'removed 9 installed file(s)', 'removed the mgs-modkit backup/manifest folder']
+CONFIRMED P1: unowned bytes permanently removed without backup
+All fixtures disposable; native games/exports/binaries NOT RUN
+exit=0
+
+$ python3 docs/batches/evidence/12-14-16-brain-review/probes.py source --seat <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/verifier-14-mgs4-patriotfix --source /tmp/mgs14-verifier-patriot
+Reviewed SHA: 38ef1b6a679411d48b784a8142aed797ae170117
+Exact source tree: c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de
+Modified compiled header accepted: True
+Header authenticated: False
+CONFIRMED P2: compiled .h drift is omitted from the inventory
+All fixtures disposable; native games/exports/binaries NOT RUN
+exit=0
+
+$ python3 docs/batches/evidence/12-14-16-brain-review/probes.py windows --seat <user-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/worker-16-volume1-qol-upgrade
+Reviewed SHA: 0e909f639f7687839c4fe3e3af37c551b3b36467
+Original member: 'a\\b'
+Normalized member: 'a/b'
+Validator result: {'asset': 'raw-backslash.zip', 'sha256': '693a8f95324c1c929af81f5212aca46cda2f8f7da732ddc4fa4249df20e9cc9a', 'members': 1, 'crc': 'pass'}
+CONFIRMED P2: Windows reader normalization hides a raw backslash
+All fixtures disposable; native games/exports/binaries NOT RUN
+exit=0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit=0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.0 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  newer release available: 4.0.1 -- minor or patch: update between batches; Brain proposes it
+Merge rule
+  owner-approves
+Work not merged yet
+  brain/11-12-briefs (this machine's copy): 11 commit(s), last 2026-10-09; batch 17-delivery: Verifier review in -- Brain judges it
+  worker/12-install-plan-engine: 5 commit(s), last 2026-10-09; batch 12-install-plan-engine: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/16-volume1-qol-upgrade: 2 commit(s), last 2026-10-09; batch 16-volume1-qol-upgrade: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/14-mgs4-patriotfix: 8 commit(s), last 2026-10-09; batch 14-mgs4-patriotfix: 1 commit(s) after the Verifier's review -- Brain checks them
+  brain/11-12-briefs: 10 commit(s), last 2026-10-09; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-interface, 14-mgs4-patriotfix-verifier-dispatch: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 2 commit(s), last 2026-10-09; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/11-12-briefs; no uncommitted changes
+  not on GitHub yet: brain/11-12-briefs (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <user-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to judge batch 17-delivery
+exit=0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 76%]
+...................................................................      [100%]
+283 passed in 5.87s
+exit=0
+
+$ python3 -m ruff check .
+All checks passed!
+exit=0
+
+$ python3 -m py_compile tools/fw.py install.py docs/batches/evidence/12-14-16-brain-review/probes.py
+(no output)
+exit=0
+
+$ git diff --check 5f6dd663d72a987b06b5910a88eb7e2550b5bce9...HEAD
+(no output)
+exit=0
+
+$ git diff --exit-code origin/main -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop docs/agents tools/fw.py tests/test_framework.py
+(no output)
+exit=0

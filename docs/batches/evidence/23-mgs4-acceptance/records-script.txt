@@ -1,0 +1,41 @@
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from pytest import MonkeyPatch
+import install
+from conftest import mod_zips, patch_download
+from test_mgs4_plan import combined, prepare
+
+def full(found):
+    return {key: [(p.relative_to(root).as_posix(), 'dir' if p.is_dir() else 'file', None if p.is_dir() else p.read_bytes()) for p in sorted(root.rglob('*'))] for key,(root,_) in found.items()}
+
+count=0
+for schema in (1,2):
+ for key in ('mgs1','mgs2','mgs3','mgs4'):
+  for field in ('settings','mods'):
+   for value in (None,42,False,'invalid',[],['invalid'],[['custom','value']],[[1,2,3]]):
+    with TemporaryDirectory() as folder, MonkeyPatch.context() as mp:
+     base=Path(folder)
+     mp.setattr(install,'app_data_dir',lambda:base/'state')
+     patch_download.__wrapped__(mp,mod_zips.__wrapped__(base))
+     found,options=combined(base); found[key]=found.pop(key)
+     root=found[key][0]; record=root/install.MODKIT_DIRNAME/install.MANIFEST_NAME
+     record.parent.mkdir()
+     body=dict(schema=schema,game=key,added=[],overwritten=[],mods={},settings={}); body[field]=value
+     record.write_text(json.dumps(body))
+     backup=record.parent/'backups'/('MGSPatriotFix.settings' if key=='mgs4' else 'original.bin')
+     backup.parent.mkdir(); backup.write_bytes(b'oldest backup')
+     (record.parent/'empty').mkdir()
+     before=full(found)
+     for k,location in found.items(): options[k]=install.options_for_game(k,location,options[k],lambda _:None)
+     assert full(found)==before
+     opened=[]
+     def forbid(*a,**kw):
+      opened.append(a); raise AssertionError('live transaction opened')
+     mp.setattr(install,'InstallTxn',forbid)
+     try: prepare(base,found,options)
+     except install.CorruptManifestError: pass
+     else: raise AssertionError((schema,key,field,value))
+     assert not opened and full(found)==before
+     count+=1
+print('PASS',count,'schema-1/2 late settings/mods refusals; real collection/preparation; zero live constructors; all files/directories/records/backups unchanged')

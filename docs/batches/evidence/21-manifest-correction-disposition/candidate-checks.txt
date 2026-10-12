@@ -1,0 +1,40 @@
+$ git rev-parse HEAD
+d9f13f4a02c3d894689bc21eac9911d619344c2c
+
+exit 0
+$ git status --short
+
+exit 0
+$ python3 -m pytest tests/ -q
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 49%]
+........................................................................ [ 65%]
+........................................................................ [ 82%]
+........................................................................ [ 98%]
+.......                                                                  [100%]
+439 passed in 23.22s
+
+exit 0
+$ python3 -m ruff check .
+All checks passed!
+
+exit 0
+$ python3 -m py_compile tools/fw.py install.py
+
+exit 0
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+
+exit 0
+$ git -c core.whitespace=cr-at-eol diff --check
+
+exit 0
+$ python3 tools/embed_install_plan.py --check
+OK: standalone plan matches authoritative source
+
+exit 0
+$ python3 -m py_compile install_plan.py tools/embed_install_plan.py
+
+exit 0
+Shortcut tags/SHA/line endings/Python 3.9: PASS 3f2b0049358d31679aa5db63d630e74383be771957cf6d3edce3e32e64a39e75

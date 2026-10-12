@@ -1,0 +1,66 @@
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/21-manifest-correction-disposition/record_recheck.py .worktrees/worker-14-mgs4-patriotfix
+Reviewed SHA: d9f13f4a02c3d894689bc21eac9911d619344c2c
+mgs1 late malformed settings refused; records/backups/all games unchanged
+mgs2 late malformed settings refused; records/backups/all games unchanged
+mgs3 late malformed settings refused; records/backups/all games unchanged
+mgs4 late malformed settings refused; records/backups/all games unchanged
+PASS 28 independent malformed settings cases; no live transaction construction
+Native games and real-device restoration NOT RUN
+exit 0
+
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/21-manifest-correction-disposition/legacy_record_recheck.py .worktrees/worker-14-mgs4-patriotfix
+Reviewed SHA: d9f13f4a02c3d894689bc21eac9911d619344c2c
+PASS schema 1 settings missing False all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+PASS schema 1 settings missing True all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+PASS schema 2 settings missing False all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+PASS schema 2 settings missing True all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
+All fixtures disposable; native compatibility NOT RUN
+exit 0
+
+cwd: .worktrees/worker-14-mgs4-patriotfix
+$ python3 docs/batches/evidence/14-manifest-preflight/audit.py
+PASS only _plan_validate_record changes; constructor, recovery, removal, recipes and writers unchanged
+PASS engine, embedding, audio acceptance, bounded source capture and latest Verifier report preserved
+PASS preserved review head remains an ancestor
+exit 0
+
+cwd: .worktrees/worker-14-mgs4-patriotfix
+$ python3 docs/batches/evidence/14-mgs4-patriotfix/verify-delivery.py /tmp/mgs14-final-verifier/framework
+Install-MGS-Mods.cmd v2.3.0 3f2b0049358d31679aa5db63d630e74383be771957cf6d3edce3e32e64a39e75 line endings OK
+Install-MGS-Mods.desktop v2.3.0 3f2b0049358d31679aa5db63d630e74383be771957cf6d3edce3e32e64a39e75 line endings OK
+All candidate Python files: LF and Python 3.9 grammar OK
+MGS1–3 definitions/pins/URLs/checksums and unpublished kit version unchanged
+docs/agents/FRAMEWORK.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/brain.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/worker.md matches pinned immutable framework 4.0.0 and manifest
+docs/agents/roles/verifier.md matches pinned immutable framework 4.0.0 and manifest
+tools/fw.py matches pinned immutable framework 4.0.0 and manifest
+tests/test_framework.py matches pinned immutable framework 4.0.0 and manifest
+Checked commit: d9f13f4a02c3d894689bc21eac9911d619344c2c
+exit 0
+
+cwd: .worktrees/worker-14-mgs4-patriotfix
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/actual-archive.py /tmp/mgs14-final-verifier/patriot.zip
+PASS official ZIP: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+PASS all four games prepared with actual authenticated PatriotFix ZIP; zero live writes
+PASS mixed execution replays cached actual payload/settings with no network or writer calls
+PASS actual MGS4 repair/removal keeps oldest custom settings, save bytes and unowned legacy ASI
+Native exports/ASI initialization/licensed boots/gameplay/real-device restoration: NOT RUN
+exit 0
+
+cwd: .
+$ gh run view 38232687896 --json headSha,conclusion,url,jobs --jq {headSha,conclusion,url,jobs:[.jobs[]|{name,conclusion}]}
+{"conclusion":"success","headSha":"d9f13f4a02c3d894689bc21eac9911d619344c2c","jobs":[{"conclusion":"success","name":"test-windows"},{"conclusion":"success","name":"test (3.12)"},{"conclusion":"success","name":"test (3.11)"},{"conclusion":"success","name":"test (3.9)"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38232687896"}
+exit 0
+
+cwd: .
+$ git diff --exit-code d9f13f4a02c3d894689bc21eac9911d619344c2c ab4cbe666af085f1ad39ac62fe46402f236055d4 -- install.py Install-MGS-Mods.cmd Install-MGS-Mods.desktop install_plan.py tools/embed_install_plan.py tests/test_mgs4_plan.py
+
+exit 0
+
+cwd: .
+$ git merge-base --is-ancestor bd8546524886614a04f5629b1fbbf1f741b73163 ab4cbe666af085f1ad39ac62fe46402f236055d4
+
+exit 0
