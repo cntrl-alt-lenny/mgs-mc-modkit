@@ -12,6 +12,8 @@ Post-merge main tree equals the independently reviewed Batch 16 delivery. Protec
 
 MGS4 schema-1 records with `settings` equal to null, 42 or `["invalid"]` pass options collection/preparation. During replay, MGS1–3 commit; MGS4's constructor raises `CorruptManifestError` converting settings to a dict. MGS4 files stay unchanged. This violates all-game preflight of knowable record assumptions, without demonstrating save loss. Actual reproducer/output are in [evidence](evidence/20-merge-and-record-disposition/).
 
+Handoff at `e9477fc`: 283 tests, Ruff, compilation, framework check, shortcut/line-ending/3.9 checks pass; see `handoff-checks.txt`.
+
 ## Not checked
 
 Corrected manifest preflight is not implemented yet. Native exports, game boots, ASI initialization, real user audio and real-device restoration remain NOT RUN. Neither MGS4 merge nor shipping upgrades/releases are authorized.
