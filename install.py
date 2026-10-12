@@ -4289,11 +4289,11 @@ def build_install_plan(found, per_game, audio, expected_inputs=None):
 def _plan_validate_record(game):
     live = Path(game.path)
     root = live / MODKIT_DIRNAME
-    if root.is_symlink():
-        raise CorruptManifestError("Linked recovery directory; nothing was changed")
+    if root.is_symlink() or (root.exists() and not root.is_dir()):
+        raise CorruptManifestError("Invalid recovery directory; nothing was changed")
     for directory in (root / "staging", root / "rollback", root / "backups"):
-        if directory.is_symlink():
-            raise CorruptManifestError("Linked transaction directory; backups kept")
+        if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
+            raise CorruptManifestError("Invalid transaction directory; backups kept")
     record = root / MANIFEST_NAME
     if record.exists():
         data = _read_record(record)
@@ -4461,8 +4461,20 @@ class CurrentRecipeAdapter:
             dest = _safe_game_path(Path(game.path), rel)
             if dest.is_symlink() or (dest.exists() and not dest.is_file()):
                 raise ValueError("Destination is not a regular file: " + rel)
+            # Transaction backup ancestors must be usable before any game runs.
+            backup_root = Path(game.path) / MODKIT_DIRNAME / "backups"
+            backup = _safe_game_path(backup_root, rel)
+            for parent in backup.parents:
+                if parent.exists() and not parent.is_dir():
+                    raise CorruptManifestError("Invalid backup ancestor; backups kept: " + rel)
+                if parent == backup_root:
+                    break
+            if backup.exists() and not backup.is_file():
+                raise CorruptManifestError("Invalid backup destination; backups kept: " + rel)
             # Extraction + installed payload, original backup + rollback fallback.
             size += payload_size * 2 + (dest.stat().st_size * 3 if dest.exists() else 0)
+        # Reserve a private authenticated replay copy in addition to extraction.
+        size += sum(Path(source).stat().st_size for source, _ in tx.identities)
         shutil.rmtree(tx.game_dir)
         return PreparedGame(game, tuple(tx.actions), tuple(tx.identities),
                             tuple(tx.mods.items()), size)
@@ -4481,6 +4493,13 @@ class CurrentRecipeAdapter:
             device = path.stat().st_dev
             needed, _ = volumes.get(device, (SPACE_MARGIN_BYTES, path))
             volumes[device] = (needed + game.required_bytes, path)
+            # Preparation/replay storage can be on a different volume.
+            for source, _ in game.identities:
+                cache = Path(source)
+                cache_device = cache.stat().st_dev
+                if cache_device != device:
+                    cache_needed, _ = volumes.get(cache_device, (SPACE_MARGIN_BYTES, cache.parent))
+                    volumes[cache_device] = (cache_needed + cache.stat().st_size, cache.parent)
         for needed, path in volumes.values():
             if free_bytes(path) < needed:
                 raise RuntimeError("Not enough free space for the complete prepared installation")
@@ -4489,29 +4508,48 @@ class CurrentRecipeAdapter:
         game = prepared.game
         tx = None
         try:
-            tx = InstallTxn(Path(game.path), game.key, self.log)
-            tx.settings = {k: v for k, v in json.loads(game.settings).items() if k in SAVED_OPT_KEYS}
-            for number, (action, target, data) in enumerate(prepared.actions):
+            cache_dir = Path(prepared.identities[0][0]).parent
+            with tempfile.TemporaryDirectory(prefix="replay_", dir=cache_dir) as td:
+                # Copy each source once, authenticate the copy, then give only
+                # these private paths to InstallTxn. Later cache replacement
+                # cannot change the archive used for listing or extraction.
+                identities = dict(prepared.identities)
+                actions = []
+                for number, (action, target, data) in enumerate(prepared.actions):
+                    check_cancelled()
+                    if action == "archive":
+                        source = Path(target)
+                        if source.is_symlink() or not source.is_file():
+                            raise ReplanRequired("Prepared payload changed; prepare a fresh plan")
+                        replay = Path(td) / (str(number) + source.suffix)
+                        shutil.copyfile(source, replay)
+                        if sha256_file(replay) != identities[target]:
+                            raise ReplanRequired("Prepared payload changed; prepare a fresh plan")
+                        target = str(replay)
+                    actions.append((action, target, data))
+                tx = InstallTxn(Path(game.path), game.key, self.log)
+                tx.settings = {k: v for k, v in json.loads(game.settings).items() if k in SAVED_OPT_KEYS}
+                for number, (action, target, data) in enumerate(actions):
+                    check_cancelled()
+                    if self.progress:
+                        self.progress.update(f"{GAMES[game.key]['short']} — Installing prepared files",
+                                             (index + number / len(prepared.actions)) * 100 /
+                                             len(outcomes))
+                    if action == "archive":
+                        tx.install_archive(Path(target), component=data)
+                    else:
+                        tx.write_bytes(target, data)
+                for name, version in prepared.mods:
+                    tx.note_mod(name, version)
+                problems = verify_install(GAMES[game.key], tx.game_dir)
+                if problems:
+                    raise RuntimeError("Verification failed: " + ", ".join(problems))
                 check_cancelled()
+                tx.commit()
+                outcomes[game.key] = "installed and verified"
                 if self.progress:
-                    self.progress.update(f"{GAMES[game.key]['short']} — Installing prepared files",
-                                         (index + number / len(prepared.actions)) * 100 /
-                                         len(outcomes))
-                if action == "archive":
-                    tx.install_archive(Path(target), component=data)
-                else:
-                    tx.write_bytes(target, data)
-            for name, version in prepared.mods:
-                tx.note_mod(name, version)
-            problems = verify_install(GAMES[game.key], tx.game_dir)
-            if problems:
-                raise RuntimeError("Verification failed: " + ", ".join(problems))
-            check_cancelled()
-            tx.commit()
-            outcomes[game.key] = "installed and verified"
-            if self.progress:
-                self.progress.update(f"{GAMES[game.key]['short']} — Complete",
-                                     (index + 1) * 100 / len(outcomes))
+                    self.progress.update(f"{GAMES[game.key]['short']} — Complete",
+                                         (index + 1) * 100 / len(outcomes))
         except BaseException:
             if tx is None:
                 outcomes[game.key] = "not changed; inspect recovery record / lock"

@@ -212,3 +212,91 @@ def test_mgs4_plan_settings_identity_is_immutable(tmp_path, patch_download):
     with pytest.raises(ValueError, match='plan order'):
         install.execute_plan(stale, adapter, dict.fromkeys(found, 'not started'))
     assert snapshot(found) == before
+
+
+@pytest.mark.parametrize('key', ['mgs3', 'mgs4'])
+@pytest.mark.parametrize('obstruction', ['root', 'staging', 'rollback', 'backups', 'backup-parent', 'backup-destination'])
+def test_transaction_obstructions_refuse_before_any_game_commits(
+        tmp_path, patch_download, key, obstruction):
+    found, options = combined(tmp_path)
+    root = found[key][0]
+    recovery = root / install.MODKIT_DIRNAME
+    if obstruction == 'root':
+        recovery.write_bytes(b'obstruction')
+    else:
+        recovery.mkdir()
+        if obstruction.startswith('backup-'):
+            dest = root / ('plugins/MGSHDFix.asi' if key == 'mgs3' else 'MGS4/scripts/MGSPatriotFix.asi')
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(b'original')
+            rel = dest.relative_to(root)
+            if obstruction == 'backup-parent':
+                backup = recovery / 'backups' / rel.parent
+                backup.parent.mkdir(parents=True)
+                backup.write_bytes(b'obstructed parent')
+            else:
+                (recovery / 'backups' / rel).mkdir(parents=True)
+        else:
+            (recovery / obstruction).write_bytes(b'obstruction')
+    before = snapshot(found)
+    with pytest.raises((RuntimeError, ValueError, OSError)):
+        prepare(tmp_path, found, options)
+    assert snapshot(found) == before
+    assert all(not (g / install.MODKIT_DIRNAME / install.MANIFEST_NAME).exists()
+               for g, _ in found.values())
+
+
+@pytest.mark.parametrize('key', ['mgs3', 'mgs4'])
+def test_cached_archive_replacement_after_first_commit_is_refused(
+        tmp_path, monkeypatch, patch_download, key):
+    found, options = combined(tmp_path)
+    adapter, prepared = prepare(tmp_path, found, options)
+    before = snapshot(found)
+    cached_game = next(g for g in prepared.games if g.game.key == key)
+    cached = Path(cached_game.identities[-1][0])
+    real = adapter.execute
+
+    def replace_after_first(game, index, outcomes):
+        real(game, index, outcomes)
+        if index == 0:
+            build_zip(cached, {'plugins/UNCONFIRMED.asi': b'unconfirmed'})
+
+    monkeypatch.setattr(adapter, 'execute', replace_after_first)
+    outcomes = dict.fromkeys(found, 'not started')
+    with pytest.raises(install.ReplanRequired, match='Prepared payload changed'):
+        install.execute_plan(prepared, adapter, outcomes)
+    assert outcomes['mgs1'] == 'installed and verified'
+    assert outcomes[key] == 'not changed; inspect recovery record / lock'
+    assert snapshot(found)[key] == before[key]
+    assert not any('UNCONFIRMED' in rel for files in snapshot(found).values() for rel in files)
+    if key == 'mgs3':
+        assert outcomes['mgs4'] == 'not started'
+
+
+def test_cached_source_change_during_extraction_cannot_change_replay_bytes(
+        tmp_path, monkeypatch, patch_download):
+    found, options = combined(tmp_path)
+    adapter, prepared = prepare(tmp_path, found, options)
+    originals = {source: Path(source).read_bytes()
+                 for game in prepared.games for source, _ in game.identities}
+    real = install.InstallTxn.install_archive
+    calls = []
+
+    def mutate_originals(tx, archive, **kwargs):
+        assert str(archive) not in originals
+        # The selected game's every archive is already authenticated privately.
+        game = next(g for g in prepared.games if g.game.key == tx.game_key)
+        for source, _ in game.identities:
+            Path(source).write_bytes(b'replaced during archive use')
+        assert archive.read_bytes() in originals.values()
+        calls.append(tx.game_key)
+        return real(tx, archive, **kwargs)
+
+    monkeypatch.setattr(install.InstallTxn, 'install_archive', mutate_originals)
+    outcomes = dict.fromkeys(found, 'not started')
+    install.execute_plan(prepared, adapter, outcomes)
+    assert set(outcomes.values()) == {'installed and verified'}
+    assert set(calls) == set(found)
+    for folder, _ in found.values():
+        notes, ok = install.uninstall_game(folder, lambda _: None)
+        assert ok, notes

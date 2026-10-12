@@ -1,0 +1,38 @@
+Integration input: Batch 14 c2e7ea470d5c38390238fc8854f31187499ff330;
+Batch 12 c3ecd64a7a3a3a3e8994a77511bb1585b3ec04a9;
+Brain brief cef5164c4656332ea8e256b11746d6abd24ad9a0.
+
+Port: cherry-picked the seven Batch 12 commits in original order. First engine
+commit conflicted only in install.py's old execution loop and both shortcuts;
+two later shortcut hashes conflicted as expected. Selected the engine lifecycle,
+retained Batch 14 recipes/corrections and regenerated both hashes after adaptation.
+Current main synced into the Worker branch; README conflict resolved with one
+MGS4 row, historical upstream-candidate columns and explicit unpublished-checkout
+instructions. No default branch was modified and no PR was merged.
+
+Initial full suite: python3 -m pytest tests/ -q -> 1 failed, 371 passed (exit 1).
+Old mixed-loader test expected MGS1 to commit before MGS4 refused. New required
+all-game preparation correctly leaves both unstarted. Test now proves that.
+New tests first run: 1 failed, 52 passed (exit 1), wrong fixture section spelling;
+second new-only run: 1 failed, 18 passed (exit 1), unsupported test region literal.
+Corrected fixtures to authenticated Mouse Settings and default EU/FR pair.
+19 new integration tests then passed. Full suite at 4b0f94c: 391 passed (exit 0).
+
+Fetched Batch 12 Verifier documentation at 73d7b45 (no production changes).
+Two blockers affect this adapter: regular-file recovery directory obstructions
+escape preparation; cached identity is checked only before the first game.
+Worker addressed both here without editing install_plan.py or InstallTxn.
+Preflight now checks recovery directory types and backup destinations/ancestors.
+Execution copies each game's archives privately, authenticates all copies before
+opening its transaction, then replays only those private copies. Cache mutation
+after an earlier commit refuses; mutation during extraction cannot alter replay.
+Additional copy space is reserved, including a separate cache/replay volume.
+New regression run: 1 failed, 33 passed (exit 1): a regular-file backup parent was
+not caught by _safe_game_path, which rejects links but does not check directory
+types. Added explicit ancestor type preflight. Ruff first flagged a shadowed
+fixture import (exit 1); renamed the test loop variable.
+
+Plain git diff --check reports expected CMD CRLF as trailing whitespace (exit 2).
+git -c core.whitespace=cr-at-eol diff --check is the project-correct check.
+Advisory tools/check_pins.py: 2 updates available (HDFix 4.1.2, M2Fix v3.7.3),
+exit 1. Shipping pins are intentionally unchanged. Native checks remain NOT RUN.
