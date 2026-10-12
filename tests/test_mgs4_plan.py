@@ -64,6 +64,48 @@ def test_late_mgs4_preparation_failure_never_opens_any_transaction(
     assert snapshot(found) == before
 
 
+@pytest.mark.parametrize('key', ['mgs1', 'mgs2', 'mgs3', 'mgs4'])
+@pytest.mark.parametrize('field,bad', [
+    ('settings', None), ('settings', 42), ('settings', ['invalid']),
+    ('settings', []), ('settings', [['custom', 'value']]),
+    ('mods', None), ('mods', [['custom', 'version']]),
+])
+def test_malformed_record_mapping_refuses_all_games_before_transactions(
+        tmp_path, monkeypatch, patch_download, key, field, bad):
+    found, options = combined(tmp_path)
+    # Put the affected game last so each recipe is challenged after all others
+    # have successfully prepared, through the real options collection journey.
+    found[key] = found.pop(key)
+    root = found[key][0]
+    record = root / install.MODKIT_DIRNAME / install.MANIFEST_NAME
+    record.parent.mkdir()
+    body = dict(schema=1, game=key, added=[], overwritten=[], mods={}, settings={})
+    body[field] = bad
+    record.write_text(json.dumps(body))
+    backup = record.parent / 'backups' / (
+        'MGSPatriotFix.settings' if key == 'mgs4' else 'original.bin')
+    backup.parent.mkdir()
+    backup.write_bytes(b'oldest original backup')
+    options[key] = install.options_for_game(key, found[key], options[key], lambda _: None)
+    before = snapshot(found)
+    # Include empty directories and links, not just file contents.
+    membership = {k: sorted(p.relative_to(g).as_posix() for p in g.rglob('*'))
+                  for k, (g, _) in found.items()}
+    opened = []
+
+    def forbidden(*args, **kwargs):
+        opened.append(args)
+        raise AssertionError('Preparation opened a live transaction')
+
+    monkeypatch.setattr(install, 'InstallTxn', forbidden)
+    with pytest.raises(install.CorruptManifestError, match='Invalid install record'):
+        prepare(tmp_path, found, options)
+    assert not opened
+    assert snapshot(found) == before
+    assert membership == {k: sorted(p.relative_to(g).as_posix() for p in g.rglob('*'))
+                          for k, (g, _) in found.items()}
+
+
 def test_all_games_prepared_before_first_write_and_no_executor_interaction(
         tmp_path, monkeypatch, patch_download):
     found, options = combined(tmp_path)
@@ -164,7 +206,10 @@ def test_mgs4_cancel_during_preparation_keeps_all_games_unstarted(tmp_path, monk
     assert snapshot(found) == before
 
 
-def test_mgs4_schema1_repair_custom_values_oldest_backup_and_removal(tmp_path, patch_download):
+@pytest.mark.parametrize('schema', [1, 2])
+@pytest.mark.parametrize('missing_settings', [False, True])
+def test_legacy_records_repair_custom_values_oldest_backup_and_removal(
+        tmp_path, patch_download, schema, missing_settings):
     found, options = combined(tmp_path)
     root = found['mgs4'][0]
     settings = root / 'MGSPatriotFix.settings'
@@ -177,11 +222,16 @@ def test_mgs4_schema1_repair_custom_values_oldest_backup_and_removal(tmp_path, p
     before = snapshot(found)
     adapter, prepared = prepare(tmp_path, found, options)
     install.execute_plan(prepared, adapter, dict.fromkeys(found, 'not started'))
-    record = root / install.MODKIT_DIRNAME / install.MANIFEST_NAME
-    body = json.loads(record.read_text())
-    body['schema'] = 1
-    body.pop('files', None)
-    record.write_text(json.dumps(body))
+    for key, (folder, _) in found.items():
+        record = folder / install.MODKIT_DIRNAME / install.MANIFEST_NAME
+        body = json.loads(record.read_text())
+        body['schema'] = schema
+        if schema == 1:
+            body.pop('files', None)
+        if missing_settings:
+            body.pop('settings', None)
+        body['mods']['legacy-custom-mod'] = 'custom-version'
+        record.write_text(json.dumps(body))
     custom = install.validate_patriot_settings(settings.read_text())
     custom['Mouse Settings']['Mouse Horizontal Sensitivity'] = '3.5'
     settings.write_text(install.render_ini(custom))
@@ -189,6 +239,10 @@ def test_mgs4_schema1_repair_custom_values_oldest_backup_and_removal(tmp_path, p
     adapter, prepared = prepare(tmp_path, found, options, 'repair')
     install.execute_plan(prepared, adapter, dict.fromkeys(found, 'not started'))
     assert install.validate_patriot_settings(settings.read_text())['Mouse Settings']['Mouse Horizontal Sensitivity'] == '3.5'
+    for folder, _ in found.values():
+        body = json.loads((folder / install.MODKIT_DIRNAME / install.MANIFEST_NAME).read_text())
+        assert body['mods']['legacy-custom-mod'] == 'custom-version'
+        assert isinstance(body['settings'], dict)
     for folder, _ in found.values():
         notes, ok = install.uninstall_game(folder, lambda _: None)
         assert ok, notes

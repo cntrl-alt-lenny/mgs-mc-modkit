@@ -4298,8 +4298,12 @@ def _plan_validate_record(game):
     if record.exists():
         data = _read_record(record)
         _validate_manifest(data, live, root)
+        # InstallTxn copies both mappings during replay. Missing fields retain
+        # legacy defaults; explicit malformed values must refuse during private
+        # preparation, before any selected game's transaction can open.
         if (data.get("game") != game.key or "added" not in data or
-                "overwritten" not in data or not isinstance(data.get("mods", {}), dict)):
+                "overwritten" not in data or not isinstance(data.get("mods", {}), dict) or
+                not isinstance(data.get("settings", {}), dict)):
             raise CorruptManifestError("Invalid install record; backups kept")
     if (root / "backups").exists():
         for directory, dirs, names in os.walk(root / "backups"):
