@@ -1,0 +1,30 @@
+import ast
+import hashlib
+import json
+import pathlib
+import subprocess
+
+root = pathlib.Path.cwd()
+source = pathlib.Path('/tmp/mgs-framework-401-source')
+expected = '06a7d45e45751c40809d6644ea4503ec61cef709'
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source, text=True).strip() == expected
+assert subprocess.check_output(['git', 'describe', '--tags', '--exact-match'], cwd=source, text=True).strip() == 'v4.0.1'
+assert not subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=source, text=True).strip()
+manifest = json.loads((root / 'docs/agents/framework.json').read_text())
+assert manifest['framework']['release'] == '4.0.1'
+assert manifest['options'] == {'adapters': [], 'hooks': False}
+assert manifest['settings'] == {'state_words': 1000}
+for rel, entry in manifest['files'].items():
+    if entry['kind'] != 'copy':
+        continue
+    source_rel = 'framework/' + rel.removeprefix('docs/agents/') if rel.startswith('docs/agents/') else 'templates/' + rel if rel.startswith('tests/') else rel
+    actual = (root / rel).read_bytes().replace(b'\r\n', b'\n')
+    assert actual == (source / source_rel).read_bytes().replace(b'\r\n', b'\n'), rel
+    assert hashlib.sha256(actual).hexdigest() == entry['sha256'], rel
+    print('PASS official source and manifest: ' + rel)
+for rel in ['AGENTS.md', 'docs/state.md', '.gitattributes', '.worktrees/.gitignore', 'docs/batches/README.md', 'install.py', 'Install-MGS-Mods.cmd', 'Install-MGS-Mods.desktop']:
+    baseline = subprocess.check_output(['git', 'show', 'bd8546524886614a04f5629b1fbbf1f741b73163:' + rel])
+    assert (root / rel).read_bytes() == baseline, rel
+    print('PASS unchanged baseline bytes: ' + rel)
+ast.parse((root / 'tools/fw.py').read_text(), feature_version=(3, 9))
+print('PASS Python 3.9 syntax and unchanged framework settings/options')

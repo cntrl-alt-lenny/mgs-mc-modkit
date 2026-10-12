@@ -1,0 +1,87 @@
+$ git rev-parse HEAD
+6ae8d5a14f8271fb80265acfb917cdbdcecaed9d
+exit 0
+
+$ python3 tools/fw.py check
+0 error(s), 0 warning(s)
+exit 0
+
+$ python3 tools/fw.py status
+Framework
+  pinned to agentic-framework 4.0.1 (https://github.com/cntrl-alt-lenny/agentic-framework)
+  up to date with the latest release (4.0.1)
+Merge rule
+  owner-approves
+Work not merged yet
+  worker/14-mgs4-patriotfix: 29 commit(s), last 2026-10-12; batch 14-mgs4-patriotfix: Verifier review in -- Brain judges it
+  brain/framework-4-0-1: 1 commit(s), last 2026-10-12; Brain's own change (Small path): ready for your yes, or still being written
+  brain/11-12-briefs: 22 commit(s), last 2026-10-12; batch 11-12-briefs, 11-hdfix-runtime-schema-verifier-dispatch, 12-install-plan-engine-verifier-dispatch, 12-install-plan-interface, 14-combined-verifier-dispatch, 14-manifest-preflight-verifier-dispatch, 14-mgs4-patriotfix-verifier-dispatch, 16-volume1-qol-upgrade-verifier-dispatch, 17-delivery-disposition, 18-correction-disposition, 19-integration-disposition, 20-merge-and-record-disposition, 21-manifest-correction-disposition: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  brain/simple-banner: 10 commit(s), last 2026-10-12; batch 15-simple-banner: Worker summary in -- Brain reviews it, or sends the Verifier prompt if this is a Checked batch
+  worker/12-install-plan-engine: 9 commit(s), last 2026-10-12; batch 12-install-plan-engine: Verifier review in -- Brain judges it
+  worker/10-release-validation: 10 commit(s), last 2026-10-07; batch 10-release-validation: Verifier review in -- Brain judges it
+  fix/recovery-and-usability: 3 commit(s), last 2026-10-03; no summary yet: still working, or stopped without one
+This machine
+  on brain/framework-4-0-1; 1 uncommitted change(s)
+  not on GitHub yet: brain/framework-4-0-1 (1 commit(s))
+  finished checkouts (clean, and their work is merged) that can be removed: <local-home>/.codex/worktrees/product-integration-brief/mgs-mc-modkit -- git worktree remove <folder>
+  safe to leave this machine: NO -- push or deal with the items above first
+Checks
+  all project checks pass
+Command form on this machine: python3 tools/fw.py <command>
+next: ask Brain to judge batch 14-mgs4-patriotfix
+exit 0
+
+$ python3 -m pytest tests/ -q
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 88%]
+......................................                                   [100%]
+326 passed in 5.74s
+exit 0
+
+$ python3 -m ruff check .
+All checks passed!
+exit 0
+
+$ python3 -m py_compile tools/fw.py install.py
+exit 0
+
+$ python3 /tmp/mgs-framework-401-verify.py
+PASS official source and manifest: docs/agents/FRAMEWORK.md
+PASS official source and manifest: docs/agents/roles/brain.md
+PASS official source and manifest: docs/agents/roles/verifier.md
+PASS official source and manifest: docs/agents/roles/worker.md
+PASS official source and manifest: tests/test_framework.py
+PASS official source and manifest: tools/fw.py
+PASS unchanged baseline bytes: AGENTS.md
+PASS unchanged baseline bytes: docs/state.md
+PASS unchanged baseline bytes: .gitattributes
+PASS unchanged baseline bytes: .worktrees/.gitignore
+PASS unchanged baseline bytes: docs/batches/README.md
+PASS unchanged baseline bytes: install.py
+PASS unchanged baseline bytes: Install-MGS-Mods.cmd
+PASS unchanged baseline bytes: Install-MGS-Mods.desktop
+PASS Python 3.9 syntax and unchanged framework settings/options
+exit 0
+
+$ python3 /tmp/mgs-framework-401-source/tools/adopt.py . --update --dry-run
+update: <local-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/brain-framework-4-0-1 -> agentic-framework 4.0.1 (from 4.0.1)
+  same    docs/agents/FRAMEWORK.md
+  same    docs/agents/roles/brain.md
+  same    docs/agents/roles/worker.md
+  same    docs/agents/roles/verifier.md
+  same    tools/fw.py
+  same    tests/test_framework.py
+  same    docs/batches/README.md
+  keep    AGENTS.md  (project-owned)
+  keep    docs/state.md  (project-owned)
+  keep    .gitattributes  (project-owned)
+  keep    .worktrees/.gitignore  (project-owned)
+nothing to do: this project already matches agentic-framework 4.0.1
+
+dry run: nothing written
+exit 0
+
+$ git diff --check
+exit 0
