@@ -11,6 +11,13 @@ missing key**. C++ initial values do not provide missing-key fallback.
 `tools/check_pins.py` (and the weekly `check-mod-versions` workflow) tells you
 when something newer exists. It deliberately never edits anything.
 
+The [9 October Volume 1 candidate audit](upgrades/volume1-2026-10-09.md)
+records reviewed 4.1.2/v3.7.3 source/archive identities and the native capture
+handoff. `tools/validate_volume1_candidate.py` checks those candidates without
+changing shipping pins or settings. Its export check validates structure and
+declared provenance; independent native review must still confirm real exports,
+dynamic choices and per-game defaults before adoption.
+
 ---
 
 ## Why you can't bump them individually
