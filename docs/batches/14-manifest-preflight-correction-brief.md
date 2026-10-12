@@ -7,7 +7,7 @@ Checked correction. Send the Worker prompt now. The final Verifier found one con
 ```text
 MGS Master Collection Mod Kit · BATCH 14-mgs4-patriotfix · Worker
 
-Start with python3 tools/fw.py status. Read AGENTS.md, framework/Worker card, docs/state.md, original/integration briefs, Batch 20 disposition and the final combined review. Fetch origin; continue the existing isolated branch and PR #19 by fast-forwarding to preserved review head b646a768e1e4c848b00aea090a73b905909dc4ed. Do not discard the review or historical evidence.
+Start with python3 tools/fw.py status. Read AGENTS.md, framework/Worker card, docs/state.md, original/integration briefs, Batch 20 disposition and the final combined review. Fetch origin; continue the existing isolated branch and PR #19 by fast-forwarding to preserved review head 03c58903d386c1c9bc0c9671e8c4b60c69ae30b6. If a newer review-only descendant exists, retain it too after confirming production is unchanged. Do not discard the review or historical evidence.
 
 Fix the demonstrated all-game record-preflight omission. At production 868bebf712a7c11edcecd8b3afc636291a379cc4, valid MGS4 schema-1 game/file/mod lists with settings null, 42 or ["invalid"] pass collection/preparation, then the live constructor's dict conversion fails after MGS1–3 commit. Validate all record assumptions consumed by InstallTxn before any selected game's live files change, especially settings. Inspect constructor versus preflight systematically so another omitted record field does not require a further corrective batch.
 

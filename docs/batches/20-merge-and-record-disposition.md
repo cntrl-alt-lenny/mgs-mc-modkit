@@ -4,7 +4,7 @@
 
 Owner explicitly approved PR #21 as tooling only. Rechecked unchanged delivery `e410523f34c82bf25266adba6e55c9c1616562ec` and all four green CI jobs, marked the reviewed draft ready and merged it at `bd8546524886614a04f5629b1fbbf1f741b73163`. Fast-forwarded clean main. Candidate tooling/docs/tests only; installed pins, schema, installer, shortcuts and framework remain unchanged. Finished Batch 16 seats/branch are retired after clean/merged-ancestry checks; review/evidence remain in main.
 
-The final MGS4 Verifier report arrived concurrently at `b646a768e1e4c848b00aea090a73b905909dc4ed`, reviewing production `868bebf712a7c11edcecd8b3afc636291a379cc4`. Read its verdict and confirmed the single new BLOCKER independently. The earlier four findings remain corrected. PR #19 is still unmerged; dispatch one focused Worker correction, then re-review its new literal delivery.
+The final MGS4 Verifier report arrived concurrently at `b646a768e1e4c848b00aea090a73b905909dc4ed`, reviewing production `868bebf712a7c11edcecd8b3afc636291a379cc4`. Read its verdict and confirmed the single new BLOCKER independently. The review-only repeat at `03c58903d386c1c9bc0c9671e8c4b60c69ae30b6` preserves the same blocker; production is unchanged. The earlier four findings remain corrected. PR #19 is still unmerged; dispatch one focused Worker correction, then re-review its new literal delivery.
 
 ## Checked
 
