@@ -10,7 +10,7 @@ and precise delivery status in README. Removed the unsupported one-click claim a
 waveforms and technical labels. Kept an accessible SVG title/description.
 
 Clarified that MGS4 is implemented on the Worker branch in PR #19, but awaits
-final independent review and merge before inclusion
+the final record-preflight correction, re-review and merge before inclusion
 in the main installer. This is
 more precise than "integration in progress" and does not imply native gameplay
 validation. No production code, pins, framework or release change.
@@ -33,6 +33,8 @@ After the independent review, refreshed status to corrections pending and the
 banner to a stable in-development label; rerendered both preview sizes. After Brain reproduced the delivered corrections, refreshed README status to launcher integration and final review pending; artwork is unchanged. After the combined engine/MGS4 delivery, updated status to final independent review pending. Status refresh at `ae062b8` passes framework/whitespace/production equality; actual commands are in [status-refresh.txt](evidence/15-simple-banner/status-refresh.txt).
 
 Final-review status refresh at `f61d58e`: framework/whitespace/production equality pass; [actual commands](evidence/15-simple-banner/integration-status-refresh.txt).
+
+After the final review, refreshed README status to record-validation correction pending; artwork and production remain unchanged.
 
 ## Not checked
 
