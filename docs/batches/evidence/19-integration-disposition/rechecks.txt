@@ -1,0 +1,154 @@
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/19-integration-disposition/findings.py .worktrees/verifier-12-install-plan-engine original
+Reviewed SHA: 73d7b4582e85ac6a0f358c8666553d83ad814f05
+staging ORIGINAL FAILURE: NotADirectoryError {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "previous setup restored"}
+rollback ORIGINAL FAILURE: NotADirectoryError {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "previous setup restored"}
+backups ORIGINAL FAILURE: NotADirectoryError {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "previous setup restored"}
+cache ORIGINAL FAILURE: unconfirmed ASI installed {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "installed and verified"}
+All fixtures disposable; native games NOT RUN
+
+exit 0
+
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/19-integration-disposition/findings.py .worktrees/worker-14-mgs4-patriotfix corrected
+Reviewed SHA: 868bebf712a7c11edcecd8b3afc636291a379cc4
+staging REFUSED BEFORE ANY GAME WRITE: Invalid transaction directory; backups kept
+rollback REFUSED BEFORE ANY GAME WRITE: Invalid transaction directory; backups kept
+backups REFUSED BEFORE ANY GAME WRITE: Invalid transaction directory; backups kept
+cache REFUSED BEFORE TARGET TRANSACTION: Prepared payload changed; prepare a fresh plan {"mgs1": "installed and verified", "mgs2": "installed and verified", "mgs3": "not changed; inspect recovery record / lock"}
+during-use PASS: original cached bytes replaced; private replay remains authenticated
+All fixtures disposable; native games NOT RUN
+
+exit 0
+
+cwd: .
+$ python3 .worktrees/brain-11-12-briefs/docs/batches/evidence/19-integration-disposition/source.py .worktrees/worker-14-mgs4-patriotfix /tmp/mgs-brain-20261012/patriot
+Reviewed SHA: 868bebf712a7c11edcecd8b3afc636291a379cc4
+Official tag and 61 literal blob/checkout hashes: PASS; exact fixture reproduced
+ConfigTool/pch.h modified refused: Unreviewed source bytes: ConfigTool/pch.h; source-format review required
+ConfigTool/pch.h omitted refused: Source inventory changed; source-format review required
+src/resources/stdafx.h modified refused: Unreviewed source bytes: src/resources/stdafx.h; source-format review required
+src/resources/stdafx.h omitted refused: Source inventory changed; source-format review required
+src/resources/version.h modified refused: Unreviewed source bytes: src/resources/version.h; source-format review required
+src/resources/version.h omitted refused: Source inventory changed; source-format review required
+Added header refused: Source inventory changed; source-format review required
+Source restored; native binaries NOT RUN
+
+exit 0
+
+cwd: .worktrees/worker-14-mgs4-patriotfix
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py
+PASS original recipes/writers/InstallTxn/locks/recovery/removal/layout validation unchanged
+PASS authoritative engine/embed tool/audio acceptance tests equal literal Batch 12 input
+PASS original independent review/capture/61 source hashes/28 fields/24 reads preserved
+PASS one MGS4 README row; dated upstream candidates and unpublished checkout instructions
+Checked commit: 868bebf712a7c11edcecd8b3afc636291a379cc4
+
+exit 0
+
+cwd: .worktrees/worker-14-mgs4-patriotfix
+$ python3 docs/batches/evidence/14-mgs4-plan-integration/actual-archive.py /tmp/mgs-brain-20261012/patriot.zip
+PASS official ZIP: 4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1
+PASS all four games prepared with actual authenticated PatriotFix ZIP; zero live writes
+PASS mixed execution replays cached actual payload/settings with no network or writer calls
+PASS actual MGS4 repair/removal keeps oldest custom settings, save bytes and unowned legacy ASI
+Native exports/ASI initialization/licensed boots/gameplay/real-device restoration: NOT RUN
+
+exit 0
+
+cwd: .worktrees/verifier-16-volume1-qol-upgrade
+$ python3 tools/validate_volume1_candidate.py --source /tmp/mgs-v16-review/hdfix --archives /tmp/mgs-v16-review
+{
+  "archives": [
+    {
+      "asset": "MGSHDFix_4.1.2.zip",
+      "sha256": "fbac84acc36bd395ab649beb576cf60e861fb43d3b36c26057fe900f5fa38e1d",
+      "members": 13,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGSM2Fix_3.7.3.zip",
+      "sha256": "0dabbe0b74bd1844d9f03d864949534ca3c29ea7bd9cf109f877963186e4aa80",
+      "members": 7,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip",
+      "sha256": "a832bb004ceb59885d08f8a3da6e59910c2d401a7e2b0447edf262edb1d63003",
+      "members": 10441,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip",
+      "sha256": "a576b7037e35a630f7dae35553e8329de809633b85ba8baf4f72518fb58cf769",
+      "members": 4514,
+      "crc": "pass"
+    },
+    {
+      "asset": "MGSM2Fix_3.6.0.zip",
+      "sha256": "a979dea88acd8324b269b101a79293d32674af03d64e800ab9978216b215410d",
+      "members": 7,
+      "crc": "pass"
+    }
+  ],
+  "source": {
+    "commit": "33e80bf4d2223f6866b0b92e06c3c9b85efab652",
+    "fields": 134,
+    "native_exports": "not established by source"
+  }
+}
+
+exit 0
+
+cwd: .worktrees/verifier-16-volume1-qol-upgrade
+$ python3 /tmp/mgs-v16-review/probes.py
+Original raw-backslash/matching-normalized-manifest bypass: reproduced ACCEPT
+Corrected same bytes: unsafe archive path: a\b
+Independent header writer: 9 unsafe-name cases refused before payload read; no extraction
+Synthetic metadata can structurally pass: still requires independent provenance/defaults/native review
+exit=0
+
+exit 0
+
+cwd: .worktrees/verifier-16-volume1-qol-upgrade
+$ python3 /tmp/mgs-v16-review/audit.py
+ShizCalev/MGSHDFix 4.1.2 release/tag/notes/signature PASS
+ShizCalev/MGSHDFix 4.1.1 release/tag/notes/signature PASS
+nuggslet/MGSM2Fix v3.7.3 release/tag/notes/signature PASS
+nuggslet/MGSM2Fix v3.7.2 release/tag/notes/signature PASS
+nuggslet/MGSM2Fix v3.7.1 release/tag/notes/signature PASS
+nuggslet/MGSM2Fix v3.7 release/tag/notes/signature PASS
+ShizCalev/MGS2-Community-Bugfix-Compilation 3.0.0 release/tag/notes/signature PASS
+ShizCalev/MGS3-Community-Bugfix-Compilation 2.0.1 release/tag/notes/signature PASS
+Baseline v3.6 official tag/release PASS
+MGSHDFix_4.1.2.zip official asset identity + bsdtar layout PASS 13
+MGSM2Fix_3.7.3.zip official asset identity + bsdtar layout PASS 7
+MGS2-Community-Bugfix-Compilation_Base_v3.0.0.zip official asset identity + bsdtar layout PASS 10441
+MGS3-Community-Bugfix-Compilation_Base_v2.0.1.zip official asset identity + bsdtar layout PASS 4514
+MGSM2Fix_3.6.0.zip official asset identity + bsdtar layout PASS 7
+Seven source blobs and exact checkout transforms PASS
+Runtime calls/fields/sections: 139 134 27
+M2Fix baseline/candidate INI identical; authenticated source LF conversion PASS
+Python 3.9 grammar; installer LF; shortcuts LF/CRLF: PASS; tag v2.3.0 SHA256 e3732996b09db0ffd7b38597b1d3e08552701aa0d6078ce7e4093816ba9c308a
+Six framework copies equal v4.0.0 source PASS
+Local desktop-file-validate available: False
+
+exit 0
+
+cwd: .
+$ gh run view 38217375942 --json headSha,conclusion,url,jobs --jq {headSha,conclusion,url,jobs: [.jobs[] | {name,conclusion}]}
+{"conclusion":"success","headSha":"73d7b4582e85ac6a0f358c8666553d83ad814f05","jobs":[{"conclusion":"success","name":"test-windows"},{"conclusion":"success","name":"test (3.11)"},{"conclusion":"success","name":"test (3.12)"},{"conclusion":"success","name":"test (3.9)"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38217375942"}
+
+exit 0
+
+cwd: .
+$ gh run view 38218023940 --json headSha,conclusion,url,jobs --jq {headSha,conclusion,url,jobs: [.jobs[] | {name,conclusion}]}
+{"conclusion":"success","headSha":"e410523f34c82bf25266adba6e55c9c1616562ec","jobs":[{"conclusion":"success","name":"test (3.9)"},{"conclusion":"success","name":"test (3.11)"},{"conclusion":"success","name":"test (3.12)"},{"conclusion":"success","name":"test-windows"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38218023940"}
+
+exit 0
+
+cwd: .
+$ gh run view 38218395168 --json headSha,conclusion,url,jobs --jq {headSha,conclusion,url,jobs: [.jobs[] | {name,conclusion}]}
+{"conclusion":"success","headSha":"868bebf712a7c11edcecd8b3afc636291a379cc4","jobs":[{"conclusion":"success","name":"test (3.12)"},{"conclusion":"success","name":"test (3.9)"},{"conclusion":"success","name":"test (3.11)"},{"conclusion":"success","name":"test-windows"}],"url":"https://github.com/cntrl-alt-lenny/mgs-mc-modkit/actions/runs/38218395168"}
+
+exit 0
