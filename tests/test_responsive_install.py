@@ -110,10 +110,14 @@ def test_partial_install_reports_each_game(tmp_path, monkeypatch, patch_download
     ui = FakeUI(checklist=[["mgs1", "mgs2"], []], menu=["go"])
     monkeypatch.setattr(install, "UI", lambda: ui)
 
-    def broken(*args, **kw):
-        raise RuntimeError("bugfix unavailable")
+    real_archive = install.InstallTxn.install_archive
 
-    monkeypatch.setattr(install, "install_bugfix", broken)
+    def broken(tx, archive, *args, **kw):
+        if tx.game_key == "mgs2":
+            raise RuntimeError("bugfix unavailable")
+        return real_archive(tx, archive, *args, **kw)
+
+    monkeypatch.setattr(install.InstallTxn, "install_archive", broken)
     assert install.main() == 1
     message = str(ui.errors[-1])
     assert "MGS1: installed and verified" in message

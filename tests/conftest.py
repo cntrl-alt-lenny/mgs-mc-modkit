@@ -101,11 +101,14 @@ def mod_zips(tmp_path: Path) -> dict[str, Path]:
 def patch_download(monkeypatch, mod_zips):
     """Replace network download() with a copy from the matching fixture zip.
 
-    Also exercises the real behaviour that a pinned sha256 is *passed* — we
-    just don't enforce it here, since fixture bytes won't match the pinned
-    production hash (checksum enforcement is tested separately).
+    Give the synthetic recipes exact fixture checksums so plan preparation
+    authenticates cached payloads too. Production pins remain untouched.
     """
     calls = []
+    monkeypatch.setattr(install, "HDFIX_SHA256", install.sha256_file(mod_zips["MGSHDFix"]))
+    monkeypatch.setattr(install, "M2FIX_SHA256", install.sha256_file(mod_zips["MGSM2Fix"]))
+    for key, mod in (("mgs2", "MGS2-Community-Bugfix"), ("mgs3", "MGS3-Community-Bugfix")):
+        monkeypatch.setitem(install.GAMES[key], "bugfix_sha256", install.sha256_file(mod_zips[mod]))
 
     def fake(url, dest, log, sha256=None):
         calls.append((url, sha256))
