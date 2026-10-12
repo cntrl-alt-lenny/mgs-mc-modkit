@@ -1,0 +1,22 @@
+$ python3 tools/adopt.py <local-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/brain-framework-4-0-1 --update
+update: <local-home>/Dev/GitHub/mgs-mc-modkit/.worktrees/brain-framework-4-0-1 -> agentic-framework 4.0.1 (from 4.0.0)
+  replace tools/fw.py
+  same    docs/agents/FRAMEWORK.md
+  same    docs/agents/roles/brain.md
+  same    docs/agents/roles/worker.md
+  same    docs/agents/roles/verifier.md
+  same    tests/test_framework.py
+  same    docs/batches/README.md
+  keep    AGENTS.md  (project-owned)
+  keep    docs/state.md  (project-owned)
+  keep    .gitattributes  (project-owned)
+  keep    .worktrees/.gitignore  (project-owned)
+  record  docs/agents/framework.json
+
+What each release asks of this project:
+
+--- 4.0.1 ---
+Nothing beyond the update itself. Brain runs `tools/adopt.py <project>
+--update` from a clone of the framework at `v4.0.1`. A project that got the
+later `fw.py` on 2026-10-06 sees only its record change to 4.0.1.
+exit 0
