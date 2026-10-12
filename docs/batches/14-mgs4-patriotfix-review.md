@@ -8,7 +8,7 @@ Reviewed PR #19 at literal **868bebf712a7c11edcecd8b3afc636291a379cc4** on 12 Oc
 
 Both original Batch 12 blockers are corrected: regular-file recovery directories and unusable live/backup ancestors now refuse before transactions; private replay copies retain confirmed archive identity through copying/extraction. Original MGS4 legacy-removal and compiled-header authentication findings are corrected.
 
-Verdict: **corrections required; BLOCKED for acceptance**. No production edits, acceptance, merge, tag or publication. Brain decides disposition.
+Verdict: **corrections required; BLOCKED for acceptance**, independently reproduced again at the same literal production SHA. No production edits, acceptance, merge, tag or publication. Brain decides disposition.
 
 | Goal | Judgment / evidence |
 |:--|:--|
@@ -55,6 +55,43 @@ All commands ran from the isolated repository root unless stated. Temporary scri
 | `gh run view 38218395168 --json headSha,conclusion,jobs`; `gh run view 38218395168 --log > /tmp/mgs14-ci.log` | exact head, success; Linux 3.9/3.11/3.12: 408 passed; Windows: 406 passed, 2 skipped; lint/compile/desktop validation passed | 0 each |
 
 Native Config Tool exports, GUI, ASI initialization, licensed Windows/Deck boots/gameplay, DS3/flashbacks, real user audio and real-device restoration: **NOT RUN**. Bounded source capture excludes build projects/resources/dependencies/binaries. Synthetic probes and CI do not remove the native handoff gates.
+
+## Repeat verification at the same literal SHA
+
+Historical evidence above and below is preserved. Review parent `b646a768e1e4c848b00aea090a73b905909dc4ed` differs from the reviewed SHA only in this document. Fresh isolated checkout; original probe scripts inspected and rerun against the literal candidate.
+
+| Exact command / inspection | Actual repeat result | Exit |
+|:--|:--|:--|
+| `python3 tools/fw.py status`; `git fetch origin` | Initial main clean; isolated candidate clean; all project checks pass; fetch silent | 0 each |
+| `git worktree add --detach .worktrees/verifier-14-combined 868bebf712a7c11edcecd8b3afc636291a379cc4` | Existing seat preserved; creation refused | 128 |
+| `git worktree add --detach .worktrees/verifier-14-combined-audit 868bebf712a7c11edcecd8b3afc636291a379cc4` | Fresh isolated candidate created | 0 |
+| `python3 -m pytest tests/ -q` | `408 passed in 18.96s`, local Python 3.9.6 | 0 |
+| `python3 -m ruff check .` | `All checks passed!` | 0 |
+| `python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py tools/capture_patriot_schema.py` | silent | 0 |
+| `python3 tools/embed_install_plan.py --check` | `OK: standalone plan matches authoritative source` | 0 |
+| `python3 tools/fw.py check` | `0 error(s), 0 warning(s)` | 0 |
+| `command -v desktop-file-validate` | unavailable locally | 1 |
+| `python3 -m pytest tests/test_install_plan.py -q -k 'standalone or embedding'` | `2 passed, 27 deselected in 0.31s`; isolated import without source module | 0 |
+| `python3 -m pytest tests/test_install_plan.py -q -k sync_check` | `1 passed, 28 deselected in 0.16s`; nonwriting/bad markers | 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/record.py` | `null`, `42`, `['invalid']`: MGS1–3 installed; MGS4 unchanged, constructor refuses; blocker confirmed | 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/probes.py` | 11 probes PASS: directory/live/backup ancestors refuse; cache-after-commit/copy-race refuse; extraction uses private bytes; cancellation restores MGS2, leaves MGS3–4 unstarted | 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/audio.py` | confident and explicit uncertain replacement refuse combined plan | 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/space.py` | device 1/2 deficient-by-one refuse; exact thresholds pass, simulated devices | 0 |
+| `git clone --depth 1 --branch 0.2.2 https://github.com/ShizCalev/MGSPatriotFix.git /tmp/mgs14-repeat-source` | literal tree `c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de` | 0 |
+| `curl -fL https://github.com/ShizCalev/MGSPatriotFix/releases/download/0.2.2/MGS4_MGSPatriotFix_0.2.2.zip -o /tmp/mgs14-repeat.zip` | 9862 KiB fresh official archive | 0 |
+| `python3 docs/batches/evidence/14-mgs4-patriotfix-correction/source-audit.py /tmp/mgs14-repeat-source` | 61 literal blobs/CRLF/hashes; live tag; clean fixture parity PASS | 0 |
+| `python3 docs/batches/evidence/14-mgs4-plan-integration/actual-archive.py /tmp/mgs14-repeat.zip` | official checksum, four-game preparation/replay/repair/removal/save/oldest-settings/unowned ASI PASS | 0 |
+| `PYTHONPATH=. python3 /tmp/mgs14-repeat-identity.py` | identity.py reproduced below, only source path changed to fresh clone: all 61 mutation/omission and added-header refusals; both shortcut hashes/line endings/3.9 grammar/pins PASS | 0 |
+| `python3 docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py`; `python3 /tmp/mgs14-final-verifier/framework.py` | original recipes/safety/source/parity/docs and six pinned framework copies PASS | 0 each |
+| Official source inspection: `ConfigTool/main.cpp:2449`, `src/resources/config.cpp`, `src/fixes/graphics_tuning.cpp:72`, `src/dllmain.cpp:111` | all controls serialized including PW; 28 fields/24 reads verified; rendering defaults retain filtering 8, shadows 0, blur/dynamic resolution; root/save paths agree | 0 |
+| Official [Steam app page](https://store.steampowered.com/app/2492670/) read | MGS4 title and KONAMI identity verified | n/a |
+| `python3 tools/refresh_checksums.py` | `All pinned checksums match the live release assets.` All five exact SHA-256s match; no pins changed | 0 |
+| `python3 tools/check_pins.py` | unchanged five pins; HDFix 4.1.2/M2Fix v3.7.3 advisory updates | 1 |
+| `gh pr view 19 --json headRefOid,headRefName,url,statusCheckRollup` | current head is earlier review `b646a76`, four green jobs; production reviewed separately | 0 |
+| `gh api 'repos/cntrl-alt-lenny/mgs-mc-modkit/actions/runs?head_sha=868bebf712a7c11edcecd8b3afc636291a379cc4'`; `gh run view 38218395168 --json headSha,conclusion,jobs` | literal candidate run `38218395168`, success, all four jobs green | 0 each |
+| `gh run view 38218395168 --log > /tmp/mgs14-repeat-ci.log`; `rg 'passed\|desktop-file-validate\|All checks passed' /tmp/mgs14-repeat-ci.log` | Linux 3.9/3.11/3.12: 408 passed, lint/compile/desktop pass; Windows 406 passed, 2 skipped | 0 each |
+
+| `git -c core.whitespace=cr-at-eol diff --check`; `python3 tools/fw.py check` (repeat review) | only authorized review document changed; whitespace clean; `0 error(s), 0 warning(s)` | 0 each |
 
 ## Reproducible temporary verifier scripts
 
