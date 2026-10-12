@@ -4214,11 +4214,11 @@ def _plan_inputs(game_dir, steam_root):
                 digest = os.readlink(path)
             elif path.is_file() and (
                     rel.startswith(MODKIT_DIRNAME + "/") or
-                    name in ("MGSHDFix.settings", "MGSM2Fix.ini", "launcher_sv")):
+                    name in ("MGSHDFix.settings", "MGSM2Fix.ini", "MGSPatriotFix.settings", "launcher_sv")):
                 # Recovery snapshots can include multi-GB audio: stat identity
                 # is sufficient for those; records and config get exact hashes.
                 if name in (MANIFEST_NAME, JOURNAL_NAME, "MGSHDFix.settings",
-                            "MGSM2Fix.ini", "launcher_sv"):
+                            "MGSM2Fix.ini", "MGSPatriotFix.settings", "launcher_sv"):
                     digest = sha256_file(path)
             files.append((rel, stat.st_mode, stat.st_size, stat.st_mtime_ns,
                           stat.st_ctime_ns, stat.st_ino, digest))
@@ -4229,7 +4229,9 @@ def _plan_inputs(game_dir, steam_root):
 
 def _plan_packages(key, components):
     g = GAMES[key]
-    if g.get("kind", "hdfix") == "m2fix":
+    if g.get("kind") == "patriot":
+        packages = [PlanPackage("MGSPatriotFix", PATRIOT_VERSION, PATRIOT_URL, PATRIOT_SHA256)]
+    elif g.get("kind", "hdfix") == "m2fix":
         packages = [PlanPackage("MGSM2Fix", M2FIX_VERSION, M2FIX_URL, M2FIX_SHA256)]
     else:
         packages = [PlanPackage("MGSHDFix", HDFIX_VERSION, HDFIX_URL, HDFIX_SHA256)]
@@ -4268,7 +4270,8 @@ def build_install_plan(found, per_game, audio, expected_inputs=None):
         incompatible = []
         if roles and (roles != expected or len(set(roles)) != len(roles)):
             incompatible.append("Audio roles must be unique and ordered base, HQ ending, then update")
-        if key == "mgs1" and components:
+        validate_game_destination(key, game_dir)
+        if key in ("mgs1", "mgs4") and components:
             incompatible.append("This recipe does not support supplied audio")
         if key == "mgs2" and any(r != "base" for r in roles):
             incompatible.append("MGS2 supports only base audio")
@@ -4315,6 +4318,38 @@ class _PreparationTxn:
         self.actions, self.identities, self.mods = [], [], {}
         self.destinations = []
         live = Path(game.path)
+        if game.key == "mgs4":
+            # The unchanged recipe inspects layout and loader membership, not
+            # their bytes. Represent only those facts in the private game view;
+            # the live snapshot authenticates them before and after preparation.
+            self._prior_added, self._backed_up = set(), set()
+            record = live / MODKIT_DIRNAME / MANIFEST_NAME
+            if record.exists():
+                added, overwritten = _validate_manifest(
+                    _read_record(record), live, live / MODKIT_DIRNAME)
+                self._prior_added = set(added)
+                self._backed_up = {item["path"] for item in overwritten}
+            backups = live / MODKIT_DIRNAME / "backups"
+            for path in backups.rglob("*"):
+                if path.is_file():
+                    rel = path.relative_to(backups).as_posix()
+                    if rel not in set(PATRIOT_PAYLOAD) | {"MGSPatriotFix.settings"}:
+                        raise CorruptManifestError("MGS4 orphan backup is outside reviewed mod files; backups kept")
+                    self._backed_up.add(rel)
+            members = [live / "MGS4/mgs4.exe", live / "Launcher/launcher.exe"]
+            for folder in (live / "MGS4", live / "Launcher"):
+                members.extend(folder / name for name in (
+                    "dinput8.dll", "dxgi.dll", "d3d11.dll", "winmm.dll", "winhttp.dll",
+                    "wininet.dll", "version.dll", "dsound.dll", "d3d9.dll") if (folder / name).exists())
+                members.extend(folder.rglob("MGSPatriotFix.asi"))
+            for path in members:
+                rel = path.relative_to(live).as_posix()
+                source = _safe_game_path(live, rel)
+                if source.is_symlink() or not source.is_file():
+                    raise RuntimeError("MGS4 layout/loader must be a regular file: " + rel)
+                dest = _safe_game_path(self.game_dir, rel)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.touch()
         for path in live.glob("*_savedata_win/*/launcher/launcher_sv"):
             rel = path.relative_to(live).as_posix()
             _safe_game_path(live, rel)
@@ -4371,6 +4406,7 @@ class CurrentRecipeAdapter:
     def recheck(self, plan):
         for game in plan.games:
             live = Path(game.path)
+            validate_game_destination(game.key, live)
             if (live / MODKIT_DIRNAME / JOURNAL_NAME).exists():
                 raise ReplanRequired("Recovery is pending; recover and confirm a fresh plan")
             if _plan_inputs(live, Path(game.steam_root)) != game.inputs:
@@ -4385,7 +4421,7 @@ class CurrentRecipeAdapter:
             if tuple(p for p in game.packages if p.role == "package") != current:
                 raise ReplanRequired("Package definitions changed; confirm a fresh plan")
             # Settings writers remain owned by the existing recipe.
-            if supplied and GAMES[game.key].get("kind") == "m2fix":
+            if supplied and GAMES[game.key].get("kind") in ("m2fix", "patriot"):
                 raise ValueError("Audio is incompatible with this recipe")
 
     def prepare(self, game, workspace, index):
@@ -4398,7 +4434,9 @@ class CurrentRecipeAdapter:
         g, opts = GAMES[game.key], json.loads(game.settings)
         if self.progress:
             self.progress.update(f"{g['short']} — Preparing all selected payloads", 0)
-        if g.get("kind", "hdfix") == "m2fix":
+        if g.get("kind") == "patriot":
+            install_patriot(tx, tmp, opts, self.log)
+        elif g.get("kind", "hdfix") == "m2fix":
             install_m2fix(tx, tmp, opts, self.log)
         else:
             install_hdfix(tx, tmp, self.log)
@@ -4725,7 +4763,6 @@ def _main(log, log_path=None) -> int:
             adapter = CurrentRecipeAdapter(log, prog)
             prepared = prepare_plan(confirmed_plan, adapter, Path(td))
             execute_plan(prepared, adapter, outcomes)
-
 
     try:
         run_with_progress(prog, install_selected)

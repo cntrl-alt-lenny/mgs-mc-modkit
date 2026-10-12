@@ -228,7 +228,7 @@ def test_full_mgs4_journey_and_upfront_visual_choices(tmp_path, patch_download, 
     assert (root / 'mgs4_savedata_win/123/save.dat').exists()
 
 
-def test_mixed_game_failure_keeps_first_committed_result(tmp_path, patch_download, monkeypatch):
+def test_mixed_game_preparation_failure_leaves_every_game_unchanged(tmp_path, patch_download, monkeypatch):
     mgs1 = tmp_path / 'mgs1'
     mgs1.mkdir()
     (mgs1 / 'METAL GEAR SOLID.exe').write_bytes(b'game')
@@ -238,10 +238,10 @@ def test_mixed_game_failure_keeps_first_committed_result(tmp_path, patch_downloa
     ui = FakeUI(menu=['go'], checklist=[['mgs1', 'mgs4']])
     monkeypatch.setattr(install, 'UI', lambda: ui)
     assert install.main() == 1
-    assert (mgs1 / install.MODKIT_DIRNAME / install.MANIFEST_NAME).exists()
+    assert not (mgs1 / install.MODKIT_DIRNAME).exists()
     assert not (mgs4 / install.MODKIT_DIRNAME / install.MANIFEST_NAME).exists()
     error = str(ui.errors)
-    assert 'MGS1: installed and verified' in error and 'MGS4: previous setup restored' in error
+    assert 'MGS1: not started' in error and 'MGS4: not started' in error
     assert (mgs4 / 'MGS4/winmm.dll').read_bytes() == b'manual'
 
 

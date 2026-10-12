@@ -115,6 +115,7 @@ def patch_download(monkeypatch, mod_zips):
     authenticates cached payloads too. Production pins remain untouched.
     """
     calls = []
+    monkeypatch.setattr(install, "PATRIOT_SHA256", install.sha256_file(mod_zips["MGSPatriotFix"]))
     monkeypatch.setattr(install, "HDFIX_SHA256", install.sha256_file(mod_zips["MGSHDFix"]))
     monkeypatch.setattr(install, "M2FIX_SHA256", install.sha256_file(mod_zips["MGSM2Fix"]))
     for key, mod in (("mgs2", "MGS2-Community-Bugfix"), ("mgs3", "MGS3-Community-Bugfix")):
