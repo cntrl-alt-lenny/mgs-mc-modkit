@@ -1,3 +1,210 @@
+# 14-mgs4-patriotfix: manifest correction independent re-review
+
+Reviewed **d9f13f4a02c3d894689bc21eac9911d619344c2c** on 12 October 2026 under Brain dispatch **62602c60845621972f032b9a9b0f8453a9e8b5d9**. Rules/card/state/brief/disposition read; origin fetched; isolated seat; correction diff inspected before Worker summary.
+
+Verdict: **prior manifest blocker resolved; no new blocking findings**. This supersedes the historical verdict below. Brain determines acceptance; nothing accepted, merged, tagged or published. Historical review/evidence bytes follow unchanged; older verdicts remain in Git.
+
+Native exports, GUI, ASI initialization, licensed Windows/Deck boots/gameplay, real audio and real-device restoration: **NOT RUN**. Synthetic/CI evidence cannot establish native compatibility. Source capture remains bounded, excluding build projects/resources/dependencies/binaries.
+
+| Goal / constructor assumption | Independent judgment |
+|:--|:--|
+| Malformed settings and mods | Met: 128 cases, schemas 1/2, eight shapes per mapping including null/scalars/empty/malformed/convertible pair lists; each MGS1–4 last. Real collection/preparation refuses before any live constructor; complete selected files/directories/records/backups unchanged. No discarded/reset settings. |
+| Valid/missing settings | Met offline: four schema-1/2 present/missing lifecycle variants; preparation non-mutating, successful replay/repair/removal, custom/hidden values, custom mods, saves, oldest backups and unowned ASI preserved; explicit backup-byte comparison across repair. Absent settings retains constructor `{}` default. |
+| Record object/game/added/overwritten/paths | Shared `_read_record` and `_validate_manifest` validate object/list/path/ownership; game identity and required lists checked in preflight and constructor. List/set/path comprehensions receive validated values. |
+| Mods/settings conversions | Preflight requires dictionaries, defaults absent fields to `{}`; constructor copies mappings. Values inside dictionaries remain unrestricted structurally. |
+| Recovery/directories/orphans | Planning/adapter rejects pending journal; preparation validates root/staging/rollback/backups, linked backups and destination ancestors. MGS4 private recipe restricts orphan ownership; other recipes retain generic adoption. Permission/disk/concurrent races are not claimed preflight omissions. |
+| Schema/transaction_id/files | No further constructor conversion; shared manifest compatibility retained. Transaction ID participates in recovery, which pending journals prevent during preparation/replay. |
+| Earlier fixes / production scope | Met: entire installer AST except `_plan_validate_record` unchanged versus `03c5890`; engine/embed/audio/capture/history byte-preserved. Directory/replay/legacy-removal/header/audio probes pass. |
+| Shortcuts / CI combination | Met: both unpublished v2.3.0 pins independently match SHA `3f2b0049358d31679aa5db63d630e74383be771957cf6d3edce3e32e64a39e75`; CMD CRLF, desktop/Python LF. Actual CI checkout `ab4cbe666af085f1ad39ac62fe46402f236055d4` has parents `bd8546524886614a04f5629b1fbbf1f741b73163` (merged PR #21) and literal candidate; installer/module/shortcut/embed/capture bytes equal candidate. |
+| Finding: NOTE, historical audit predicate | `docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py:33` compares original `c2e7ea4` review bytes; later historical reviews intentionally differ. Unmodified historical script exits 1 at that predicate, not production. Original bytes evaluated from their stated Git commit; independent current-history audit passes. |
+
+| Exact command / inspection at literal candidate before review edit | Actual output / exit |
+|:--|:--|
+| `python3 tools/fw.py status`; `git fetch origin` | All project checks pass; clean detached candidate; fetch silent / 0 each |
+| `python3 -m pytest tests/ -q` | `439 passed in 29.77s` / 0 |
+| `python3 -m ruff check .` | `All checks passed!` / 0 |
+| `python3 -m py_compile tools/fw.py install.py install_plan.py tools/embed_install_plan.py tools/capture_patriot_schema.py` | Silent / 0 |
+| `python3 tools/embed_install_plan.py --check`; `python3 tools/fw.py check` | `OK: standalone plan matches authoritative source`; `0 error(s), 0 warning(s)` / 0 each |
+| `python3 --version`; `command -v desktop-file-validate` | Python 3.9.6 / 0; validator unavailable / 1; actual Linux CI validator succeeds |
+| `python3 -m pytest tests/test_install_plan.py -q -k 'standalone or embedding or sync_check'` | `3 passed, 26 deselected in 0.55s` / 0 |
+| `python3 docs/batches/evidence/14-manifest-preflight/audit.py` | Only validator changes; constructor/recovery/removal/recipes/writers unchanged; engine/embed/audio/capture/review preserved; original review ancestor / 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-preflight-verifier/records.py` | `PASS 128 schema-1/2 late settings/mods refusals; real collection/preparation; zero live constructors; all files/directories/records/backups unchanged` / 0 |
+| `python3 /tmp/mgs14-preflight-verifier/legacy.py .` | Four schema/settings combinations PASS, all-game lifecycle/custom/hidden/save/oldest/unowned checks; backup-byte comparison added / 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/probes.py` | `PASS 11 independent failure/identity/outcome probes`; directory/ancestor refusal, cache/copy mutation, private extraction and cancellation preservation / 0 |
+| `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/audio.py`; `PYTHONPATH=.:tests python3 /tmp/mgs14-final-verifier/space.py` | Confident/uncertain replacement refuses; shared-game/separate-cache thresholds pass (simulated devices) / 0 each |
+| `python3 docs/batches/evidence/14-mgs4-patriotfix-correction/source-audit.py /tmp/mgs14-repeat-source` | Live tag `c8e76fe99c66a5cee6b112fbd80cbd8eb7b522de`; 61 inputs/blobs/CRLF/hashes/fixture/header delta PASS / 0 |
+| `python3 docs/batches/evidence/14-mgs4-plan-integration/actual-archive.py /tmp/mgs14-repeat.zip` | Official ZIP SHA `4f8fa5dd493c9d5d023fd4dfdcad39a2259b2aedf02685840751c263f497a6b1`; zero-write four-game preparation; authenticated replay/repair/removal/settings/saves/oldest/unowned PASS / 0 |
+| `python3 /tmp/mgs14-final-verifier/framework.py` | Six pinned framework copies byte-equal source and fingerprints / 0 |
+| `python3 docs/batches/evidence/14-mgs4-plan-integration/verify-integration.py` | Original recipe and engine assertions PASS; original report-byte predicate fails / 1; historical assertion rerun with original report from Git PASS / 0 |
+| `python3 /tmp/mgs14-preflight-verifier/identity.py` | Entire AST except validator unchanged; historical bytes preserved; shortcuts/3.9/CI merge-tree equality and PR21 parent assertions PASS / 0 |
+| `python3 tools/check_pins.py` | Two advisory updates (HDFix 4.1.2, M2Fix v3.7.3); other pins current / 1; no upgrade |
+| `gh pr view 19 --json headRefOid,headRefName,baseRefName,url,statusCheckRollup`; `gh run view 38232687896 --json headSha,conclusion,jobs` | Exact literal head; four SUCCESS jobs / 0 each |
+| `gh run view 38232687896 --log > /tmp/mgs14-preflight-ci.log`; `git fetch origin refs/pull/19/merge` | Actual checkout `ab4cbe6`; Linux 3.9/3.11/3.12 each 482 passed, Windows 480 passed/2 existing skips; lint/compile/desktop validation pass / 0 each |
+
+| `python3 tools/refresh_checksums.py` | `All pinned checksums match the live release assets.` All five live archive SHA-256s equal unchanged pins / 0; subsequent advisory pin check exits 1 as recorded above |
+
+| Post-edit `python3 tools/fw.py check`; `python3 tools/fw.py status`; `git -c core.whitespace=cr-at-eol diff --check`; `git diff --stat` | `0 error(s), 0 warning(s)`; all project checks pass (unrelated linked Brain seat dirty, preserved); whitespace silent; only authorized review changed / 0 each |
+
+## Reproducible correction probes
+
+### records.py
+
+```python
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from pytest import MonkeyPatch
+import install
+from conftest import mod_zips, patch_download
+from test_mgs4_plan import combined, prepare
+
+def full(found):
+    return {key: [(p.relative_to(root).as_posix(), 'dir' if p.is_dir() else 'file', None if p.is_dir() else p.read_bytes()) for p in sorted(root.rglob('*'))] for key,(root,_) in found.items()}
+
+count=0
+for schema in (1,2):
+ for key in ('mgs1','mgs2','mgs3','mgs4'):
+  for field in ('settings','mods'):
+   for value in (None,42,False,'invalid',[],['invalid'],[['custom','value']],[[1,2,3]]):
+    with TemporaryDirectory() as folder, MonkeyPatch.context() as mp:
+     base=Path(folder)
+     mp.setattr(install,'app_data_dir',lambda:base/'state')
+     patch_download.__wrapped__(mp,mod_zips.__wrapped__(base))
+     found,options=combined(base); found[key]=found.pop(key)
+     root=found[key][0]; record=root/install.MODKIT_DIRNAME/install.MANIFEST_NAME
+     record.parent.mkdir()
+     body=dict(schema=schema,game=key,added=[],overwritten=[],mods={},settings={}); body[field]=value
+     record.write_text(json.dumps(body))
+     backup=record.parent/'backups'/('MGSPatriotFix.settings' if key=='mgs4' else 'original.bin')
+     backup.parent.mkdir(); backup.write_bytes(b'oldest backup')
+     (record.parent/'empty').mkdir()
+     before=full(found)
+     for k,location in found.items(): options[k]=install.options_for_game(k,location,options[k],lambda _:None)
+     assert full(found)==before
+     opened=[]
+     def forbid(*a,**kw):
+      opened.append(a); raise AssertionError('live transaction opened')
+     mp.setattr(install,'InstallTxn',forbid)
+     try: prepare(base,found,options)
+     except install.CorruptManifestError: pass
+     else: raise AssertionError((schema,key,field,value))
+     assert not opened and full(found)==before
+     count+=1
+print('PASS',count,'schema-1/2 late settings/mods refusals; real collection/preparation; zero live constructors; all files/directories/records/backups unchanged')
+```
+
+### legacy.py
+
+```python
+"""Independent valid old/new records through full mixed-game repair/removal."""
+import json
+from pathlib import Path
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
+
+
+def main():
+    seat = Path(sys.argv[1]).resolve()
+    sys.path[:0] = [str(seat), str(seat / 'tests')]
+    import install
+    from pytest import MonkeyPatch
+    from conftest import mod_zips, patch_download
+    from test_mgs4_plan import combined, prepare
+    from test_install_plan import snapshot
+    print('Reviewed SHA:', subprocess.check_output(
+        ['git', '-C', str(seat), 'rev-parse', 'HEAD'], text=True).strip())
+    for schema in (1, 2):
+        for missing in (False, True):
+            with TemporaryDirectory() as folder, MonkeyPatch.context() as patch:
+                base = Path(folder)
+                patch.setattr(install, 'app_data_dir', lambda: base / 'app-state')
+                patch_download.__wrapped__(patch, mod_zips.__wrapped__(base))
+                found, options = combined(base)
+                game = found['mgs4'][0]
+                settings = game / 'MGSPatriotFix.settings'
+                parser = install.patriot_defaults()
+                parser['Mouse Settings']['Mouse Vertical Sensitivity'] = '2.750000'
+                parser['Launcher and Splashscreens']['Internal Upscaling (PW)'] = '"4K"'
+                settings.write_text(install.render_ini(parser))
+                (game / 'MGSM2Fix.asi').write_bytes(b'unowned original')
+                before = snapshot(found)
+                for key, location in found.items():
+                    options[key] = install.options_for_game(key, location, options[key], lambda _: None)
+                adapter, prepared = prepare(base, found, options)
+                assert snapshot(found) == before
+                install.execute_plan(prepared, adapter, dict.fromkeys(found, 'not started'))
+                for directory, _ in found.values():
+                    record = directory / install.MODKIT_DIRNAME / install.MANIFEST_NAME
+                    body = json.loads(record.read_text())
+                    body['schema'] = schema
+                    if schema == 1:
+                        body.pop('files', None)
+                    if missing:
+                        body.pop('settings', None)
+                    else:
+                        body['settings']['owner-custom-metadata'] = {'keep-structurally-valid': True}
+                    body['mods']['owner-extra-mod'] = 'owner-version'
+                    record.write_text(json.dumps(body))
+                for key, location in found.items():
+                    options[key] = install.options_for_game(key, location, options[key], lambda _: None)
+                before_repair = snapshot(found)
+                oldest = {k: {p.relative_to(directory).as_posix(): p.read_bytes() for p in (directory / install.MODKIT_DIRNAME / 'backups').rglob('*') if p.is_file()} for k, (directory, _) in found.items()}
+                adapter, prepared = prepare(base, found, options, 'repair')
+                assert snapshot(found) == before_repair
+                install.execute_plan(prepared, adapter, dict.fromkeys(found, 'not started'))
+                assert oldest == {k: {p.relative_to(directory).as_posix(): p.read_bytes() for p in (directory / install.MODKIT_DIRNAME / 'backups').rglob('*') if p.is_file()} for k, (directory, _) in found.items()}
+                values = install.validate_patriot_settings(settings.read_text())
+                assert values['Mouse Settings']['Mouse Vertical Sensitivity'] == '2.750000'
+                assert values['Launcher and Splashscreens']['Internal Upscaling (PW)'] == '"4K"'
+                for directory, _ in found.values():
+                    body = json.loads((directory / install.MODKIT_DIRNAME / install.MANIFEST_NAME).read_text())
+                    assert body['mods']['owner-extra-mod'] == 'owner-version'
+                    notes, ok = install.uninstall_game(directory, lambda _: None)
+                    assert ok, notes
+                assert snapshot(found) == before
+                print('PASS schema', schema, 'settings missing', missing,
+                      'all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved')
+    print('All fixtures disposable; native compatibility NOT RUN')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+### identity.py
+
+```python
+import ast, hashlib, re, subprocess
+from pathlib import Path
+root=Path.cwd(); old='03c58903d386c1c9bc0c9671e8c4b60c69ae30b6'; candidate='d9f13f4a02c3d894689bc21eac9911d619344c2c'; merge='ab4cbe666af085f1ad39ac62fe46402f236055d4'
+def blob(ref,name):return subprocess.check_output(['git','show',ref+':'+name])
+a=ast.parse(blob(old,'install.py')); b=ast.parse((root/'install.py').read_bytes())
+for tree in (a,b):tree.body=[n for n in tree.body if not isinstance(n,ast.FunctionDef) or n.name!='_plan_validate_record']
+assert ast.dump(a)==ast.dump(b)
+print('PASS entire installer AST except _plan_validate_record unchanged: constants/constructor/recipes/removal/audio/replay/directory fixes')
+changed=subprocess.check_output(['git','diff','--name-only',old,candidate],text=True).splitlines()
+assert all(p in ('install.py','Install-MGS-Mods.cmd','Install-MGS-Mods.desktop','docs/batches/14-mgs4-patriotfix.md','tests/test_mgs4_plan.py') or p.startswith('docs/batches/evidence/14-manifest-preflight/') for p in changed)
+assert blob(old,'docs/batches/14-mgs4-patriotfix-review.md')==(root/'docs/batches/14-mgs4-patriotfix-review.md').read_bytes()
+print('PASS all historical evidence/review bytes preserved')
+digest=hashlib.sha256((root/'install.py').read_bytes()).hexdigest()
+for name in ('Install-MGS-Mods.cmd','Install-MGS-Mods.desktop'):
+ data=(root/name).read_bytes(); assert re.search(rb'TAG=v2\.3\.0',data); assert re.search(rb'SHA='+digest.encode(),data)
+ assert b'\n' not in data.replace(b'\r\n',b'') if name.endswith('.cmd') else b'\r' not in data
+for name in ('install.py','install_plan.py','tools/embed_install_plan.py','tools/capture_patriot_schema.py'):
+ data=(root/name).read_bytes(); assert b'\r' not in data; ast.parse(data,feature_version=(3,9))
+print('PASS both v2.3.0 shortcuts SHA',digest,'CMD CRLF; desktop/Python LF; Python 3.9 grammar')
+for name in ('install.py','install_plan.py','Install-MGS-Mods.cmd','Install-MGS-Mods.desktop','tools/embed_install_plan.py','tools/capture_patriot_schema.py'):
+ assert blob(merge,name)==blob(candidate,name),name
+print('PASS actual CI merge tree installer/module/shortcut/embed/capture bytes equal literal candidate')
+parents=subprocess.check_output(['git','show','-s','--format=%P',merge],text=True).split(); assert candidate in parents
+assert subprocess.run(['git','merge-base','--is-ancestor','bd8546524886614a04f5629b1fbbf1f741b73163',merge]).returncode==0
+assert blob(merge,'tools/capture_settings_schema.py')==blob('bd8546524886614a04f5629b1fbbf1f741b73163','tools/capture_settings_schema.py')
+print('PASS CI merge includes main bd85465 PR21 tooling; parents',*parents)
+```
+
+## Historical review and evidence (superseded verdict)
+
 # 14-mgs4-patriotfix: combined independent Verifier review
 
 Reviewed PR #19 at literal **868bebf712a7c11edcecd8b3afc636291a379cc4** on 12 October 2026. Dispatch: Brain `675ba20ceaf416163dc2765ba0b7d2c8f5ad5fb7`. Started with framework status, read rules/card/state and complete dispatch/briefs/dispositions, fetched origin, used an isolated detached seat, and inspected the full production diff before the Worker summary. Original review remains in Git at `38ef1b6a679411d48b784a8142aed797ae170117`; all historical evidence files are untouched.
