@@ -44,7 +44,7 @@ during execution, cancellation/rollback/outcomes, old-record repair/removal,
 custom values and no executor interaction. Fresh official source independently
 reproduces the unchanged fixture. The authenticated official PatriotFix ZIP
 passes mixed preparation/replay/repair/removal with oldest settings, saves and
-unowned legacy ASI preserved. Exact-delivery Linux/Windows CI is linked from PR #19.
+unowned legacy ASI preserved. [Live checks](evidence/14-mgs4-plan-integration/live-checks.txt) authenticate all five pinned archive checksums. Exact-delivery Linux/Windows CI is linked from PR #19.
 
 ## Not checked
 
