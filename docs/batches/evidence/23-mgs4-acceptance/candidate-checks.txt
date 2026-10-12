@@ -40,4 +40,3 @@ PASS schema 2 settings missing False all-game install/repair/remove; custom/hidd
 PASS schema 2 settings missing True all-game install/repair/remove; custom/hidden values, saves, oldest originals and unowned ASI preserved
 All fixtures disposable; native compatibility NOT RUN
 exit 0
-
