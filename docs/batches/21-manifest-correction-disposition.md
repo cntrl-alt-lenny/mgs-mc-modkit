@@ -16,6 +16,8 @@ Inspected the constructor versus non-mutating preflight and Worker assumption au
 
 Exact-delivery CI run **38232687896** passes all four jobs. GitHub actually checked merge commit `ab4cbe666af085f1ad39ac62fe46402f236055d4`: Linux 3.9/3.11/3.12 each **482 passed**, Windows **480 passed, 2 existing skips**; lint/compile/desktop validation pass. This merge tree includes main's PR #21 tooling, preserves the corrected installer/shortcut/module bytes, and descends from current main.
 
+Handoff at `4ae55cc`: 283 tests, Ruff, compilation, framework/shortcut/line-ending/3.9 checks pass; protected production/framework files equal main. Actual outputs are in `handoff-checks.txt`.
+
 ## Not checked
 
 Independent Verifier re-review and owner merge approval remain pending. Native exports, GUI/ASI initialization, licensed Windows/Deck boots/gameplay, real audio and real-device repair/removal remain NOT RUN. No shipping upgrades or publication authorized.
