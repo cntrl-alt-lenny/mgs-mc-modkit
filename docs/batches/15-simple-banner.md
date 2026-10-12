@@ -32,6 +32,8 @@ records the checked commit; only documentation/artwork differs from main.
 After the independent review, refreshed status to corrections pending and the
 banner to a stable in-development label; rerendered both preview sizes. After Brain reproduced the delivered corrections, refreshed README status to launcher integration and final review pending; artwork is unchanged. After the combined engine/MGS4 delivery, updated status to final independent review pending. Status refresh at `ae062b8` passes framework/whitespace/production equality; actual commands are in [status-refresh.txt](evidence/15-simple-banner/status-refresh.txt).
 
+Final-review status refresh at `f61d58e`: framework/whitespace/production equality pass; [actual commands](evidence/15-simple-banner/integration-status-refresh.txt).
+
 ## Not checked
 
 Correction verification, native exports, licensed Windows/Deck initialization,
